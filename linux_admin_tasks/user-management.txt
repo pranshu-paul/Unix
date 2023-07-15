@@ -1,0 +1,76 @@
+Useful commands -- useradd, usermod, groupadd, groupmod, groupdel, authconfig, passwd, chage, visudo, su, sudo, userdel, groupdel.
+Useful configuration files -- /etc/login.defs, /etc/default/useradd, /etc/shells, /etc/pam.d/su, /etc/sudoers /etc/skel /etc/passwd /etc/shadow /etc/group .
+
+Users in the "wheel" group can do all the adminitrative tasks by using the "sudo" command.
+
+Add ".hushlogin" file in a user's home directory to remove all the banners while logging in.
+
+A new banner can be added in the /etc/motd file.
+
+Add a hidden file in the /etc/skel directory to use as the default files present in a new user account.
+
+# Add the following line or uncomment in the file "/etc/pam.d/su" to avoid the users using the "su" command who are not in the "wheel" group.
+auth            requisite       pam_wheel.so use_uid
+
+# To add a user into the "wheel" group.
+usermod -aG wheel USER_NAME
+
+# To add a user in the "adm group to use the "journalctl" command.
+usermod -aG adm USER_NAME
+
+
+# Sudoers file configuration.
+# ALWAYS EDIT THE SUDOERS FILE CAREFULLY.
+/etc/sudoers
+
+export EDITOR=vim
+
+# If editing the "/etc/sudoers" file directly.
+# Use the below command to check whether the syntax is correct or not.
+# ALWAYS USE THE BELOW COMMAND FIRST TO VERIFY THE SYNTAX IN THE SUDOERS FILE.
+visudo -c
+visudo -c -f <path_to_the_sudoers_file>
+
+# Format
+# user machine.ip=(from_which_users) [NOPASSWD:]commands
+# % - indicates group names.
+
+This is the directory "/etc/sudoers.d" where custom files can be added.
+Always add custom configurations in the directory "/etc/sudoers.d"
+
+# %group host=(users) [NOPASSWD:]commands
+%pranshu ALL=(ALL) NOPASSWD: /usr/bin/yum, NOPASSWD: /usr/sbin/aureport, PASSWD: /usr/bin/systemctl
+
+# Instead of giving the complete access to the commands, only few options can also be provided.
+%pranshu ALL=(ALL) NOPASSWD: /usr/bin/yum info, NOPASSWD: /usr/sbin/aureport -a, PASSWD: /usr/bin/systemctl reboot
+
+# USER MACHINE NOPASSWORD COMMANDS.
+oracle ALL = NOPASSWD: /bin/systemctl start, /bin/systemctl restart vncserver
+
+# To allow all the wheel group users to run all commands without password.
+%wheel ALL=(ALL)       NOPASSWD: ALL
+
+
+
+
+
+# SAMPLE CONFIGURATION FILES
+****************************
+
+/etc/passwd
+/etc/passwd
+username:password:UID:GID:comment:home-directory:login-shell
+
+x -- means password is encrypted
+
+root:x:0:0:root:/root:/bin/bash
+
+
+/etc/shadow
+/etc/shadow
+
+username:password:last-password-date:min-password-expiry:max-password-expiry:no.-of-day-warn-before-password-expiry
+
+root:$6$jKZME4R4$NnQ4lmr/7f26AzYmCeaVEamV05Ri2le3HObxcYCVHSjRsg4yBM3eyJcaU/et9pFzT7.lQmXIBxJ790LKA.OiB.:18889:0:99999:7:::
+
+password -- $6$ = method of encryption = sha512sum after that is password hash

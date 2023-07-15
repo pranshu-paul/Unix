@@ -1,0 +1,34 @@
+-- Installting MySQL from RPMs.
+mkdir mysql
+
+wget <link_of_the_mysql_bundle>.tar
+
+tar -xvf <MySQL>.tar
+
+rpm -ivh *.rpm
+
+rpm -ivh *.rpm --nodeps --force (In case errors occur during the installation)
+
+systemctl enable --now mysqld
+
+grep password /var/log/mysqld.log
+
+mysql -u root -p
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql#459';
+
+FLUSH PRIVILEGES;
+
+-- Installting MySQL from a compressed tar.
+
+tar -xvzf <mysql>.tar.gz
+
+export the bin of mysql in .bash_profile
+
+mysqld --initialize --datadir=./data
+
+mysqld --datadir=./data
+
+alter user 'root'@'localhost' identified by 'Mysql#459';
+
+flush privileges;

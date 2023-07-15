@@ -1,0 +1,66 @@
+create table test_tb as select host, user, account_locked from user;
+
+mysqldump -u root -p --information_schema > information_schema.sql
+
+mysqldump -u root -p testrst > test.sql
+
+mysql -u root –p testrst < test.sql
+
+use <database_name>;
+
+show create table <table_name>; # to check which constraints are applied on a table's columns
+
+show tables;
+
+select 9/2, now();
+
+create user 'pranshu'@'144.24.110.48' identified by 'Mysql@3456';
+
+grant create, alter, drop, insert, update, delete, select, references, reload on *.* to 'pranshu'@'localhost' with grant option;
+
+grant connect on *.* to 'paul'@'localhost' with grant option;
+
+grant all privileges on *.* to 'paul'@'144.24.110.48' with grant option;
+
+show grants for 'pranshu'@'144.24.110.48';
+
+grant all on database_name.* to 'pranshu'@'144.24.110.48'; identified by 'mysql@345';
+
+create user 'pranshu'@'%' identified by 'Mysql@3456';
+grant all privileges on *.* to 'pranshu'@'%' with grant option;
+flush privileges;
+
+
+
+mkdir mysql
+
+# download MySQL
+wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.33-1.el8.x86_64.rpm-bundle.tar
+
+tar -xvf <MySQL>.tar
+
+rpm -ivh *.rpm --nodeps --force (In case errors occur during the installation)
+
+systemctl enable --now mysqld
+
+grep password /var/log/mysqld.log
+
+mysql -u root -p
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql#459'; # This will be the root user's password.
+FLUSH PRIVILEGES;
+
+
+
+# Mysql general commands.
+show databases;
+
+use <database_name>;
+
+show tables;
+
+
+
+# To restore the hr.sql
+create database hr;
+mysql -u root –p hr < hr.sql

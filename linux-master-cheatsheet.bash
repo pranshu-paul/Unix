@@ -474,7 +474,7 @@ firewall-cmd --permanent --set-target=DROP
 firewall-cmd --add-port=<port>/<protocol>
 
 # To make changes persistant.
-# This option doesn't let's you to add port immediatley.
+# This option doesn't let you to add port immediatley.
 firewall-cmd --add-port=<port>/<protocol> --permanent
 
 # Use this option after [--permanent] option.

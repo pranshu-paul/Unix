@@ -52,7 +52,7 @@ kill -9 $(ps -ef | grep FND | grep $TWO_TASK | grep $USER | grep -v grep | awk '
 
 
 grep -n -e 'ORA-' -e 'RMAN-' rman.log # -- Searches for the errors in the RMAN restore or backup log.
-grep -n 'ERRORCODE = [0,1,2]' <any_ebs_log> # -- Searches for the errors in EBS related logs.
+grep -n 'ERRORCODE = [1,2]' <any_ebs_log> # -- Searches for the errors in EBS related logs.
 cat RMAN.log | wc -l
 grep -n 'ORA-' ERPPROD_db_11082022_003001.out # Shows on which line number the error is.
 grep 'ORA-' alert_$ORACLE_SID.log # -- Searches for the errors in the alert log.

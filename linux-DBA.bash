@@ -1,4 +1,4 @@
-# Last edited: 7/15/2023
+# Last edited: 7/17/2023
 
 # ONLY FOR ORACLE DATABASE WITH EBS TECHNOLOGY STACK.
 # Standard user COMMANDS; Not requires any root privilege or wheel group membership.
@@ -122,6 +122,7 @@ nc -zv miditech0092.miditech.co.in 8040
 curl -v telnet://www.oswebadmin.com:443
 curl ifconfig.co # -- Loads the server's public IP.
 curl -oL <any_file_name> <the_url> # -- To download a file.
+curl -I <url>
 
 curl cheat.sh/<any_linux_or_unix_command> # -- To get the structure of commands for the syntax.
 

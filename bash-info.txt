@@ -28,7 +28,7 @@ apt -y install bash-completion
 	-- multiline comment
 '
 
-history -c # Clears the complee history.
+history -c # Clears the complete history.
 
 history -d <offset>
 

@@ -3,6 +3,8 @@ Useful configuration files -- /etc/login.defs, /etc/default/useradd, /etc/shells
 
 Users in the "wheel" group can do all the adminitrative tasks by using the "sudo" command.
 
+useradd -D # SHows the default new user configuration
+
 Add ".hushlogin" file in a user's home directory to remove all the banners while logging in.
 
 A new banner can be added in the /etc/motd file.
@@ -15,7 +17,7 @@ auth            requisite       pam_wheel.so use_uid
 # To add a user into the "wheel" group.
 usermod -aG wheel USER_NAME
 
-# To add a user in the "adm group to use the "journalctl" command.
+# To add a user in the "adm" group to use the "journalctl" command.
 usermod -aG adm USER_NAME
 
 

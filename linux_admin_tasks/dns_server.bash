@@ -1,5 +1,10 @@
 Creating a DNS server.
 
+# We can add multiple server entries in the zone files.
+
+# Download the packages.
+dnf -y install bind bind-utils
+
 # Run the below commands to change the settings.
 sed -i '11s/^listen-on/#listen-on/' /etc/named.conf
 sed -n '11p' /etc/named.conf
@@ -15,9 +20,9 @@ include "/etc/named/forward_custom.conf";
 include "/etc/named/reverse_custom.conf";
 
 # Create a custom forward file "/etc/named/forward_custom.conf"
-zone "oswebadmin.com" IN {
+zone "pauldb.net" IN {
      type master;
-     file "forward.oswebadmin.com";
+     file "forward.pauldb.net";
      allow-update { none; };
      allow-query { any; };
 };
@@ -25,17 +30,17 @@ zone "oswebadmin.com" IN {
 # Create a custom reverse file "/etc/named/reverse_custom.conf"
 zone "100.168.192.in-addr.arpa" IN {
      type master;
-     file "reverse.oswebadmin.com";
+     file "reverse.pauldb.net";
      allow-update { none; };
      allow-query { any; };
 };
 
 
 # Make a forword zone file.
-vim /var/named/forward.oswebadmin.com
+vim /var/named/forward.pauldb.net
 
 $TTL 1D
-@                IN     SOA    www.oswebadmin.com.            root.oswebadmin.com. (
+@                IN     SOA    srv01.pauldb.net.            root.pauldb.net. (
                                                             2014051001  ; serial
                                                             3600        ; refresh
                                                             1800        ; retry
@@ -45,19 +50,19 @@ $TTL 1D
 
 ; Name servers
 
-@                 IN     NS    www.oswebadmin.com.
-@                 IN     PTR   root.oswebadmin.com.
+@                 IN     NS    srv01.pauldb.net.
+@                 IN     PTR   root.pauldb.net.
 
 ; Hostname to IP resolution
 
-www               IN     A     192.168.100.3
-100               IN     PTR   www.oswebadmin.com.
+srv01               IN     A     192.168.100.6
+6               IN     PTR   srv01.pauldb.net.
 
 # Make a reverse zone file.
-vim /var/named/reverse.oswebadmin.com
+vim /var/named/reverse.pauldb.net
 
 $TTL 1D
-@                IN     SOA    www.oswebadmin.com.     	root.oswebadmin.com. (
+@                IN     SOA    srv01.pauldb.net.     		root.pauldb.net. (
                                                             2014051001  ; serial
                                                             3600        ; refresh
                                                             1800        ; retry
@@ -67,18 +72,18 @@ $TTL 1D
 
 ; Name servers
 
-@                 IN     NS    www.oswebadmin.com.
-@                 IN     PTR   root.oswebadmin.com.
+@                 IN     NS    srv01.pauldb.net.
+@                 IN     PTR   root.pauldb.net.
 
 ; Hostname to IP resolution
 
-www               IN     A     192.168.100.3
-100               IN     PTR   www.oswebadmin.com.
+srv01               IN     A     192.168.100.6
+6               IN     PTR   srv01.pauldb.net.
 
 # Run the below commands to check the configurations.
 named-checkconf -z
-named-checkzone oswebadmin.com /var/named/forward.oswebadmin.com
-named-checkzone 192.168.100.3 /var/named/reverse.oswebadmin.com
+named-checkzone pauldb.net /var/named/forward.pauldb.net
+named-checkzone 192.168.100.6 /var/named/reverse.pauldb.net
 
 systemctl restart named
 
@@ -87,9 +92,17 @@ systemctl restart named
 dns=none
 
 [ipv4]
-dns=192.168.100.3;
+dns=192.168.100.6;
 
 # Add the below line as the First name server in the file "/etc/resolv.conf"
-nameserver 192.168.100.3
+nameserver 192.168.100.6
 
 firewall-cmd --add-port=53/udp --permanent
+firewall-cmd --reload
+
+# If creating two nodes
+# Add the DNS entry using "nmtui"
+
+systemd-resolve --flush-caches
+
+

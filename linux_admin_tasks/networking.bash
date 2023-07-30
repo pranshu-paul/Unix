@@ -81,6 +81,28 @@ nmcli con down ens224 && nmcli con up ens224
 # To restart a connection.
 nmcli con down ens3 && nmcli con up ens3
 
+# To create a subnet.
+nmcli connection add con-name <any_subnet_name> ifname <interface_name> type ethernet ip4 <ip_address>/<cidr> gw4 <gateway>
+
+nmcli connection add con-name test_subnet \
+ifname enp0s9 \
+type ethernet \
+ip4 192.168.101.1/27 \
+gw4 192.168.101.1 \
+autoconnect yes \
+ipv4.never-default yes
+
+
+# Create a new proxy connection
+nmcli connection add type socks con-name "My SOCKS Proxy" ifname "*" ipv4.method auto ipv6.method auto
+
+# Set the SOCKS proxy address and port
+nmcli connection modify "My SOCKS Proxy" ipv4.proxy 127.0.0.1:1080 ipv6.proxy 127.0.0.1:1080
+
+# Activate the SOCKS proxy connection
+nmcli connection up "My SOCKS Proxy"
+
+
 # To list on which ports the system is listening. -- l listening, n output in numbers, t TCP protocol, p PID.
 # ss - shows system sockets.
 # The below commands runs better with the root user.

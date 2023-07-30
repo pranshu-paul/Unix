@@ -475,6 +475,7 @@ firewall-cmd --add-port=<port>/<protocol>
 
 # To make changes persistant.
 # This option doesn't let you to add port immediatley.
+# The below option is an example of stateless firewall.
 firewall-cmd --add-port=<port>/<protocol> --permanent
 
 # Use this option after [--permanent] option.
@@ -1501,10 +1502,11 @@ ss -nHtu | awk '{print $6}'
 
 # To install stat.
 yum -y install coreutils
-Trace system calls.
+
 
 # To install strace.
 yum -y install strace
+Trace system calls.
 
 # To install subscription-manager.
 yum -y install subscription-manager
@@ -1580,7 +1582,9 @@ systemctl cat sshd
 systemctl edit SERVICE|SOCKET
 
 # To list failed services.
-systemctl list-units --state failed --type service# Package for tail is "coreutils".# To install tar.													c -- create
+systemctl list-units --state failed --type service
+# Package for tail is "coreutils".# To install tar.													
+																	c -- create
 yum -y install tar													v -- verbose
 																	z -- gzip
 																	f -- use archive file

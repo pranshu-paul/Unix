@@ -18,6 +18,8 @@ yum install xterm --downloaddir=/root/xterm # To download package only in provid
 
 yum provides <command>
 
+yum history
+
 
 ##############################
 RPM

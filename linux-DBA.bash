@@ -1,4 +1,4 @@
-# Last edited: 7/17/2023
+# Last edited: 7/28/2023
 
 # ONLY FOR ORACLE DATABASE WITH EBS TECHNOLOGY STACK.
 # Standard user COMMANDS; Not requires any root privilege or wheel group membership.
@@ -119,10 +119,12 @@ ss -lntp | grep <port>
 nc -zv <sub_domain>.<domain>.<tld> <port>
 nc -zv google.com 443
 nc -zv miditech0092.miditech.co.in 8040
-curl -v telnet://www.oswebadmin.com:443
+curl -v telnet://<ip_address>:1521
 curl ifconfig.co # -- Loads the server's public IP.
 curl -oL <any_file_name> <the_url> # -- To download a file.
 curl -I <url>
+curl --proxy socks5://127.0.0.1:1080 http://example.com
+
 
 curl cheat.sh/<any_linux_or_unix_command> # -- To get the structure of commands for the syntax.
 
@@ -130,6 +132,9 @@ curl cheat.sh/<any_linux_or_unix_command> # -- To get the structure of commands 
 dig <domain_name> # Package = bind-utils
 dig -x 8.8.8.8 # -- Reverse DNS lookup.
 dig @<dns_server> <domain_name>
+
+host <domain_name>
+host -t TXT <domain_name>
 
 lsnrctl start <listener_name>
 lsnrctl status <listener_name>
@@ -208,9 +213,9 @@ openssl x509 -noout -issuer -subject -dates -fingerprint -email -trustout -in <C
 
 # To generate a self signed certificate.
 openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
--keyout <certificate>.key \
--out <certificate>.crt \
--subj "/C=IN/ST=Delhi/L=Delhi/O=OSWebAdmin/OU=Linux administration/CN=*.${Domainname}" &> /dev/null
+-keyout tomcat.key \
+-out tomcat.crt \
+-subj "/C=IN/ST=Delhi/L=Delhi/O=OSWebAdmin/OU=Linux administration/CN=*.oswebadmin.com" &> /dev/null
 
 
 

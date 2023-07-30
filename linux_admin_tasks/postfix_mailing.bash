@@ -4,7 +4,18 @@
 # Set FQDN in your mail server.
 
 # Create the following records for your mail server domain name.
-# MX, A, PTR, TXT, SPF
+# MX, A, PTR (rDNS), TXT, SPF
+
+MX @ mail.paulpranshu.xyz 1 hour
+TXT @ v=spf1 ip4:64.227.188.201 ~all 1 hour
+
+# Add DKIM (Domain Key Identified Mail) record.
+openssl genrsa -out dkim_private.pem 2048
+openssl rsa -in dkim_private.pem -pubout -outform der | openssl base64 -A
+
+# Add a DMARC (Domain-based Message Authentication, Reporting, and Conformance)
+TXT	_dmarc	v=DMARC1;p=quarantine	1 hour
+
 
 # Add entry in /etc/hosts file.
 
@@ -25,9 +36,9 @@ postconf -e "mydomain = oswebadmin.com" # -- to change your domain name
 postconf mydomain # -- to list my domain
 postconf -e "myorigin = oswebadmin.com" # -- to change domain name
 postconf myorigin # -- defines default domain name for the server
-postconf -e "mydestination = oswebadmin.com, \$myhostname, localhost.\$mydomain, localhost" # -- change my destinationa long with the interface 
+postconf -e "mydestination = oswebadmin.com, \$myhostname, localhost.\$mydomain, localhost" # -- change my destination along with the interface 
 postconf mydestination # -- displays final destination for the our mail server
-postconf -e "home_mailbox = Maildir/"
+postconf -e "home_mailbox = /var/spool/mail/"
 
 # Enabling TLS in postfix.
 # For TLS httpd is required and certbot(Let'sEncrypt)
@@ -58,7 +69,7 @@ cat >> /etc/postfix/sasl_passwd << EOF
 EOF
 
 postmap /etc/postfix/sasl_passwd
-chmod 600 /etc/postfix/sasl_passwd
+chmod 400 /etc/postfix/sasl_passwd
 
 
 postconf -e "relayhost = [smtp.gmail.com]:587"
@@ -78,23 +89,28 @@ systemctl restart postfix
 Mutt client configuration
 # To run mutt first we need to set up mutt configuration file.
 # Default folder for mutt is ~/.muttrc
+# Same configuration can be run on Solaris as well.
 
 # Here is a sample configuration file(.muttrc).
 
 # Port for imap = 993 and smtp = 587
 
-# set folder = "imaps://testing.paulpranshu@gmail.com@imap.gmail.com:993"
-# set spoolfile = "+INBOX"
-# set smtp_url = "smtp://testing.paulpranshu@gmail.com@smtp.gmail.com:587"
-# set smtp_pass = "PASSWORD"
-# set imap_pass = "PASSWORD"
-# set from = "testing.paulpranshu@gmail.com"
-# set realname = "Pranshu Paul"
+set folder = "imaps://testing.paulpranshu@gmail.com@imap.gmail.com:993"
+set imap_pass = "<password>"
+
+set spoolfile = "+INBOX"
+set smtp_url = "smtp://testing.paulpranshu@gmail.com@smtp.gmail.com:587"
+set smtp_pass = "<password>"
+set from = "testing.paulpranshu@gmail.com"
+set realname = "Pranshu Paul"
+set editor= "vi"
+set pager = "less"
+set signature = "Sent from Oracle Solaris"
 
 
-# To send email from command line.
+# To send email from the command line.
 # -s SUBJECT -c CARBON COPY -b BLIND CARBON COPY -a ATTACHMENT
-# echo MESSAGE | mutt -s "SUBJECT" -c CARBON COPY -b BLIND CARBON COPY MAIL RECIPIENT -a # PATH TO ATTACHMENT
+# echo <message> | mutt -s "<subject>" -c <carbon_copy> -b <blind_carbon_copy> <mail_recipient> -a <attachment_path>
 echo Hello | mutt -s "Test mail" -c someone@somwhere.com -b someone2@somwhere.com someone3@somwhere.com -a /etc/os-release
 
 # HereDoc can be also use a message writing for email.
@@ -104,4 +120,4 @@ This is a email.
 HereDoc
 
 # Commands output can be also send as stdin to mutt.
-nmcli dev status | mutt -s "Mutt" someone@somwhere.com# To install nc.
+nmcli dev status | mutt -s "Test mail" someone@somwhere.com

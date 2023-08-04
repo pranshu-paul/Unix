@@ -10,6 +10,7 @@ MX @ mail.paulpranshu.xyz 1 hour
 TXT @ v=spf1 ip4:64.227.188.201 ~all 1 hour
 
 # Add DKIM (Domain Key Identified Mail) record.
+# The below commands are not tested yet.
 openssl genrsa -out dkim_private.pem 2048
 openssl rsa -in dkim_private.pem -pubout -outform der | openssl base64 -A
 
@@ -17,7 +18,7 @@ openssl rsa -in dkim_private.pem -pubout -outform der | openssl base64 -A
 TXT	_dmarc	v=DMARC1;p=quarantine	1 hour
 
 
-# Add entry in /etc/hosts file.
+# Add an entry in /etc/hosts file.
 
 #Install Postfix and Mailx mail client.
 dnf -y install postfix mailx
@@ -41,7 +42,8 @@ postconf mydestination # -- displays final destination for the our mail server
 postconf -e "home_mailbox = /var/spool/mail/"
 
 # Enabling TLS in postfix.
-# For TLS httpd is required and certbot(Let'sEncrypt)
+# For TLS httpd is required and certbot(Let's Encrypt)
+# Or, we could generate a Let's Encrypt certificate from punchsalad.com
 
 #postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/httpd.crt"
 #postconf smtpd_tls_cert_file
@@ -64,25 +66,49 @@ systemctl enable --now postfix
 ####################################################################################################
 # Postfix Relay
 
+# Download Postfix.
+dnf -y install postfix
+
+# Run the below command to add the SMTP server's credentials.
 cat >> /etc/postfix/sasl_passwd << EOF
-[smtp.gmail.com]:587    testing.paulpranshu@gmail.com:<PASSWORD>
+[smtp.gmail.com]:587    testing.paulpranshu@gmail.com:<password>
 EOF
 
+# Create a hashed version of the file "/etc/postfix/sasl_passwd".
+# Change it's permissions to 400.
 postmap /etc/postfix/sasl_passwd
 chmod 400 /etc/postfix/sasl_passwd
 
-
+# Set the relayhost.
+# It doesn't deliver locally.
 postconf -e "relayhost = [smtp.gmail.com]:587"
+postconf relayhost
+
+# Enable smtp TLS.
 postconf -e "smtp_use_tls = yes"
+postconf smtp_use_tls
+
+# Enable SASL (Simple Authentication and Security Layer) to yes.
+# Tu authenticate with the SMTP server postfix will use the above credentials.
 postconf -e "smtp_sasl_auth_enable = yes"
+postconf smtp_sasl_auth_enable
+
+# Provide the path of the hashed file.
 postconf -e "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+postconf smtp_sasl_password_maps
+
+# Provide the path of the local CA authority.
 postconf -e "smtp_tls_CAfile = /etc/ssl/certs/postfix.pem"
+postconf smtp_tls_CAfile
+
 postconf -e "smtp_sasl_security_options = noanonymous"
+postconf smtp_sasl_security_options
+
 postconf -e "smtp_sasl_tls_security_options = noanonymous"
+postconf smtp_sasl_tls_security_options
 
+# Restart the postfix service.
 systemctl restart postfix
-
-
 
 
 ############################################################################

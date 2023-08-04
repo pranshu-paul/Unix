@@ -5,6 +5,7 @@
 103.240.90.232  dbprd.mmtc-pamp.com  dbprd
 103.240.90.231  ebsprod.mmtc-pamp.com  ebsprod
 
+ipcalc
 
 # To list the network cards.
 lshw -class network -short

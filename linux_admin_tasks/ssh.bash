@@ -6,7 +6,7 @@ Configuration files.
 # TO CREATE AUTHORIZED_KEYS FILE.
 cd ~ ; mkdir .ssh ; chmod 700 .ssh ; cd .ssh ; touch authorized_keys ; chmod 600 authorized_keys ; cd ~
 
-# TO CHECK LOGS FOR SSHD.
+# TO CHECK LOGS OF SSHD.
 journalctl -f -t sshd
 
 # TO CHECK WHICH IP ARE CONNECTED TO SERVER.
@@ -17,19 +17,20 @@ ss -nptu | awk '{print $5 "   :   "  $6}'
 awk '{print $12}' /var/log/audit/audit.log | grep addr= | sort | uniq -c | sort -nr | sed "1 d" | nl
 
 # TROUBLESHOOTING.
-When changing port first enable port on firewall then SElinux.
-semanage port -a -t ssh_port_t -p tcp PORTNUMBER
+#When changing the port, first enable the port on the firewall then SElinux.
+semanage port -a -t ssh_port_t -p tcp <port>
 firewall-cmd --zone=public --add-service=ssh --permanent
-After changing port in sshd_config.
-When changing configuration in sshd_config.
-Use "sshd -t" to check whether the configuration is ok or not.
-Restart sshd.service "systemctl restart sshd.service"
-Use "w" command to check who is logged into the system.
-To force log out a user use "pkill -u USER_NAME"
-Check SElinux context for each ssh config file.
-Check SElinux context of ~/.ssh directory if pub-key authentication is not working.
-Use "restorecon -R -v ~/.ssh" to restore SElinux context.
-Use "aureport" command if some one is brute forcing.
+
+# After changing port in sshd_config.
+# When changing configuration in sshd_config.
+# Use "sshd -t" to check whether the configuration is ok or not.
+# Restart sshd.service "systemctl restart sshd.service"
+# Use "w" command to check who is logged into the system.
+# To force log out a user use "pkill -u <user_name>"
+# Check SElinux context for the each ssh config file.
+# Check SElinux context of ~/.ssh directory if pub-key authentication is not working.
+# Use "restorecon -R -v ~/.ssh" to restore SElinux context.
+# Use "aureport" command if some one is brute forcing.
 
 
 ####################### Sample /etc/ssh/sshd_config hardening ################
@@ -76,7 +77,7 @@ chmod 600 ~/.ssh/authorized_keys
 # This file contains public keys of remote systems.
 # This file must be with the permissions of 600.
 
-ssh-rsa AAAA... # This is the line where key starts below options can be prepend to this line for keys in authorized_keys file.
+ssh-rsa AAAA... # This is the line where key starts the below options can be prepend to this line for keys in authorized_keys file.
 
 # This option executes command and logs out of the system.
 # Can not use this option multiple times.
@@ -121,6 +122,7 @@ chmod 744 /etc/ssh/sshrc
 ####################################################################################################
 AUTOMATION IN SSH WITH PASSWORDLESS SETUP
 *****************************************
+dnf -y install sshpass
 
 # USING NATIVE SSH TOOLS FOR PASSWORDLESS SETUP. #
 ssh-keygen -b 4096 -t rsa
@@ -151,89 +153,37 @@ sshpass -e scp -P 2169 /home/paul/test paul@10.0.0.171:/home/paul
 export SSHPASS='Pa55wo&rd@lin#ux'
 sshpass -e ssh paul@10.0.0.171 -p 2169
 
-
-
-
+########################################################################
+# echo 'machine <ip_address> login <user_name> password <password>' > .netrc
 
 #!/bin/bash
 
 usage () {
-echo "Usage: $0 <source> <user> <hostname> <port> <destination>" >&2
-echo 'Sends file to remote host without password.' >&2
-exit 1
+	echo "Usage: $0 <remote_user> <hostname> <port> <file> <destination>" >&2
+	echo 'Sends file to remote host without password.' >&2
+	exit 1
 }
 
 if [[ $# -lt 5 ]]; then
-usage
+	usage
 fi
 
 if [[ ! -f ~/.netrc ]]; then
-echo "File .netrc not exists in the user $USER home folder." >&2
-exit
+	echo "File .netrc does not exist in the home folder of $USER." >&2
+	exit 2
 fi
 
-export FULL_FILE_PATH="${1}"
-export DEST_PATH="${5}"
-export REMOTE_USER="${2}"
-export REMOTE_PORT="${4}"
-export REMOTE_HOSTNAME="${3}"
+export remote_user="${1}"
+export remote_hostname="${3}"
+export remote_port="${4}"
+export full_file_path="${4}"
+export dest_path="${5}"
 
-if [[ -d $ "${FULL_FILE_PATH}" ]]; then
-echo "Directory provided."
-echo "Please make an archive of the directory using zip or tar."
-exit 2
+if [[ -d $ "${full_file_path}" ]]; then
+	echo "Directory provided."
+	echo "Please make an archive of the directory using zip or tar."
+	exit 3
 fi
 
-curl -T "${FULL_FILE_PATH}" sftp://"${REMOTE_USER}"@"${REMOTE_HOSTNAME}":"${REMOTE_PORT}""${DEST_PATH}" -n
-
-
-##########################################################################################################
-
-#!/bin/bash
-
-usage() {
-  printf "Usage: %s <source_file1> [<source_file2> ...] <user> <hostname> <port> <destination>\n" "$0" >&2
-  printf "Sends file(s) to remote host without password.\n" >&2
-  exit 1
-}
-
-if [[ $# -lt 5 ]]; then
-  usage
-fi
-
-if [[ ! -e ~/.netrc ]]; then
-  echo "File .netrc not found in the user $USER home folder." >&2
-  exit 2
-fi
-
-export REMOTE_USER="$3"
-export REMOTE_PORT="$4"
-export REMOTE_HOSTNAME="$2"
-export DEST_PATH="$6"
-
-shift 4 # Shift the positional parameters to exclude the remote host information
-
-for file in "$@"; do
-  if [[ ! -e "$file" ]]; then
-    echo "File $file not found." >&2
-    exit 2
-  fi
-
-#  if [[ -d "$file" ]]; then
-#    echo "Directory provided."
-#    echo "Please make an archive of the directory using zip or tar."
-#    exit 2
-#  fi
-
-  printf "Exporting file %s to %s:%s...\n" "$file" "$REMOTE_USER@$REMOTE_HOSTNAME" "$DEST_PATH"
-  curl -T "$file" sftp://"${REMOTE_USER}"@"${REMOTE_HOSTNAME}":"${REMOTE_PORT}""${DEST_PATH}" -n 2> /dev/null
-
-  if [[ $? -ne 0 ]]; then
-          usage
-  else
-  printf "Export of %s completed.\n" "$file"
-  fi
-done
-
-
-
+# -n means use the ".netrc" file for credentials.
+curl -T "${full_file_path}" sftp://"${remote_user}"@"${remote_hostname}":"${remote_port}""${dest_path}" -n

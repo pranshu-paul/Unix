@@ -36,3 +36,11 @@ mysql -u root -p
 # From outside the docker.
 # Run the below command.
 mysql -h 0.0.0.0 -P 3306 -u root -p
+
+
+# To create a docker network.
+docker network create mysql_network
+
+# To connect the docker network to the already running image.
+docker network connect mysql_network mysql_container
+docker network connect mysql_network mysql_container_1

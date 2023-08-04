@@ -304,7 +304,7 @@ cryptsetup - manage plain dm-crypt and LUKS encrypted volumes# To install curl.
 yum -y install curl
 
 # To check a ip's details.
-curl ipinfo.io/"IP_ADDRESS"
+curl ipinfo.io/"<ip_address>"
 
 # For example.
 curl ipinfo.io/8.8.8.8
@@ -457,47 +457,7 @@ find . -user oracle -exec rm -fr {} \;
 yum -y install finger
 
 
-# To install firewall-cmd.
-# firewall-cmd uses netfilter at its backend.
-yum -y install firewalld
 
-# List all current rules and ports defined.
-firewall-cmd --list-all
-
-# Firwall default behaviour.
-# targets available ACCEPT, DROP, REJECT
-firewall-cmd --permanent --set-target=DROP
-
-# To add a new port.
-# This option adds port immediatley, but removes port after reboot.
-# The below option is an example of stateless rule.
-firewall-cmd --add-port=<port>/<protocol>
-
-# To make changes persistant.
-# This option doesn't let you to add port immediatley.
-# The below option is an example of stateless firewall.
-firewall-cmd --add-port=<port>/<protocol> --permanent
-
-# Use this option after [--permanent] option.
-firewall-cmd --reload
-
-# To add rich rule. (until next reboot)
-# family type ipv6 ipv4.
-# Options for rules {accept|reject|drop}.
-firewall-cmd --add-rich-rule='rule family="ipv4" source address="IP_ADDRESS[/CIDR]" accept'
-
-# To add a persistant rich rule.
-# The below rules are examples of stateful firewall.
-firewall-cmd --add-rich-rule='rule family="ipv4" source address="<ip_address>[/<cidr>]" accept' --permanent
-firewall-cmd --add-rich-rule='rule family="ipv4" port port="8080" protocol="tcp"  source address="192.168.64.1" accept' --permanent
-firewall-cmd --reload
-
-# To remove rich-rule.
-# Must be same as added.
-firewall-cmd --remove-rich-rule='rule family="ipv4" source address="IP_ADDRESS" accept'
-
---add-forward-port=port=<portid>:proto=tcp:toport=<portid>[:toaddr=<address>[/mask]]
-firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080:toaddr=10.0.0.45
 
 Package = coreutils
 fmt (1)              - simple optimal text formatter
@@ -871,7 +831,7 @@ journalctl -f -u ssh
 journalctl _UID=1000
 
 # To check logs made by an executable.
-journalctl -r /PATH/TO/EXECUTABLE
+journalctl -r $(which sshd)
 
 # To check n number of line.
 journalctl -n N
@@ -879,12 +839,18 @@ journalctl -n N
 # To check priority wise.
 # ebug (7), info (6),
 # notice (5), warning (4), err (3), crit (2), alert (1), and emerg (0).
-journalctl -p
+journalctl -p 3
 
 # To check logs from specific date.
-journalctl -S "2020-10-30 18:17:16"# To install kexec.
-yum -y install kexec-tools# To install killall.
-yum -y install psmisckill PID
+journalctl -S "2020-10-30 18:17:16"
+
+# To install kexec.
+yum -y install kexec-tools
+
+# To install killall.
+yum -y install psmisckill 
+
+PID
 
 kill 0
 
@@ -989,27 +955,6 @@ yum -y install ltrace
 # To install lvm.
 yum -y install lvm2
 
-
-
-pvs -- # Brief display for physical volumes.
-pvdisplay -- # To display physical volumes.
-pvcreate /dev/BLOCK_DEVICE -- # To create a physical volume.
-pvremove /dev/BLOCK_DEVICE -- # To remove a physical volume.
-
-
-vgs -- # Brief display for volume groups.
-vgcreate VOLUME_GROUP_NAME /dev/PHYSICAL_VOLUME_CREATED -- # To create a volume group.
-vgextend VOLUME_GROUP_NAME /dev/NEW_PHYSICAL_VOLUME_CREATED -- # To extend a volume group.
-vgreduce VOLUME_GROUP_NAME /dev/PHYSICAL_VOLUME_WHICH_WANT_TO_REMOVE -- # To remove a physical volume from a volume group.
-vgremove VOLUME_GROUP_NAME -- # To remove a volume group.
-
-lvs -- # Brief display for logical volume.
-lvcreate --size 5G --name NAME_STRING VG_GROUP_NAME -- #  To create a logical volume. [-L|--size] [-n|--name]
-lvdisplay -- # To display logical volumes.
-lvextend --size +1G /dev/VG_GROUP_NAME/LOGICAL_VOLUME -- # To extend a logical volume. [-L|--size]
-lvresize --size -1G /dev/VG_GROUP_NAME/LOGICAL_VOLUME -- # To resize a logical volume. [-L|--size]
-lvremove /dev/VG_GROUP_NAME/LOGICAL_VOLUME -- # To remove a logical volume.
-lvrename /dev/VG_GROUP_NAME/LOGICAL_VOLUME_OLD_NAME /dev/VG_GROUP_NAME/LOGICAL_VOLUME_NEW_NAME
 
 # To install make.
 yum -y install make
@@ -1204,18 +1149,18 @@ yum -y install passwd
 passwd
 
 # To change a users password(works only with sudo or root).
-passwd USER_NAME
+passwd <user_name>
 
 # To locks out a users password.
-passwd -l USER_NAME
+passwd -l <user_name>
 
 # To unlocks a users password.
-passwd -u USER_NAME
+passwd -u <user_name>
 
 # To automate a users password change without being prompted.
-echo PASSWORD | passwd --stdin USER_NAME
+echo PASSWORD | passwd --stdin <user_name>
 
-echo $RANDOM $RANDOM | sha512sum | head -c 16 | passwd --stdin USER_NAME
+echo $RANDOM $RANDOM | sha512sum | head -c 16 | passwd --stdin <user_name>
 
 # To install pax.
 yum -y install pax
@@ -1253,7 +1198,7 @@ yum -y install libpwquality
 pwmake 64
 
 # To change a users password with prompted.
-pwmake 64 | passwd --stdin USER_NAME
+pwmake 64 | passwd --stdin <user_name>
 
 Package for renice util linux.
 
@@ -1515,7 +1460,7 @@ subscription-manager
 
 # To attach a new subscription if there is no attached.
 subscription-manager register --auto-attach
-subscription-manager register --username USER_NAME --password PASSWORD --auto-attach
+subscription-manager register --username <user_name> --password <password> --auto-attach
 
 # To attach subscription if it's already attached.
 subscription-manager register --auto-attach --force

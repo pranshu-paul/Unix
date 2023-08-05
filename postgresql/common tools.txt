@@ -1,0 +1,7 @@
+pg_ctl
+pg_ctlcluster
+psql
+pg_dump
+
+
+pg_top from EPEL

@@ -1,3 +1,5 @@
+# Configuring LDAP server.
+
 # Packages required for LDAP.
 packages=(\
 cracklib \
@@ -46,49 +48,63 @@ make
 # Install LDAP.
 make install
 
-
-mkdir /var/lib/openldap /etc/openldap/slapd.d
-
-
-
 chown -R ldap:ldap /var/lib/openldap
 chown root:ldap /etc/openldap/slapd.conf
 chmod 640 /etc/openldap/slapd.conf
 
-rpm -ql sudo |  grep -i schema.openldap
-
-# Copy the schema directory 
-cp /usr/share/doc/sudo/schema.OpenLDAP  /etc/openldap/schema/sudo.schema
 
 # Verify the 
 ls -l /etc/openldap/slapd.ldif
 
-vim /etc/openldap/slapd.ldif
-dn: olcDatabase=mdb,cn=config
-objectClass: olcDatabaseConfig
-objectClass: olcMdbConfig
-olcDatabase: mdb
-OlcDbMaxSize: 1073741824
-olcSuffix: dc=paul,dc=xyz
+# Just change the below line only in file "/usr/local/etc/openldap/slapd.ldif"
+# At line no. 82 and 83.
+olcSuffix: dc=paulpranshu,dc=xyz
 olcRootDN: cn=Manager,dc=paulpranshu,dc=xyz
-olcRootPW: secret
-olcDbDirectory: /usr/local/var/openldap-data
-olcDbIndex: objectClass eq
 
+# Create "olcDbDirectory" directory.
 mkdir -p /usr/local/var/openldap-data
 
+# Remove the previous "ldif" file.
 cd /usr/local/etc/slapd.d
 rm -rfv *
 
-slapadd -n 0 -F /etc/slapd.d -l /etc/openldap/slapd.ldif
+# Add the LDAP configuration file to its location/
+slapadd -n 0 -F /usr/local/etc/slapd.d -l /etc/openldap/slapd.ldif
 
-# Start LDAP and verify.
+# Start LDAP with the directory of "ldif" file.
 /usr/local/libexec/slapd -F /usr/local/etc/slapd.d
 
+# Verify LDAP daemon.
 ps -ef | grep slapd
-
 ss -lt | grep ldap
 
 
 # Verify LDAP.
 ldapsearch -x -b '' -s base '(objectclass=*)' namingContexts
+
+# Create a systemd unit file for LDAP.
+vim /etc/systemd/system/slapd.service
+[Unit]
+Description=OpenLDAP Server Daemon
+After=syslog.target network-online.target
+Documentation=man:slapd
+Documentation=man:slapd-mdb
+
+[Service]
+Type=forking
+Environment="SLAPD_URLS=ldap:/// ldapi:/// ldaps:///"
+Environment="SLAPD_OPTIONS=/usr/local/etc/slapd.d"
+ExecStart=/usr/local/libexec/slapd -F $SLAPD_OPTIONS
+
+[Install]
+WantedBy=multi-user.target
+
+systemctl daemon-reload
+systemctl enable --now 
+
+
+
+# Glossary #
+cn = common name
+dn = distinguished name
+olc = OpenLDAP Configuration

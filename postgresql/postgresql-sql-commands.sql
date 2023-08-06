@@ -1,22 +1,4 @@
-dnf -y install postgresql-server.x86_64 postgresql.x86_64
-/usr/bin/postgresql-setup --initdb
-systemctl enable --now postgresql.service
-
-\c -- connect
-\l -- list databases
-\d -- details of current database
-\d <table_name>
-\q -- quit
-
-
-Datatypes:
-VARCHAR(string-length)
-INT
-SERIAL
-DATE
-NUMERIC(4, 1); -- Can have four decimal places to the right side.
-
-
+# Postgresql SQL commands.
 
 alter table second_table drop column age;
 alter table characters add primary key (name);

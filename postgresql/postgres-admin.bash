@@ -1,3 +1,5 @@
+# POTGRESQL STRUCTURE AND REQUIREMENTS
+
 # Required environment variables.
 LD_LIBRARY_PATH=/usr/lib64
 
@@ -38,42 +40,17 @@ export PG_OOM_ADJUST_VALUE=0
 useradd -r -m /var/lib/pgsql postgres
 
 
+# To enforce password while logging in.
+# Change the authentication method to "md5" from "ident" or blank.
+# In the file "/var/lib/pgsql/data/pg_hba.conf".
+# After making any changes, run the below command.
+pg_ctl reload
+
+# In case you forget the password.
+# Just revert the auth method.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# General administrative commands.
 \c -- connect
 \l -- lists databases
 \d -- lists all the objects
@@ -81,10 +58,45 @@ useradd -r -m /var/lib/pgsql postgres
 \dt -- lists all the tables 
 \q -- quit
 
+\dn -- lists the available schemas
+\df -- lists functions
+\du -- lists users
+
+
+SELECT version(); # Shows the postgresql version.
+
+\i <filename> -- runs a SQL script from the prompt.
+
+\? -- to get help
+
+\h <sql_command> -- to get help about a particular SQL command
+\h alter table
+\h 
+
+
+# psql commands
+psql -f <postgres_commands> -- # Reads commands from the file.
+psql -h <ip_address> -p <port> -U <username> -W # -- The "W" flag is to prompt for the password.
+psql -c '<sql_query>' <database> # Executes a single query on the given database name.
+
+
+# pg_ctl
+pg_ctl start # Starts postgres
+pg_ctl stop # Stops postgres
+pg_ctl reload # Reloads postgres
+
+# Shows the all active processes.
+select * from pg_stat_activity;
+
+# Gives the statistics about the "bgwriter" process.
+select * from pg_stat_bgwriter;
+
+# Gives a briefing about the database.
+pg_controldata $PGDATA
 
 Datatypes:
-VARCHAR(string-length)
-INT
-SERIAL
-DATE
-NUMERIC(4, 1); -- Can have four decimal places to the right side.
+varchar(string-length)
+int
+serial
+date
+numeric(4, 1); -- Can have four decimal places to the right side.

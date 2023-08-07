@@ -1,4 +1,4 @@
-Backingup the database:
+# Backingup the database:
 pg_dump -- Creates a dump of the database.
 
 --clean                  clean (drop) database objects before recreating
@@ -10,5 +10,5 @@ pg_dump --clean --create --inserts --username=<username> <database> > <database>
 pg_dump --clean --create --inserts --username=freecodecamp students > students.sql
 pg_dump --clean --create --inserts --username=freecodecamp mario_database > mario_database.sql
 
-Restoring the database created earlier
+# Restoring the database created earlier
 psql -U postgres < students.sql

@@ -11,7 +11,6 @@ dnf -y install cifs-utils
 cat > /root/.smb_cred <<EOF
 username=<username>
 password=<password>
-defaults # Options
 EOF
 
 # Protect the file containing credentials from being read.

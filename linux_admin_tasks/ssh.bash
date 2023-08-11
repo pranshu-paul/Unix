@@ -180,8 +180,8 @@ export full_file_path="${4}"
 export dest_path="${5}"
 
 if [[ -d $ "${full_file_path}" ]]; then
-	echo "Directory provided."
-	echo "Please make an archive of the directory using zip or tar."
+	echo "Directory provided!"
+	echo "Please make an archive of the directory by zip or tar."
 	exit 3
 fi
 

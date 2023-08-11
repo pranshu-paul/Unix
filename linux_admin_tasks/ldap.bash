@@ -48,6 +48,7 @@ make
 # Install LDAP.
 make install
 
+# Change the permissions and ownership of the directories.
 chown -R ldap:ldap /var/lib/openldap
 chown root:ldap /etc/openldap/slapd.conf
 chmod 640 /etc/openldap/slapd.conf
@@ -99,10 +100,9 @@ ExecStart=/usr/local/libexec/slapd -F $SLAPD_OPTIONS
 [Install]
 WantedBy=multi-user.target
 
+# Reload all the systemd unit-files.
 systemctl daemon-reload
-systemctl enable --now 
-
-
+systemctl enable --now slapd
 
 # Glossary #
 cn = common name

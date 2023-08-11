@@ -1,5 +1,4 @@
 # MOUNTING A SAMBA CLIENT
-*************************
 
 # Packages required cifs-utils
 dnf -y install cifs-utils
@@ -25,8 +24,9 @@ mount -t cifs -o username=<usernam> //<ip_address>/users /<mount_point>
 # Reload the daemons after updating /etc/fstab.
 systemctl daemon-reload
 
+
+#####################################################
 # CONFIGURING A SAMBA SERVER and nmb (NetBIOS service)
-******************************************************
 dnf -y install samba.$(uname -m) nmb
 
 # Create a folder (as a samba share)

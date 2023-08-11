@@ -1,13 +1,26 @@
-# Postifx wrapper script
+# Creating a basic SMTP server for sending and recieving emails.
+
 # Port 25 must be unblocked.
 
 # Set FQDN in your mail server.
 
 # Create the following records for your mail server domain name.
-# MX, A, PTR (rDNS), TXT, SPF
+# MX, A, CNAME, PTR (rDNS), TXT, SPF
 
-MX @ mail.paulpranshu.xyz 1 hour
-TXT @ v=spf1 ip4:64.227.188.201 ~all 1 hour
+# Example of DNS records.
+# A Record: Main domain record.
+@	600	 IN 	A	<ip_address>
+
+# TXT Record: For SPF and google postmaster
+@	3600	 IN 	TXT	"google-site-verification=gmwzrZZrWrcySxAZ-WNbp6YLOzZTrDzrIzY1tA-YVY4"
+@	3600	 IN 	TXT	"v=spf1 +a +mx +ip4:<ip_address> ~all"
+
+# CNAME Record: For MX record, it must be pingable.
+<hostname>	3600	 IN 	CNAME	@
+
+# MX Record: For incoming emails.
+@	3600	 IN 	MX	0	<hostname>.<domain>.<tld>.
+
 
 # Add DKIM (Domain Key Identified Mail) record.
 # The below commands are not tested yet.
@@ -20,10 +33,10 @@ TXT	_dmarc	v=DMARC1;p=quarantine	1 hour
 
 # Add an entry in /etc/hosts file.
 
-#Install Postfix and Mailx mail client.
+# Install Postfix and Mailx mail client.
 dnf -y install postfix mailx
 
-postconf mail_version # -- to check postfix mail version
+postconf mail_version # -- To check postfix mail version
 
 rpm -ql postfix | grep /usr/sbin # -- to list all associated binaries with postfix
 
@@ -31,31 +44,31 @@ postconf -e "inet_interfaces = all" # -- to allow postconf to edit postfix main.
 postconf inet_interfaces  # -- to list interface for postfix
 postconf -e "inet_protocols = all"
 postconf inet_protocols
-postconf -e "myhostname = mail.oswebadmin.com" # -- to chnage hostname for mail server
+postconf -e "myhostname = <hostname>" # -- to chnage hostname for mail server
 postconf myhostname # -- to list hostname for mail server
-postconf -e "mydomain = oswebadmin.com" # -- to change your domain name
+postconf -e "mydomain = <domain_name>" # -- to change your domain name
 postconf mydomain # -- to list my domain
-postconf -e "myorigin = oswebadmin.com" # -- to change domain name
+postconf -e "myorigin = <domain_name>" # -- to change domain name
 postconf myorigin # -- defines default domain name for the server
-postconf -e "mydestination = oswebadmin.com, \$myhostname, localhost.\$mydomain, localhost" # -- change my destination along with the interface 
+postconf -e "mydestination = <domain_name>, \$myhostname, localhost.\$mydomain, localhost" # -- change my destination along with the interface 
 postconf mydestination # -- displays final destination for the our mail server
-postconf -e "home_mailbox = /var/spool/mail/"
+postconf mail_spool_directory
+postconf mailbox_size_limit
 
 # Enabling TLS in postfix.
 # For TLS httpd is required and certbot(Let's Encrypt)
 # Or, we could generate a Let's Encrypt certificate from punchsalad.com
 
-#postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/httpd.crt"
+#postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/postfix.crt"
 #postconf smtpd_tls_cert_file
-#postconf -e "smtpd_tls_key_file = /etc/pki/tls/private/httpd.key"
+#postconf -e "smtpd_tls_key_file = /etc/pki/tls/private/postfix.key"
 #postconf smtpd_tls_key_file
 #postconf -e "smtpd_use_tls = yes"
 #postconf smtpd_use_tls
 #postconf -e "smtp_use_tls = yes"
 #postconf smtp_use_tls
 
-postconf mail_spool_directory
-
+# Open port 25/tcp or add the service SMTP.
 firewall-cmd --add-service=smtp --permanent && firewall-cmd --reload
 
 # Start Postfix daemon.
@@ -111,19 +124,25 @@ postconf smtp_sasl_tls_security_options
 systemctl restart postfix
 
 
+# To test e-mail dry run.
+echo "This is a test email" | mailx -s "Test Subject" -n recipient@example.com
+
+
 ############################################################################
-Mutt client configuration
+# Mutt client configuration
 # To run mutt first we need to set up mutt configuration file.
-# Default folder for mutt is ~/.muttrc
+# Default configuration file of mutt at a user level is ~/.muttrc
 # Same configuration can be run on Solaris as well.
 
 # Here is a sample configuration file(.muttrc).
 
 # Port for imap = 993 and smtp = 587
 
+# For incoming.
 set folder = "imaps://testing.paulpranshu@gmail.com@imap.gmail.com:993"
 set imap_pass = "<password>"
 
+# For outgoing only.
 set spoolfile = "+INBOX"
 set smtp_url = "smtp://testing.paulpranshu@gmail.com@smtp.gmail.com:587"
 set smtp_pass = "<password>"

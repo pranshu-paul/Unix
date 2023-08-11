@@ -1,8 +1,7 @@
-NFS SERVER AND CLIENT SIDE CONFIGURATON IN RHEL
-***********************************************
+# NFS SERVER AND CLIENT SIDE CONFIGURATON IN RHEL
 
-SERVER SIDE CONFIGURATON
-************************
+
+# SERVER SIDE CONFIGURATON
 
 # Packages required for the NFS server.
 nfs-utils
@@ -42,8 +41,9 @@ ss -lntp | grep -e State -e rpc -e mountd
 setsebool -P nfs_export_all_rw 1
 
 
-CLIENT SIDE CONFIGURATON
-************************
+#########################
+#CLIENT SIDE CONFIGURATON
+
 # Required Packages.
 nfs-utils
 
@@ -62,8 +62,8 @@ mount -t nfs -o defaults srv_el8:/nfs-share /nfs-client
 srv_el8:/nfs-share	/nfs-client	nfs		defaults	0 0
 
 
-CHANGING PORT ON SERVER SIDE
-****************************
+##############################
+# CHANGING PORT ON SERVER SIDE
 
 # Add the following entry under [lockd] section in /etc/nfs.conf.
 # Alternatively, nfs ports can also be specified in /etc/modprobe.d/lockd.conf

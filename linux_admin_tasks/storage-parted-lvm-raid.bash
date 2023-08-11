@@ -1,3 +1,5 @@
+# Storage Administration
+
 # For the devices name starting with "sd"
 dmesg | grep SCSI
 
@@ -25,7 +27,7 @@ blkid | grep /dev/sdb1 | awk '{print $2}'
 mount -t xfs UUID="3847161a-699b-4d0f-92c9-58d61c9c8344" /mnt
 
 # Make an entry in "/etc/fstab"
-# Use UUID insted of physciall path "/dev/sdx"
+# Use UUID insted of physcial path "/dev/sdx"
 UUID="3847161a-699b-4d0f-92c9-58d61c9c8344" /mnt defaults 0 0
 
 # Reload the system daemons after updating the "/etc/fstab"
@@ -38,7 +40,8 @@ mount -av
 wipefs -a /dev/sdb1
 wipefs -a /dev/sdb
 
-# RAID
+
+######################################################
 # RAID stands for Redundant Array of Independent Disks.
 
 # Check the block drives.
@@ -97,6 +100,10 @@ mount -av
 # List all the partitions.
 cat /proc/partitions
 
+
+###########################
+# Logical Volume Management
+
 # Packages required.
 yum -y install lvm2
 
@@ -124,6 +131,7 @@ lvrename /dev/<vg_group_name>/<logical_volume_old_name> /dev/<vg_group_name/<log
 blkid
 
 
+###########################
 # Creating a SWAP partition.
 # Check the status of the block drive.
 parted /dev/sdc print
@@ -170,6 +178,7 @@ UUID="<uuid>" -- # When mounting using UUID.
 systemctl daemon-reload
 
 
+##################################
 # Creating partitions from "fdisk".
 # The below command is creating a GPT partition with complete size and saving it.
 printf "g\nn\n1\n\n\nw\n" | fdisk /dev/sdc

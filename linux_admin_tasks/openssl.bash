@@ -13,4 +13,12 @@ openssl req -new -newkey rsa:4096 -nodes -keyout dovecot.key -out dovecot.csr -s
 openssl x509 -req -in dovecot.csr -out dovecot.crt -CA ca.crt -CAkey ca.key -CAcreateserial -days 365
 
 
+# Generating DKIM record to digital sign emails.
+openssl genpkey -algorithm RSA -out dkim_private.key
+openssl rsa -in dkim_private.key -pubout -out dkim_public.key
+
+
+openssl s_client -connect paulpranshu.xyz:25
+
+
 

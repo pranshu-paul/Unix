@@ -41,13 +41,14 @@ useradd -r -m /var/lib/pgsql postgres
 
 
 # To enforce password while logging in.
-# Change the authentication method to "md5" from "ident" or blank.
+# Change the authentication method to "md5" from "ident" or "blank".
 # In the file "/var/lib/pgsql/data/pg_hba.conf".
 # After making any changes, run the below command.
 pg_ctl reload
 
 # In case you forget the password.
 # Just revert the auth method.
+
 
 
 # General administrative commands.

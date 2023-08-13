@@ -42,7 +42,7 @@ setsebool -P nfs_export_all_rw 1
 
 
 #########################
-#CLIENT SIDE CONFIGURATON
+# CLIENT SIDE CONFIGURATON
 
 # Required Packages.
 nfs-utils

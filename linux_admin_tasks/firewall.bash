@@ -2,6 +2,10 @@
 # firewall-cmd uses netfilter at its backend.
 yum -y install firewalld
 
+# To get more help about firewall.
+man firewall-cmd
+man firewalld.conf
+
 # List all current rules and ports defined.
 firewall-cmd --list-all
 
@@ -13,6 +17,13 @@ firewall-cmd --permanent --set-target=DROP
 # This option adds port immediatley, but removes port after reboot.
 # The below option is an example of stateless rule.
 firewall-cmd --add-port=<port>/<protocol>
+
+# To add, remove, and query icmp block.
+# We could also use the option "--permanent".
+firewall-cmd --add-icmp-block-inversion
+firewall-cmd --remove-icmp-block-inversion
+firewall-cmd --query-icmp-block-inversion
+
 
 # To make changes persistant.
 # This option doesn't let you to add port immediatley.
@@ -40,3 +51,20 @@ firewall-cmd --remove-rich-rule='rule family="ipv4" source address="<ip_address>
 # To add a port forward.
 # --add-forward-port=port=<portid>:proto=tcp:toport=<portid>[:toaddr=<address>[/mask]]
 firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080:toaddr=10.0.0.45
+
+
+# Important configuration file.
+/etc/firewalld/firewalld.conf
+
+# To see the enabled configuration of firewall.
+grep -v -e '^#' -e '^$' /etc/firewalld/firewalld.conf
+
+# Reload the firewall after any changes.
+systemctl reload firewalld
+
+# To enable the firewall port forward.
+# Enable the ip_forward kernel parameter.
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Or, update the sysctl.conf file.
+net.ipv4.ip_forward=1

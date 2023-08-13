@@ -26,7 +26,7 @@ ssl_dh = </etc/dovecot/dh.pem
 useradd --home-dir /var/mail/ --shell /usr/sbin/nologin vmail
 
 chown vmail:vmail /var/mail/
-chmod 700 /var/mail/
+chmod 777 /var/mail/
 
 # Uncomment and update the following line in /etc/dovecot/conf.d/10-mail.conf
 mail_location = mbox:~/mail:INBOX=/var/mail/%u

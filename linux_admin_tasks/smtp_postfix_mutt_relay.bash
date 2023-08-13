@@ -7,7 +7,7 @@
 # Create the following records for your mail server domain name.
 # MX, A, CNAME, PTR (rDNS), TXT, SPF
 
-# Example of DNS records.
+# Required DNS records.
 # A Record: Main domain record.
 @	600	 IN 	A	<ip_address>
 
@@ -22,14 +22,10 @@
 @	3600	 IN 	MX	0	<hostname>.<domain>.<tld>.
 
 
-# Add DKIM (Domain Key Identified Mail) record.
-# The below commands are not tested yet.
-openssl genrsa -out dkim_private.pem 2048
-openssl rsa -in dkim_private.pem -pubout -outform der | openssl base64 -A
+# Add DKIM (Domain Key Identified Mail) record (see openssl).
 
 # Add a DMARC (Domain-based Message Authentication, Reporting, and Conformance)
-TXT	_dmarc	v=DMARC1;p=quarantine	1 hour
-
+TXT	v=DMARC1; p=none; rua=mailto:testing.paulpranshu@gmail.com; ruf=mailto:testing.paulpranshu@gmail.com; fo=1; adkim=s; aspf=s; pct=100;
 
 # Add an entry in /etc/hosts file.
 
@@ -159,10 +155,10 @@ set signature = "Sent from Oracle Solaris"
 echo Hello | mutt -s "Test mail" -c someone@somwhere.com -b someone2@somwhere.com someone3@somwhere.com -a /etc/os-release
 
 # HereDoc can be also use a message writing for email.
-cat << HereDoc mutt -s "Mutt" someone@somwhere.com
+cat << EOF mutt -s "Mutt" someone@somwhere.com
 Message can be type in this format.
 This is a email.
-HereDoc
+EOF
 
 # Commands output can be also send as stdin to mutt.
 nmcli dev status | mutt -s "Test mail" someone@somwhere.com

@@ -1,4 +1,5 @@
-#default vim configuration files
+# Default vim configuration files
+
 # User level: .vimrc 
 # System wide: /etc/vimrc
 
@@ -51,6 +52,9 @@ P -- pastes upwards
 # To set and unset number lines.
 set number
 set nonumber
+
+# To get better contrast.
+set bg=dark
 
 # To unhighlight.
 noh

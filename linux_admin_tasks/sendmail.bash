@@ -1,3 +1,7 @@
+
+
+sendmail -F Pranshu Paul paulpranshu@gmail.com
+
 #!/bin/bash
 
 # Define email parameters

@@ -11,7 +11,18 @@
 
 useradd -D # Shows the default new user configuration
 
+# To create a new user.
+useradd <username>
 
+# UID, GID 100 - 999 are reserved for administartors.
+# -c COMMENT, -g GID,-m creates home directory, -r creates system user, -s login sheel, -u UID
+useradd -c Administrator -m -r -s /bin/bash -u 201 pranshu
+
+# add user with a expiry date.
+useradd -e YYYY-MM-DD <username>
+
+# -g primary group -G supplementry group -u UID 
+useradd -g oinstall -G dba -u 2000 <username>
 
 # To delete a user recursively with its home directory.
 userdel -r <username>
@@ -23,7 +34,7 @@ usermod -l <old_name> <new_name>
 usermod -s /bin/bash <username>
 
 # To change a users description.
-usermod -c 'DESCRIPTION' '<username>'
+usermod -c '<description>' '<username>'
 
 # To change a users group.
 # This removes the user from its current group.
@@ -140,6 +151,15 @@ setfacl -b <file>
 # To run command as second user.
 su - USER -c '<command>'
 su - paul -c 'ls -la'
+
+# To install vlock.
+yum -y install kbd
+
+# To lock current tty/pts.
+vlock
+
+# To lock all tty.
+vlock -a
 
 
 ############################################################################

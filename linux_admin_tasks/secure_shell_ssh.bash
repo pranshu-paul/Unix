@@ -33,47 +33,42 @@ firewall-cmd --zone=public --add-service=ssh --permanent
 # Use "aureport" command if some one is brute forcing.
 
 
+#######################################
+# General SSH commands.
 
-# ssh public keys also work with rsync.
+# To ssh into a system.
+ssh USER_NAME@IP_ADDRESS or ssh -l USER_NAME IP_ADDRESS
 
--a -- archive						#--max-size='200k' -- to specify file's maximum size
--v -- verbose						#--progress -- to show progress while transfer
--z -- compress						#--include 'R*' -- include all files starting with R
--h -- human readable				#--exclude '*' -- exclude all other files and folder
--e -- specify remote shell to use	#--remove-source-files -- removes source file after transfer
--n -- performs a dry run before transfer
--r -- recursive
+# To specify another port number.
+ssh -p USER_NAME@IP_ADDRESS
 
-##############################################################
-# To copy files from this server to remote server.
-rsync -avzh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To use remote server's private key to connect.
+ssh -t KEY_FILE -l USER_NAME IP_ADDRESS
 
-# To copy remote directory files to this local server.
-rsync -avhz USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
+# To forward local port to the remote port of remote server to access another service on remote server without opening firewall in it.
+ssh -L LOCAL_PORT:LOCALHOST_OF_REMOTE_SERVER:REMOTE_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
 
-# If want to use specific protocol for transfer {ssh}.
-rsync -avzhe ssh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To do reverse port forwarding, this allows to access local client remotely even firewall is enabled.
+ssh -R REMOTE_PORT:LOCALHOST_OF_REMOTE_SERVER:LOCAL_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
 
-# To show progress while transfer.
-rsync -avzhe ssh --progress /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To do dynamic port forwarding and creates SOCKS proxy on localhost.
+ssh -D PORT_NUMBER USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
 
-# To specify files and folder while transfer.
-rsync -avhez ssh --include 'R*' --exclude /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To compress a ssh connection.
+ssh -l USER_NAME -C IP_ADDRESS
 
-# To remove source files after success full transfer.
-rsync --remove-source-files -azvh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To forward X11 server to client.
+ssh -X -l USER_NAME IP_ADDRESS
 
-# To copy remote directory files to this local server from ssh.
-rsync -avzhe ssh USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
+# To run command with ssh on remote system and get output in client console.
+ssh -l USER_NAME IP_ADDRESS "COMMAND;COMMAND"
 
-# To specify options with ssh.
-rsync -avzhe "ssh -p PORT"  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To put restriction on bandwith limit. {1024 KB/s}
-rsync -avzhe "ssh -p PORT" --bwlimit=1024  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+# To get verbose output.
+# This option can be used with above examples, one can increase verbosity by using upto three -vvv with ssh.
+ssh -v -l USER_NAME IP_ADDRESS
 
 
-####################### Sample /etc/ssh/sshd_config hardening ################
+################# Sample /etc/ssh/sshd_config hardening ################
 Port 2222
 Protocol 2
 X11Forwarding no
@@ -94,20 +89,20 @@ AllowGroups root,wheel
 # Never set PermitTTY no.
 
 # To allow users from specific set of IPs.
-# first wildcard means all users from that IP_ADDRESS.
-AllowUsers *@IP_ADDRESS
+# first wildcard means all users from that ip_address.
+AllowUsers *@<ip_address>
 
 # from a network.
-AllowUsers *@NETWORK_ID/CIDR
+AllowUsers *@<network_id>/<cidr
 
 # Wildcards can also be used.
-AllowUsers *@IP_ADDRESS* 
+AllowUsers *@<ip_address>* 
 
 # Restrict users from few IPs.
-AllowUsers *@IP_ADDRESS *@IP_ADDRESS *@IP_ADDRESS
+AllowUsers *@<ip_address> *@<ip_address> *@<ip_address>
 
 # Restrict to a specific users from a IP.
-AllowUsers USER_NAME@IP_ADDRESS
+AllowUsers <user_name>@<ip_address>
 ##############################################################################
 
 

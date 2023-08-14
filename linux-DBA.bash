@@ -1,4 +1,4 @@
-# Last edited: 7/28/2023
+# Last edited: 8/14/2023
 
 # ONLY FOR ORACLE DATABASE WITH EBS TECHNOLOGY STACK.
 # Standard user COMMANDS; Not requires any root privilege or wheel group membership.
@@ -216,6 +216,9 @@ openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
 -keyout tomcat.key \
 -out tomcat.crt \
 -subj "/C=IN/ST=Delhi/L=Delhi/O=OSWebAdmin/OU=Linux administration/CN=*.oswebadmin.com" &> /dev/null
+
+# To verify a chain of trust
+openssl verify -CAfile TrustedRoot.crt -verbose DigiCertCA.crt
 
 
 

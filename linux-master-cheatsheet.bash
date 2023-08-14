@@ -26,30 +26,10 @@ dsldevice.lan            ether   18:45:93:7d:ed:20   C                     ens33
 # M = Permanent entry
 # P = Published entry
 
-# To install at.
-yum -y install at
 
-# To schedule a one time task.
-# Options for timing are.
-# now | midnight | noon | teatime
-# at now | at midnight etc.
 
-# For example.
-	at 14:30
-# Output.
-at>date
-at>hostnamectl
-at>Ctrl-d
 
-# To list pending jobs.
-atq
-
-# Sample output of atq.
-4       Fri Aug 27 21:56:00 2021 a root
-# 4 is the job id.
-
-# To remove a job (use id from atq)
-atrm 4# To install auditctl.
+# To install auditctl.
 yum -y install audit
 
 # To enable auditctl.
@@ -273,18 +253,7 @@ yum -y install ncurses
 # To install cpio.
 yum -y install cpio# Package = coreutils.
 
-# To install crontab.
-yum -y install cronie
 
-# crontab format
-* * * * *  command_to_execute
-- - - - -
-| | | | |
-| | | | +- day of week (0 - 7) (where sunday is 0 and 7)
-| | | +--- month (1 - 12)
-| | +----- day (1 - 31)
-| +------- hour (0 - 23)
-+--------- minute (0 - 59)
 
 # To install cryptsetup.
 yum -y install cryptsetup
@@ -1214,29 +1183,7 @@ yum -y install sysstat
 # To install scp.
 yum -y install openssh-clients
 
-# To upload a file onto a remote server.
-scp /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
 
-# To upload file from windows machine.
-scp C:\Users\Pranshu\.ssh\id_rsa.pub 192.168.1.16:/home/pranshu/
-
-# To get a file from remote server.
-scp USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER /DESTINATION
-
-# To use another port.
-scp -P PORT /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
-
-# To compress a connection.
-scp -C /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
-
-# To use remote server identity file.
-scp -i IDENTITY_FILE /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
-
-# To preserver modification time.
-scp -p /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
-
-# To get verbose output, can also increase verbosity by -vvv.
-scp -v /PATH/TO/LOCAL_FILE USER@IP_ADDRESS:/PATH/TO/REMOTE_SERVER/DESTINATION
 
 # To install sealert.
 yum -y install setroubleshoot-server setroubleshoot
@@ -1358,36 +1305,7 @@ ssh-keygen -t rsa -b 4096 -C "COMMENT"
 # To install ssh client.
 yum -y install openssh-clients
 
-# To ssh into a system.
-ssh USER_NAME@IP_ADDRESS or ssh -l USER_NAME IP_ADDRESS
 
-# To specify another port number.
-ssh -p USER_NAME@IP_ADDRESS
-
-# To use remote server's private key to connect.
-ssh -t KEY_FILE -l USER_NAME IP_ADDRESS
-
-# To forward local port to the remote port of remote server to access another service on remote server without opening firewall in it.
-ssh -L LOCAL_PORT:LOCALHOST_OF_REMOTE_SERVER:REMOTE_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
-
-# To do reverse port forwarding, this allows to access local client remotely even firewall is enabled.
-ssh -R REMOTE_PORT:LOCALHOST_OF_REMOTE_SERVER:LOCAL_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
-
-# To do dynamic port forwarding and creates SOCKS proxy on localhost.
-ssh -D PORT_NUMBER USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
-
-# To compress a ssh connection.
-ssh -l USER_NAME -C IP_ADDRESS
-
-# To forward X11 server to client.
-ssh -X -l USER_NAME IP_ADDRESS
-
-# To run command with ssh on remote system and get output in client console.
-ssh -l USER_NAME IP_ADDRESS "COMMAND;COMMAND"
-
-# To get verbose output.
-# This option can be used with above examples, one can increase verbosity by using upto three -vvv with ssh.
-ssh -v -l USER_NAME IP_ADDRESS
 
 # To install ssm.
 yum -y install system-storage-manager
@@ -1442,45 +1360,7 @@ swapon -s -- # To list enabled swap spaces.
 swapon -a -- # To mount swap space when noauto option is provided in /etc/fstab.# To install sysctl.
 yum -y install procps-ng
 
-# systemctl - systemctl control
-# Package = systemd
 
-# To list all services with description.
-# -a=all -t=type
-systemctl -at service
-
-# To list all targets.
-systemctl -at target
-
-# To get list of enabled units.
-systemctl list-unit-files --state=enabled
-
-# To start and enable a service or socket.
-systemctl enable --now SERVICE|SOCKET
-
-# To change systemctl target.
-systemctl isolate multi-user-target
-
-# To change default target.
-systemctl set-default graphical.target
-
-# To check which is the current default target.
-systemctl get-default
-
-# To change into rescue target.
-systemctl emergency
-
-# To reboot, shutdown, hibernate.
-systemclt {reboot|poweroff|hibernate}
-
-# To view a unit file.
-systemctl cat sshd
-
-# To override a unit file.
-systemctl edit SERVICE|SOCKET
-
-# To list failed services.
-systemctl list-units --state failed --type service
 
 
 Package for taskset is util-linux.
@@ -1547,18 +1427,7 @@ yum -y install shadow-utils
 
 
 
-# To create a new user.
-useradd USER_NAME
-
-# UID, GID 100 - 999 are reserved for administartors.
-# -c COMMENT, -g GID,-m creates home directory, -r creates system user, -s login sheel, -u UID
-useradd -c Administrator -m -r -s /bin/bash -u 201 pranshu
-
-# add user with a expiry date.
-useradd -e YYYY-MM-DD USER_NAME
-
-# -g primary group -G supplementry group -u UID 
-useradd -g oinstall -G dba -u 2000 USER_NAME
+#
 
 # To install userdel.
 yum -y install shadow-utils

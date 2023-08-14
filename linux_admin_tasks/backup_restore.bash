@@ -1,3 +1,38 @@
+# To install tar.													
+c -- create, v -- verbose, z -- gzip, f -- use archive file
+yum -y install tar													
+																	
+																	
+
+# To create a compressed tar.
+tar cvzf TAR_NAME_.tar.gz FOLDER_NAME
+
+# To extract tar.
+tar xzvf TAR_NAME_.tar.gz
+
+# To list content of a tar.
+tar tvf TAR_NAME_.tar.gz
+
+# To update a tar contents.
+
+# First decompresses .gz
+gunzip TAR_NAME_.tar.gz						
+
+
+# Updating tar
+tar uf TAR_NAME_.tar FILE_OR_FOLDER_NAME
+
+# Again compressing
+gzip TAR_NAME_.tar
+
+
+# To delete contents from a compress.
+gunzip TAR_NAME_.tar.gz
+tar cvf TAR_NAME_.tar FILE_OR_FOLDER_NAME --remove-files
+gzip TAR_NAME_.tar
+
+
+
 BACKUP AND RESTORE ON RHEL OF XFS FILESYSTEM.
 
 BACKUP:

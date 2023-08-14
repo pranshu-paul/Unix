@@ -212,18 +212,7 @@ cd -
 
 # To change to the relative path of the directory.
 cd ./
-# To install chage.
-yum -y install shadow-utils
 
-# To list a users details.
-chage -l USER_NAME
-
-# To set a users password min and max expiry date.
-# -m min days, -M max days.
-chage -m 90 -M 100 paul
-
-# To set account expiry date.
-chage -E 1-JAN-2022 USER_NAME
 
 # To install chattr.
 yum -y install e2fsprogs
@@ -267,16 +256,16 @@ chmod u=rwx, go=r myscript.sh
 chown - change file owner and group
 
 # To change a file's owner.
-chown USER FILE
+chown USER <file>
 
 # To change a file's owner and group:
-chown USER:GROUP FILE
+chown USER:GROUP <file>
 
 # To change a directory's owner recursively:
 chown -R USER DIRECTORY
 
 # To change ownership to match another file:
-chown --reference=REFERENCE-FILE FILE
+chown --reference=<reference_file> <file>
 
 # To install clear.
 yum -y install ncurses
@@ -1217,43 +1206,7 @@ yum -y install rpm
 # To install rsync.
 yum -y install rsync
 
-# ssh public keys also work with rsync.
 
--a -- archive						#--max-size='200k' -- to specify file's maximum size
--v -- verbose						#--progress -- to show progress while transfer
--z -- compress						#--include 'R*' -- include all files starting with R
--h -- human readable				#--exclude '*' -- exclude all other files and folder
--e -- specify remote shell to use	#--remove-source-files -- removes source file after transfer
--n -- performs a dry run before transfer
--r -- recursive
-
-
-# To copy files from this server to remote server.
-rsync -avzh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To copy remote directory files to this local server.
-rsync -avhz USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
-
-# If want to use specific protocol for transfer {ssh}.
-rsync -avzhe ssh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To show progress while transfer.
-rsync -avzhe ssh --progress /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To specify files and folder while transfer.
-rsync -avhez ssh --include 'R*' --exclude /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To remove source files after success full transfer.
-rsync --remove-source-files -azvh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To copy remote directory files to this local server from ssh.
-rsync -avzhe ssh USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
-
-# To specify options with ssh.
-rsync -avzhe "ssh -p PORT"  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
-
-# To put restriction on bandwith limit. {1024 KB/s}
-rsync -avzhe "ssh -p PORT" --bwlimit=1024  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
 
 # To install sar.
 yum -y install sysstat
@@ -1475,7 +1428,7 @@ yum -y install sudo
 yum -y install util-linux
 
 # To run command as second user.
-su - USER -c 'COMMAND'
+su - USER -c '<command>'
 su - paul -c 'ls -la'
 
 
@@ -1528,31 +1481,9 @@ systemctl edit SERVICE|SOCKET
 
 # To list failed services.
 systemctl list-units --state failed --type service
-# Package for tail is "coreutils".# To install tar.													
-																	c -- create
-yum -y install tar													v -- verbose
-																	z -- gzip
-																	f -- use archive file
-
-# To create a compressed tar.
-tar cvzf TAR_NAME_.tar.gz FOLDER_NAME
-
-# To extract tar.
-tar xzvf TAR_NAME_.tar.gz
-
-# To list content of a tar.
-tar tvf TAR_NAME_.tar.gz
-
-# To update a tar contents.
-gunzip TAR_NAME_.tar.gz						-- First decompresses .gz
-tar uf TAR_NAME_.tar FILE_OR_FOLDER_NAME	-- Updating tar
-gzip TAR_NAME_.tar							-- Again compressing
 
 
-# To delete contents from a compress.
-gunzip TAR_NAME_.tar.gz
-tar cvf TAR_NAME_.tar FILE_OR_FOLDER_NAME --remove-files
-gzip TAR_NAME_.tarPackage for taskset is util-linux.
+Package for taskset is util-linux.
 
 # To install tcpdump.
 yum -y install tcpdump
@@ -1584,28 +1515,7 @@ yum -y install procps-ng
 
 
 # To display linux processes.
-top
 
-# top -u USER
-top -u pranshu|UID
-
-# top -o option.
-top -o %CPU
-top -o VIRT
-top -o $MEM -- highest memory usage at top.
-
-# To monitor a PID ONLY.
-top -p PID
-
-# top internal commands(keyboard shortcuts).
-E -- for changing memory unit to Mi, Gi, Ti, from Ki
-f or F -- to change display fields.
-k -- to kill a process by entering PID. press Esc to exit out of the promtp.
-H -- for changing CPU mode to threads mode.
-r -- to change process priority -- nice value [-20 is highest, 0 is default, +19 is lowest.]
-m -- to change memory value to bar graph. -- b for bold.
-1 -- to change CPU view from 1 to as logical CPUs.
-u -- for changing view to user specific.
 
 # To install traceroute.
 yum -y install traceroute
@@ -1656,42 +1566,12 @@ yum -y install shadow-utils
 # To delete a user.
 userdel USER_NAME
 
-# To delete a user recursively with home directory.
-userdel -r USER_NAME
+
 
 # To install usermod.
 yum -y install shadow-utils
 
-# To set a user group to wheel group.
-usermod -aG wheel USER_NAME
 
-# To allow a user check journals of system.
-usermod -aG adm USER_NAME
-
-# To change a users login name.
-usermod -l OLD_LOGIN_NAME NEW_LOGIN_NAME
-
-# To change a users shell.
-usermod -s /bin/bash USER_NAME
-
-# To change a users description.
-usermod -c 'DESCRIPTION' 'USER_NAME'
-
-# To change a users group.
-# This removes the user from its current group.
-usermod -g GROUP_NAME USER_NAME
-
-# To add a user into a group with overriding previous.
-usermod -aG GROUP_NAME USER_NAME
-
-# Locks out the user.
-usermod -L USER_NAME
-
-# Unlocks the user.
-usermod -U USER_NAME
-
-# To set expiry date of a user account.
-usermod --expiredate YYYY-MM-DD USER_NAME
 
 # To install vim.
 yum -y install vim-enhanced vim-common
@@ -1738,14 +1618,7 @@ ray     rushmore = NOPASSWD: /bin/kill, PASSWD: /bin/ls, /usr/bin/lprm
 # To allow all wheel group users to run all commands without password.
 %wheel ALL=(ALL)       NOPASSWD: ALL
 
-# To install vlock.
-yum -y install kbd
 
-# To lock current tty/pts.
-vlock
-
-# To lock all tty.
-vlock -a
 
 
 # To install vmstat.

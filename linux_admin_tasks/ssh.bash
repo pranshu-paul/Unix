@@ -33,6 +33,46 @@ firewall-cmd --zone=public --add-service=ssh --permanent
 # Use "aureport" command if some one is brute forcing.
 
 
+
+# ssh public keys also work with rsync.
+
+-a -- archive						#--max-size='200k' -- to specify file's maximum size
+-v -- verbose						#--progress -- to show progress while transfer
+-z -- compress						#--include 'R*' -- include all files starting with R
+-h -- human readable				#--exclude '*' -- exclude all other files and folder
+-e -- specify remote shell to use	#--remove-source-files -- removes source file after transfer
+-n -- performs a dry run before transfer
+-r -- recursive
+
+##############################################################
+# To copy files from this server to remote server.
+rsync -avzh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To copy remote directory files to this local server.
+rsync -avhz USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
+
+# If want to use specific protocol for transfer {ssh}.
+rsync -avzhe ssh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To show progress while transfer.
+rsync -avzhe ssh --progress /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To specify files and folder while transfer.
+rsync -avhez ssh --include 'R*' --exclude /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To remove source files after success full transfer.
+rsync --remove-source-files -azvh /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To copy remote directory files to this local server from ssh.
+rsync -avzhe ssh USER_NAME@IP_ADDRESS:/PATH/OF/REMOTE_SERVER /PATH/OF/LOCAL_SERVER
+
+# To specify options with ssh.
+rsync -avzhe "ssh -p PORT"  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+# To put restriction on bandwith limit. {1024 KB/s}
+rsync -avzhe "ssh -p PORT" --bwlimit=1024  /PATH/OF/SOURCE USER_NAME@IP_ADDRESS:/PATH/TO/DESTINATION
+
+
 ####################### Sample /etc/ssh/sshd_config hardening ################
 Port 2222
 Protocol 2

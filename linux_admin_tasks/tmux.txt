@@ -1,0 +1,5 @@
+yum -y install tmux
+
+ctrl+b , shift+% -- To split a window vertically.
+#ctrl+b , shift+" -- To split a window horizontally.
+ctrl+b , up,down left,right -- To navigate between windows.

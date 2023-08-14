@@ -15,6 +15,8 @@ lspci | grep -i ethernet
 
 whoami # -- Shows the current user from which you are logged in.
 
+getent # To list all the ports from /etc/services
+
 # To show IP addresses.
 ip addr show <DEVICE_NAME> | grep inet
 ip addr show ens3 | grep inet

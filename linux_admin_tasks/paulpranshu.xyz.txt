@@ -1,5 +1,5 @@
 ; Domain: paulpranshu.xyz
-; Exported (y-m-d hh:mm:ss): 2023-08-10 22:06:02
+; Exported (y-m-d hh:mm:ss): 2023-08-15 10:17:55
 ;
 ; This file is intended for use for informational and archival
 ; purposes ONLY and MUST be edited before use on a production
@@ -30,7 +30,7 @@ $ORIGIN paulpranshu.xyz.
 
 ; SOA Record
 @	3600	 IN 	SOA	ns29.domaincontrol.com.	dns.jomax.net. (
-					2023081002
+					2023081506
 					28800
 					7200
 					604800
@@ -42,7 +42,9 @@ $ORIGIN paulpranshu.xyz.
 
 ; TXT Record
 @	3600	 IN 	TXT	"google-site-verification=gmwzrZZrWrcySxAZ-WNbp6YLOzZTrDzrIzY1tA-YVY4"
-@	3600	 IN 	TXT	"v=spf1 +a +mx +ip4:64.227.188.201 ~all"
+@	3600	 IN 	TXT	"v=spf1 +a +mx +ip4:64.227.188.201 -all"
+default._domainkey	3600	 IN 	TXT	"v=DKIM1;k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/fDiKKRPgxuTOu5C6Mxrf7avMK+WjPoWrXVqhSGqqTCgkNIefRyFA+ZDQTuTAd/4dwnpQ23y3vQyRTectkBNXjIj7UJsTp+kloxeHLoodBJn5OWLTFSx+U2VLrZ0/Em0Rw9TdK1063CNqf+Xd1fSErgHRQ8yEt78jyF3i7AqhsQIDAQAB"
+_dmarc	3600	 IN 	TXT	"v=DMARC1;p=quarantine"
 
 ; CNAME Record
 srv04	3600	 IN 	CNAME	@

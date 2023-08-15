@@ -1,6 +1,7 @@
+# sendmail
 
-
-sendmail -F Pranshu Paul paulpranshu@gmail.com
+# Basic syntax to send mails from a unix system.
+echo <message> | sendmail -F <sender_name> someone@example.com
 
 #!/bin/bash
 

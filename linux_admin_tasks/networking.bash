@@ -30,16 +30,22 @@ nmtui # Package for this command -- NetworkManager-tui
 ip neigh
 arp -a # -- -a all IP address
 
-/etc/sysconfig/network-scripts
-ifcfg-<NETWORK_ALIAS>
+# Configuration file location and name.
+/etc/sysconfig/network-scripts/ifcfg-<NETWORK_ALIAS>
+
+# To get the hardware address.
+ip link show enp0s9 | grep link | awk '{print $2}'
+
+# To generate UUID.
+uuidgen
 
 # Sample ethernet file for rhel 6.
-DEVICE=eth0
-HWADDR=08:00:27:24:51:01
+DEVICE=enp0s9
+HWADDR=08:00:27:51:77:b9
 TYPE=Ethernet
-UUID=5a370c36-4453-4c3e-9d03-3e8049e6a508
-NAME=public
-DEFROUTE=yes
+UUID=820811e1-818a-499e-b535-1a29bd545f55
+NAME=enp0s9
+DEFROUTE=no
 ONBOOT=yes
 NM_CONTROLLED=yes
 BOOTPROTO=none
@@ -48,12 +54,12 @@ BROWSER_ONLY=no
 PREFIX=24
 IPV6_DISABLED=yes
 IPV6INIT=no
-DNS1=192.168.168.56.2
-IPADDR=192.168.56.5
+DNS1=192.168.100.1
+IPADDR=192.168.100.15
 NETMASK=255.255.255.0
-NETWORK=192.168.56.1
-BROADCAST=192.168.56.255
-GATEWAY=192.168.56.2
+NETWORK=192.168.100.0
+BROADCAST=192.168.100.255
+GATEWAY=192.168.100.1
 
 # nmcli general commands.
 nmcli dev connect ens160
@@ -155,14 +161,6 @@ echo erpapps > /etc/hostname # For the old distros
 
 hostnamectl set-hostname <HOSTNAME>
 hostnamectl set-hostname erpapps
-
-
-
-# Use the below commands to find package for command.
-yum provides <COMMAND>
-yum provides lvm
-yum provides dig
-
 
 #######################################################################################
 # NETWORK BONDING.

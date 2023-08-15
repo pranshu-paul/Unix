@@ -23,7 +23,7 @@ restorecon -Rrv /etc/pki/tls/certs/httpd.crt
 restorecon -Rrv /etc/pki/tls/private/httpd.key
 
 # Create a directory for the website to be made.
-mkdir -p /var/www/rhel.com
+mkdir -p /var/www/postfixadmin
 
 # Change ownership and group membership to apache.
 chown -R apache:apache /var/www
@@ -41,16 +41,17 @@ cat > /var/www/rhel.com/index.html << EOF
 EOF
 
 # Create a virtual host for the website in the directory "/etc/httpd/conf.d"
-cat > /etc/httpd/conf.d/rhel.com.conf << EOF
+cat > /etc/httpd/conf.d/postfixadmin.conf << EOF
+Listen 80
 <VirtualHost *:443>
-		DocumentRoot /var/www/rhel.com
-		ServerName rhel.com
-		CustomLog /var/log/httpd/rhel.com_access.log combined
-		ErrorLog /var/log/httpd/rhel.com_error.log
+		DocumentRoot /var/www/postfixadmin
+		ServerName postfixadmin
+		CustomLog /var/log/httpd/postfixadmin_access.log combined
+		ErrorLog /var/log/httpd/postfixadmin_error.log
 		SSLEngine on
 		SSLCertificateFile /etc/pki/tls/certs/httpd.crt
 		SSLCertificateKeyFile /etc/pki/tls/private/httpd.key
-	<Directory /var/www/rhel.com/html>
+	<Directory /var/www/postfixadmin>
 			Options Indexes FollowSymLinks
 			Allowoverride none
 			Require all granted

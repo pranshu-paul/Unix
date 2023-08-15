@@ -54,6 +54,8 @@ postconf -e relay_domains = hash:/etc/postfix/relay_domains
 # Update protocols in /etc/dovecot/dovecot.conf
 protocols = imap lmtp pop3
 
+postconf -e "mynetworks = 0.0.0.0/0"
+
 # Open the firewall.
 firewall-cmd --permanent --add-service={imaps,imap,pop3s,pop3}
 firewall-cmd --reload

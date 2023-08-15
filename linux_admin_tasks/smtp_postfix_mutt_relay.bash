@@ -21,11 +21,10 @@
 # MX Record: For incoming emails.
 @	3600	 IN 	MX	0	<hostname>.<domain>.<tld>.
 
+# DMARC (Domain-based Message Authentication, Reporting, and Conformance)
+_dmarc	3600	 IN 	TXT	"v=DMARC1;p=quarantine"
 
 # Add DKIM (Domain Key Identified Mail) record (see openssl).
-
-# Add a DMARC (Domain-based Message Authentication, Reporting, and Conformance)
-TXT	v=DMARC1; p=none; rua=mailto:testing.paulpranshu@gmail.com; ruf=mailto:testing.paulpranshu@gmail.com; fo=1; adkim=s; aspf=s; pct=100;
 
 # Add an entry in /etc/hosts file.
 
@@ -70,6 +69,11 @@ firewall-cmd --add-service=smtp --permanent && firewall-cmd --reload
 # Start Postfix daemon.
 systemctl daemon-reload
 systemctl enable --now postfix
+
+# To clear the mailq.
+postsuper -d ALL
+
+echo "This is a test mail." | mail paulpranshu@gmail.com
 
 
 ####################################################################################################

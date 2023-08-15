@@ -70,6 +70,7 @@ Import-Certificate -FilePath "root-ca-cert.pem" -CertStoreLocation Cert:\LocalMa
 
 #######################################################
 #The below steps works properly.
+# Password: windows
 
 
 # Generate Root key and Cert.

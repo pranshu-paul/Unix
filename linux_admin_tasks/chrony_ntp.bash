@@ -1,3 +1,20 @@
+# To set keyboard.
+localectl status
+
+# Set a system locale variable:
+localectl set-locale LANG=en_US.UTF-8
+
+# To set keymap to English India.
+localectl set-keymap en_IN
+
+# To check time with date.
+timedatectl status
+
+# To set timezone Asia/Kolkata.
+TZ=Asia/Kolkata
+timedatectl set-timezone "${TZ}"
+
+
 dnf -y install chrony
 
 systemctl enable --now chronyd

@@ -9,6 +9,33 @@
 # A new banner can be added in the /etc/motd file.
 # A hidden file can be added in the /etc/skel directory to use as the default files present in a new user account.
 
+# To display about the shadow information.
+getent shadow <user>
+getent shadow | grep <user>
+
+# To display the passwd information.
+getent passwd <user>
+getent passwd | grep <user>
+
+
+
+# To add a group.
+groupadd GROUP_NAME
+
+# To add a group with GID.
+groupadd -g GID GROUP_NAME
+
+
+# To delete a group.
+groupdel GROUP_NAME# To install groupmod.
+yum -y install shadow-utils
+
+# To change a group name.
+groupmod -n NEW_GROUP_NAME OLD_GROUP_NAME
+
+# To change a group GID.
+groupmod -g GID GROUP_NAME
+
 useradd -D # Shows the default new user configuration
 
 # To create a new user.
@@ -69,6 +96,7 @@ passwd -u <username>
 # Deletes the user password.
 passwd -d <username>
 
+echo $RANDOM $RANDOM | sha512sum | head -c 16 | passwd --stdin <user_name>
 
 # Shows last logins.
 last
@@ -93,6 +121,8 @@ chage -m 90 -M 100 <username>
 
 # To set account expiry date.
 chage -E 1-JAN-2022 <username>
+
+chgrp <group> <file>
 
 
 # Roles
@@ -188,7 +218,7 @@ vlock -a
 auth            requisite       pam_wheel.so use_uid
 
 
-
+faillock --user USERNAME --reset
 ##############################################################################
 # Sudoers file configuration.
 # ALWAYS EDIT THE SUDOERS FILE CAREFULLY.
@@ -248,3 +278,15 @@ vipw -s
 # root:$6$jKZME4R4$NnQ4lmr/7f26AzYmCeaVEamV05Ri2le3HObxcYCVHSjRsg4yBM3eyJcaU/et9pFzT7.lQmXIBxJ790LKA.OiB.:18889:0:99999:7:::
 
 # password -- $6$ = method of encryption = sha512sum after that is password hash
+
+
+
+##############################################
+# To install pwmake.
+yum -y install libpwquality
+
+# To generate a password.
+pwmake 64
+
+# To change a users password with prompted.
+pwmake 64 | passwd --stdin <user_name>

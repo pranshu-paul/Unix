@@ -67,6 +67,30 @@ ssh -l USER_NAME IP_ADDRESS "COMMAND;COMMAND"
 # This option can be used with above examples, one can increase verbosity by using upto three -vvv with ssh.
 ssh -v -l USER_NAME IP_ADDRESS
 
+# To save public key of client system in remote server authorized_keys file.
+ssh-copy-id USER@IP_ADDRESS
+
+# To save public key of client system in remote server authorized_keys file by using remote server's identity file.
+ssh-copy-id -i IDENTITY_FILE USER@IP_ADDRESS
+
+# -f for force option if already present there.
+ssh-copy-id -f USER@IP_ADDRESS
+
+# -p If remote server is using non-default port.
+ssh-copy-id -p <port> USER@IP_ADDRESS
+
+# to generate rsa ssh key of 4096 bits.
+ssh-keygen -t rsa -b 4096
+
+# -f for file name -p for password prompt.
+ssh-keygen -f .\id_rsa -p
+
+# To update a passphrase on a key:
+ssh-keygen -p -P OLD-PASSPHRASE -N NEW-PASSPHRASE -f KEYFILE
+
+# To add comment in a key.
+ssh-keygen -t rsa -b 4096 -C "COMMENT"
+
 
 ################# Sample /etc/ssh/sshd_config hardening ################
 Port 2222

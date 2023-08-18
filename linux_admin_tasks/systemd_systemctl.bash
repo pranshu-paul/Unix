@@ -37,3 +37,14 @@ systemctl edit SERVICE|SOCKET
 
 # To list failed services.
 systemctl list-units --state failed --type service
+
+
+# To clean the temp directory.
+systemd-tmpfiles --clean
+
+# To start a system socket only not the process.
+# This opens an endpoint so that the process can be started remotely.
+systemctl start sshd.socket
+
+# To list the active sockets.
+systemctl list-units --type socket

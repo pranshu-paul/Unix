@@ -1,12 +1,4 @@
-alias
 
-# To set shortcuts to commands.
-
-alias random-keyword="COMMAND WITH ATTRIBUTES"
-
-Example
-
-alias ll="ls -alF"
 
 # To install arp.
 yum -y install net-tools
@@ -29,39 +21,7 @@ dsldevice.lan            ether   18:45:93:7d:ed:20   C                     ens33
 
 
 
-# To install auditctl.
-yum -y install audit
 
-# To enable auditctl.
-systemctl enable --now auditd
-
-# List audit rules.
-auditctl -l
-
-# To report the status of audit system.
-auditctl -s
-
-# To delete all rules.
-auditctl -D
-
-# To define a file system rule, use the following syntax.
-# auditctl -w PATH_TO_FILE -p PERMISSIONS -k KEY_NAME
-
-# permission types.
-# r — read access to a file or a directory.
-# w — write access to a file or a directory.
-# x — execute access to a file or a directory.
-# a — change in the file's or directory's attribute.
-
-#  -k KEY_NAME can be a arbitrary name.# To install aureport.
-yum -y install audit
-
-# To check audit report.
-aureport# To install ausearch.	# see auditctl
-yum -y install audit
-
-# To search from defined auditing rules from "auditctl".
-ausearch -k KEY_STRING
 
 # To install authconfig.
 yum -y install authconfig
@@ -117,7 +77,7 @@ yum -y install gawk
 awk -F: '($3 == "0") {print}' /etc/passwd
 
 # To list all users in system.
-awk -F':' '{ print $1}' /etc/passwd
+awk -F':' '{print $1}' /etc/passwd
 
 # To install badblocks.
 yum -y install e2fsprogs
@@ -200,55 +160,7 @@ yum -y install e2fsprogs
 # To install chcon.
 yum -y install coreutils.
 
-# To install chgrp.
-yum -y install coreutils
 
-# Package = coreutils
-chmod - change file mode bits
-
-# Roles
-#u - user (owner of the file)
-#g - group (members of file's group)
-#o - global (all users who are not owner and not part of group)
-#a - all (all 3 roles above)
-
-# Numeric representations
-7 - full (rwx)
-6 - read and write (rw-)
-5 - read and execute (r-x)
-4 - read only (r--)
-3 - write and execute (-wx)
-2 - write only (-w-)
-1 - execute only (--x)
-0 - none (---)
-
-# Set user to read/write/execute to (myscript.sh), octal notation.
-chmod 755 myscript.sh
-
-# Remove read/write/execute from (myscript.sh), symbolic mode.
-chmod = myscript.sh
-
-# Set user to read/write/execute, and group and others to read only permission to (myscript.sh), symbolic mode.
-
-chmod u=rwx, go=r myscript.sh
-
-# Package = coreutils
-chown - change file owner and group
-
-# To change a file's owner.
-chown USER <file>
-
-# To change a file's owner and group:
-chown USER:GROUP <file>
-
-# To change a directory's owner recursively:
-chown -R USER DIRECTORY
-
-# To change ownership to match another file:
-chown --reference=<reference_file> <file>
-
-# To install clear.
-yum -y install ncurses
 
 # To install cpio.
 yum -y install cpio# Package = coreutils.
@@ -326,7 +238,7 @@ yum -y install nfs-utils
 yum -y install pam
 
 # To unlock a user.
-faillock --user USERNAME --reset
+
 
 
 # To install fdisk.
@@ -657,40 +569,16 @@ yum -y install grep
 -e -- extended grep
 -f -- fixed grep 
 
-# Ignores case while searching.
-grep -i STRING
 
-# Can search multiple STRINGs.
-grep -e STRING1 -e STRING2 ...
-
-
-# Looks for exact STRING only.
-grep -f STRING
-
-# Remove comments from a file and spaces.
-grep -v -e '^#' -e '^$' <file> | column -t
 
 # To install groupadd.
 yum -y install shadow-utils
 
-# To add a group.
-groupadd GROUP_NAME
-
-# To add a group with GID.
-groupadd -g GID GROUP_NAME
 
 # To install groupdel.
 yum -y install shadow-utils
 
-# To delete a group.
-groupdel GROUP_NAME# To install groupmod.
-yum -y install shadow-utils
 
-# To change a group name.
-groupmod -n NEW_GROUP_NAME OLD_GROUP_NAME
-
-# To change a group GID.
-groupmod -g GID GROUP_NAME
 
 # To install grub2-mkconfig.
 yum -y install grub2-tools
@@ -724,27 +612,7 @@ yum -y install coreutils
 # To install ifconfig.
 yum -y install net-tools
 
-# To install iostat.
-yum -y install sysstat
 
-%user -- shows percentage of CPU utilization at user level.
-%nice -- shows process priorities [-20 is highest, 0 is default, +19 is lowest.]
-%system -- shows utilization at kernel.
-%iowait -- shows CPUs waiting time when system has outstanding disk usage.
-%steal -- involuntary wait by CPUs while hypervisior was servicing another virtual processor.
-%idle -- shows how much percent CPU is in idle state.
-
-tps -- transfer per second.
-
-# To check CPUs I/O status.
-iostat -c
-
-# To check all I/O status in megabytes per second.
-iostat
-
-# To check a specific device I/O.
-iostat -x DEVICE_NAME
-iostat -x sda
 
 # To install ip6tables.
 yum -y install iptables
@@ -771,8 +639,7 @@ To kill forcefully.
 kill -9 PID
 # Package = shadow-utils
 
-# To check last log for root -u = user.
-lastlog -u root
+
 
 # To install last.
 yum -y install sysvinit-tools
@@ -791,18 +658,12 @@ less -X
 # To install localectl.
 yum -y install systemd
 
-localectl status
 
-# To set keymap to English India.
-localectl set-keymap en_IN
 
 # To install locate.
 yum -y install mlocate
 
-# To install logger.
-yum -y install util-linux
 
-logger -t TAG "MESSAGE"
 
 # To install lpr.
 yum -y install cups-client
@@ -826,11 +687,7 @@ lscpu
 # To install lshw.
 yum -y install lshw
 
-# List all hardware details.
-lshw | less
 
-# List less details of hardware.
-lshw -short | less
 
 # To install lsof.
 yum -y install lsof
@@ -1032,24 +889,12 @@ symmetric encryption with openssl to give you a high-quality result.
 Also, always remember that the result is only as good as the password
 you use. You must use a strong password otherwise encryption is meaningless.
 
-openssl enc -e -aes-256-cbc \
-  -salt \
-  -pbkdf2 \
-  -iter 1000000 \
-  -md sha512 \
-  -base64 \
-  -in somefile \
-  -out somefile.enc # to encrypt
 
-openssl enc -d -aes-256-cbc \
-  -salt \
-  -pbkdf2 \
-  -iter 1000000 \
-  -md sha512 \
-  -base64 \
-  -in somefile.enc \
-  -out somefile # to decrypt# To install parted.
-yum -y install util-linux# Package = parted
+  
+  # To install parted.
+yum -y install util-linux
+
+# Package = parted
 partprobe - inform the OS of partition table changes
 
 # To show a summary of devices and their partitions.
@@ -1104,14 +949,7 @@ ps -ef | awk '{print $2 ',' $8}' | less -- to see only PID and command.
 # To install pwd.
 yum -y install coreutils
 
-# To install pwmake.
-yum -y install libpwquality
 
-# To generate a password.
-pwmake 64
-
-# To change a users password with prompted.
-pwmake 64 | passwd --stdin <user_name>
 
 Package for renice util linux.
 
@@ -1225,17 +1063,9 @@ sosreport
 # To install ssh-copy-id.
 yum -y install openssh-clients
 
-# To save public key of client system in remote server authorized_keys file.
-ssh-copy-id USER@IP_ADDRESS
 
-# To save public key of client system in remote server authorized_keys file by using remote server's identity file.
-ssh-copy-id -i IDENTITY_FILE USER@IP_ADDRESS
 
-# -f for force option if already present there.
-ssh-copy-id -f USER@IP_ADDRESS
-
-# -p If remote server is using non-default port.
-ssh-copy-id -p USER@IP_ADDRESS# To install sshd.
+# To install sshd.
 yum -y install openssh-server.
 configuration file /etc/ssh/sshd_config
 
@@ -1245,17 +1075,7 @@ sshd -T
 # To install ssh-keygen.
 yum -y install openssh openssh-clients
 
-# to generate rsa ssh key of 4096 bits.
-ssh-keygen -t rsa -b 4096
 
-# -f for file name -p for password prompt.
-ssh-keygen -f .\id_rsa -p
-
-# To update a passphrase on a key:
-ssh-keygen -p -P OLD-PASSPHRASE -N NEW-PASSPHRASE -f KEYFILE
-
-# To add comment in a key.
-ssh-keygen -t rsa -b 4096 -C "COMMENT"
 
 # To install ssh client.
 yum -y install openssh-clients
@@ -1332,11 +1152,7 @@ yum -y install coreutils
 # To install timedatectl.
 yum -y install systemd
 
-# To check time with date.
-timedatectl status
 
-# To set timezone Asia/Kolkata.
-timedatectl set-timezone Asia/Kolkata
 
 # To install tmux.
 yum -y install tmux
@@ -1374,7 +1190,7 @@ yum -y install coreutils
 
 # To install uptime.
 yum -y install procps-ng
-uptime -p
+
 
 
 # To install useradd.
@@ -1415,32 +1231,6 @@ vipw -g
 # To install virsh.
 yum -y install libvirt-client
 
-# To install visudo.
-yum -y install sudo
-
-# sudo configuration file.
-/etc/sudoers
-
-# If directly editing /etc/sudoers file.
-# Use below command to check syntax is correct or not.
-visudo -c
-
-
-# format
-# user host=(users) [NOPASSWD:]commands
-# also need to add to group.
-# % - indicates group names
-
-# %group host=(users) [NOPASSWD:]commands
-%pranshu ALL=(ALL) NOPASSWD: /usr/bin/yum, NOPASSWD: /usr/sbin/aureport, PASSWD: /usr/bin/systemctl
-
-# Instead giving full access to commands, only few options can also be provided.
-%pranshu ALL=(ALL) NOPASSWD: /usr/bin/yum info, NOPASSWD: /usr/sbin/aureport -a, PASSWD: /usr/bin/systemctl reboot
-
-ray     rushmore = NOPASSWD: /bin/kill, PASSWD: /bin/ls, /usr/bin/lprm
-
-# To allow all wheel group users to run all commands without password.
-%wheel ALL=(ALL)       NOPASSWD: ALL
 
 
 
@@ -1478,59 +1268,3 @@ yum -y install procps-ng
 # To install xargs.
 yum -y install findutils
 
-# To install xfs_admin.
-yum -y install xfsprogs
-
-# To install xfs_fsr.
-yum -y install xfsprogs
-
-# To install xfs_growfs
-yum -y install xfsprogs
-
-# Package for xfs_repair is "xfsprogs".
-
-# To install xz.
-yum -y install xz
-
-# To install yum.
-yum -y install yum
-
-# To search for a package.
-yum search STRING
-
-# To look into packages list.
-# Use of wildcards are optional.
-yum list *STRING*
-
-# To update system.
-yum update
-
-# To security update only.
-yum -y update --security
-
-# To check which package proides this command.
-yum provides COMMAND
-
-# To complete remove a package.
-yum erase PACKAGE
-
-# To clean yum all cache.
-yum clean all
-
-# To download package only.
-yum download STRING
-
-# To look for a package info .
-yum info <package>
-
-# To look for a group.
-yum group list
-
-# To install a group.
-yum group install "GROUP NAME"
-
-# To check history that what installed.
-yum history
-
-# To install zip.
-yum -y install zip

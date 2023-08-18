@@ -133,3 +133,16 @@ echo "$(echo '   M e   ' | sed 's/ *$//g')."
 echo "$(echo '   M e   ' | sed 's/^ *| *$//g')."
 
 echo "$(echo '   M e   ' | sed -E 's/^ *| *$//g')."
+
+# Ignores case while searching.
+grep -i STRING
+
+# Can search multiple STRINGs.
+grep -e STRING1 -e STRING2 ...
+
+
+# Looks for exact STRING only.
+grep -f STRING
+
+# Remove comments from a file and spaces.
+grep -v -e '^#' -e '^$' <file> | column -t

@@ -39,7 +39,7 @@ ip link show enp0s9 | grep link | awk '{print $2}'
 # To generate UUID.
 uuidgen
 
-# Sample ethernet file for rhel 6.
+# Sample ethernet file for rhel 6,7, and 8.
 DEVICE=enp0s9
 HWADDR=08:00:27:51:77:b9
 TYPE=Ethernet
@@ -91,6 +91,9 @@ nmcli con down ens224 && nmcli con up ens224
 nmcli con down ens3 && nmcli con up ens3
 
 # To create a subnet.
+
+ipcalc 192.168.100.1/24 -S 27
+
 nmcli connection add con-name <any_subnet_name> ifname <interface_name> type ethernet ip4 <ip_address>/<cidr> gw4 <gateway>
 
 nmcli connection add con-name test_subnet \

@@ -152,6 +152,12 @@ set editor= "vi"
 set pager = "less"
 set signature = "Sent from Oracle Solaris"
 
+set smtp_url = "smtp://mailsrv2.fineorganics.com:25"
+set from = "prod_ebs@fineorganics.com"
+set edit_headers=yes
+set ssl_starttls = no
+set ssl_force_tls = no
+
 
 # To send email from the command line.
 # -s SUBJECT -c CARBON COPY -b BLIND CARBON COPY -a ATTACHMENT

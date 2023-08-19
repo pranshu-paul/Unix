@@ -50,6 +50,21 @@ pg_ctl reload
 # Just revert the auth method.
 
 
+# User Management.
+create user <username> with password '<password>';
+create user <username> with encrypted password '<password>';
+
+alter user <username> password '<password>';
+
+create database <database> owner <username>;
+
+alter database <database> owner to <username>;
+
+# For postgres user only.
+\password
+
+grant all privileges on database <database> to <username>;
+
 
 # General administrative commands.
 \c -- connect

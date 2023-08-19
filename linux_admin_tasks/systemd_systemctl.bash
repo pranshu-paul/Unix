@@ -48,3 +48,11 @@ systemctl start sshd.socket
 
 # To list the active sockets.
 systemctl list-units --type socket
+
+
+# To mask a unit file.
+# To prevent a reboot on the machine remotely.
+systemctl mask ctrl-alt-del.target
+
+# To unmask a unit file.
+systemctl unmask ctrl-alt-del.target

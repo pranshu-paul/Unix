@@ -1,7 +1,7 @@
-Commands -- ssh, sshd, sftp, scp, ssh-copy-id, ssh-keygen, w ,semanage
-Packages openssh, openssh-server
-Configuration files.
-/etc/ssh/sshd_config, /etc/ssh/sshrc, ~/.ssh/rc, ~/.hushlogin, /etc/motd, ~/.authorized_keys
+# Commands -- ssh, sshd, sftp, scp, ssh-copy-id, ssh-keygen, w ,semanage
+# Packages openssh, openssh-server
+# Configuration files.
+# /etc/ssh/sshd_config, /etc/ssh/sshrc, ~/.ssh/rc, ~/.hushlogin, /etc/motd, ~/.authorized_keys
 
 # TO CREATE AUTHORIZED_KEYS FILE.
 cd ~ ; mkdir .ssh ; chmod 700 .ssh ; cd .ssh ; touch authorized_keys ; chmod 600 authorized_keys ; cd ~
@@ -26,7 +26,7 @@ firewall-cmd --zone=public --add-service=ssh --permanent
 # Use "sshd -t" to check whether the configuration is ok or not.
 # Restart sshd.service "systemctl restart sshd.service"
 # Use "w" command to check who is logged into the system.
-# To force log out a user use "pkill -u <user_name>"
+# To force log out a user use "pkill -u <<user_name>>"
 # Check SElinux context for the each ssh config file.
 # Check SElinux context of ~/.ssh directory if pub-key authentication is not working.
 # Use "restorecon -R -v ~/.ssh" to restore SElinux context.
@@ -37,47 +37,47 @@ firewall-cmd --zone=public --add-service=ssh --permanent
 # General SSH commands.
 
 # To ssh into a system.
-ssh USER_NAME@IP_ADDRESS or ssh -l USER_NAME IP_ADDRESS
+ssh <user_name>@<ip_address> or ssh -l <user_name> <ip_address>
 
 # To specify another port number.
-ssh -p USER_NAME@IP_ADDRESS
+ssh -p <user_name>@<ip_address>
 
 # To use remote server's private key to connect.
-ssh -t KEY_FILE -l USER_NAME IP_ADDRESS
+ssh -t KEY_FILE -l <user_name> <ip_address>
 
 # To forward local port to the remote port of remote server to access another service on remote server without opening firewall in it.
-ssh -L LOCAL_PORT:LOCALHOST_OF_REMOTE_SERVER:REMOTE_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
+ssh <user_name>@<remote_ip_address> -L <any_random_port>:<remote_loopback_address>:<target_port>
 
 # To do reverse port forwarding, this allows to access local client remotely even firewall is enabled.
-ssh -R REMOTE_PORT:LOCALHOST_OF_REMOTE_SERVER:LOCAL_PORT USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
+ssh -R <remote_port>:<remote_loopback_address>:<local_port> <user_name>@<remote_ip_address>
 
 # To do dynamic port forwarding and creates SOCKS proxy on localhost.
-ssh -D PORT_NUMBER USER_NAME@IP_ADDRESS_OF_REMOTE_SERVER
+ssh -D <port> <user_name>@<remote_ip_address>
 
 # To compress a ssh connection.
-ssh -l USER_NAME -C IP_ADDRESS
+ssh -l <user_name> -C <ip_address>
 
 # To forward X11 server to client.
-ssh -X -l USER_NAME IP_ADDRESS
+ssh -X -l <user_name> <ip_address>
 
 # To run command with ssh on remote system and get output in client console.
-ssh -l USER_NAME IP_ADDRESS "COMMAND;COMMAND"
+ssh -l <user_name> <ip_address> "<command>;<command>"
 
 # To get verbose output.
 # This option can be used with above examples, one can increase verbosity by using upto three -vvv with ssh.
-ssh -v -l USER_NAME IP_ADDRESS
+ssh -v -l <user_name> <ip_address>
 
 # To save public key of client system in remote server authorized_keys file.
-ssh-copy-id USER@IP_ADDRESS
+ssh-copy-id <user>@<ip_address>
 
 # To save public key of client system in remote server authorized_keys file by using remote server's identity file.
-ssh-copy-id -i IDENTITY_FILE USER@IP_ADDRESS
+ssh-copy-id -i <identity_file> <user>@<ip_address>
 
 # -f for force option if already present there.
-ssh-copy-id -f USER@IP_ADDRESS
+ssh-copy-id -f <user>@<ip_address>
 
 # -p If remote server is using non-default port.
-ssh-copy-id -p <port> USER@IP_ADDRESS
+ssh-copy-id -p <port> <user>@<ip_address>
 
 # to generate rsa ssh key of 4096 bits.
 ssh-keygen -t rsa -b 4096
@@ -85,10 +85,11 @@ ssh-keygen -t rsa -b 4096
 # -f for file name -p for password prompt.
 ssh-keygen -f .\id_rsa -p
 
-# To update a passphrase on a key:
-ssh-keygen -p -P OLD-PASSPHRASE -N NEW-PASSPHRASE -f KEYFILE
+# To update a passphrase on a key.
+# The below command can also be used to remove password.
+ssh-keygen -p -P <old_passphrase> -N <new_passphrase> -f KEYFILE
 
-# To add comment in a key.
+# To add a comment in a key.
 ssh-keygen -t rsa -b 4096 -C "COMMENT"
 
 
@@ -113,7 +114,7 @@ AllowGroups root,wheel
 # Never set PermitTTY no.
 
 # To allow users from specific set of IPs.
-# first wildcard means all users from that ip_address.
+# first wildcard means all users from that <ip_address>.
 AllowUsers *@<ip_address>
 
 # from a network.
@@ -213,7 +214,7 @@ export SSHPASS='Pa55wo&rd@lin#ux'
 sshpass -e ssh paul@10.0.0.171 -p 2169
 
 ########################################################################
-# echo 'machine <ip_address> login <user_name> password <password>' > .netrc
+# echo 'machine <<ip_address>> login <<user_name>> password <password>' > .netrc
 
 #!/bin/bash
 

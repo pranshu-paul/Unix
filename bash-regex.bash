@@ -50,7 +50,6 @@ sed 's/freecodecamp/f233C0d3C@mp/i' name.txt -- Ignores case
 sed 's/freecodecamp/f233C0d3C@mp/i' < name.txt
 cat name.txt | sed 's/freecodecamp/f233C0d3C@mp/i'
 grep -n meow[a-z]* kitty_ipsum_1.txt | sed s/[0-9]/1/
-grep -n meow[a-z]* kitty_ipsum_1.txt | sed s/[0-9]/1/
 grep -n meow[a-z]* kitty_ipsum_1.txt | sed -E s/[0-9]+/1/ -- Extended regex
 grep -n meow[a-z]* kitty_ipsum_1.txt | sed -E 's/([0-9]+)/\1/' -- Replaces with same number
 grep -n meow[a-z]* kitty_ipsum_1.txt | sed -E 's/([0-9]+)/\1/' -- To get numbers only in output
@@ -146,3 +145,9 @@ grep -f STRING
 
 # Remove comments from a file and spaces.
 grep -v -e '^#' -e '^$' <file> | column -t
+
+# To insert a special character among the elements of an array.
+IFS=','
+printf "%s\n" "${addr[*]}"| paste
+
+

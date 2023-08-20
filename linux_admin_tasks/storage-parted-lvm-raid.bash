@@ -2,7 +2,9 @@
 
 # For the devices name starting with "sd"
 dmesg | grep SCSI
+journalctl -k | grep SCSI
 
+# Lists the block drives with their file systems.
 lsblk -f
 
 # Create a GPT signature on the block drive.
@@ -107,24 +109,59 @@ cat /proc/partitions
 # Packages required.
 yum -y install lvm2
 
-pvs -- # Brief display for physical volumes.
-pvdisplay -- # To display physical volumes.
-pvcreate /dev/<block_device> /dev/<block_device> ... -- # To create a physical volume.
-pvremove /dev/<block_device> /dev/<block_device> ... -- # To remove a physical volume.
+# Create a basic parititon.
+parted /dev/sdb mklabel gpt
+parted /dev/sdb mkpart primary 0% 100%
+parted /dev/sdb set 1 lvm on
 
+# Brief display for physical volumes.
+pvs
 
-vgs -- # Brief display for volume groups.
-vgcreate VOLUME_GROUP_NAME /dev/<physical_volume_created> -- # To create a volume group.
-vgextend VOLUME_GROUP_NAME /dev/<new_physical_volume_created> -- # To extend a volume group.
-vgreduce VOLUME_GROUP_NAME /dev/<physical_volume_which_want_to_remove> -- # To remove a physical volume from a volume group.
-vgremove VOLUME_GROUP_NAME -- # To remove a volume group.
+# To display physical volumes.
+pvdisplay
 
-lvs -- # Brief display for logical volume.
-lvcreate --size 5G --name <any_name> <vg_group_name> -- #  To create a logical volume. [-L|--size] [-n|--name]
-lvdisplay -- # To display logical volumes.
-lvextend --size +1G /dev/<vg_group_name>/<logical_volume> -- # To extend a logical volume. [-L|--size]
-lvresize --size -1G /dev/<vg_group_name>/<logical_volume> -- # To resize a logical volume. [-L|--size]
-lvremove /dev/<vg_group_name>/<logical_volume> -- # To remove a logical volume.
+# To create a physical volume.
+pvcreate /dev/<block_device> /dev/<block_device> ...
+
+# To remove a physical volume.
+pvremove /dev/<block_device> /dev/<block_device> ...
+
+# Brief display for volume groups.
+vgs
+
+# To create a volume group.
+vgcreate <volume_group_name> /dev/<physical_volume_created>
+
+# To extend a volume group.
+vgextend <volume_group_name> /dev/<new_physical_volume_created>
+
+# To remove a physical volume from a volume group.
+vgreduce <volume_group_name> /dev/<physical_volume_which_want_to_remove>
+
+# To remove a volume group.
+vgremove <volume_group_name>
+
+# Brief display for logical volume.
+lvs
+
+#  To create a logical volume. [-L|--size] [-n|--name]
+lvcreate --size 5G --name <any_name> <vg_group_name>
+
+# To display logical volumes.
+lvdisplay
+
+# To extend a logical volume. [-L|--size]
+lvextend --size +1G /dev/<vg_group_name>/<logical_volume>
+
+# To resize a logical volume. [-L|--size]
+# Resize the file system first (xfs_growfs)
+lvresize --size -1G /dev/<vg_group_name>/<logical_volume>
+
+# To remove a logical volume.
+# First unmount the file system.
+lvremove /dev/<vg_group_name>/<logical_volume>
+
+# To rename a logical volume.
 lvrename /dev/<vg_group_name>/<logical_volume_old_name> /dev/<vg_group_name/<logical_volume_new_name>
 
 # To get UUID.

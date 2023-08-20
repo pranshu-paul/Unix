@@ -4,9 +4,11 @@ yum install <package_name>
 
 yum remove <package_name>
 
-yum erase <package_name> # For RHEL 8 only to remove package completely.
+# For RHEL 8 only to remove package completely.
+yum erase <package_name> 
 
-yum install http://<package_name>.rpm # Installs package over the internet.
+# Installs package over the internet.
+yum install http://<package_name>.rpm 
 
 # To get the dependencies list for a package.(For packages available in repo only.)
 yum deplist <package_name> | grep provider | awk '{print $2}' | grep -v '.src' | sed -E 's/(-[0-9]+).*//' | sort | uniq
@@ -15,7 +17,8 @@ yum clean all # Clear all cache.
 
 yum install <package_name>
 
-yum install xterm --downloaddir=/root/xterm # To download package only in provided directory.
+# To download package only in provided directory.
+yum install xterm --downloaddir=/root/xterm 
 
 yum provides <command>
 
@@ -27,18 +30,25 @@ RPM
 
 rpm -ivh <package_name>
 
-rpm -qpR <package_name> # Lists the required dependencies.
+# Lists the required dependencies.
+rpm -qpR <package_name> 
 
-rpm -qpl <package_name> # Lists what is inside in an RPM.
+# Lists what is inside in an RPM.
+rpm -qpl <package_name> 
 
-rpm2cpio <package_name> | cpio -idmv # To extract an RPM for local use.
+# To extract an RPM for local use.
+rpm2cpio <package_name> | cpio -idmv 
 
+# To extract an RPM for local use.
 rpm -q <package_name>
 
 rpm -qa | grep <package_name_matching_string>
 
 # To install packages without dependencies.
 rpm -ivh <package_name> --nodeps --force
+
+# To query the dependent package of the library.
+rpm -qf <full_library_path>
 
 
 

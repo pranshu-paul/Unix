@@ -29,20 +29,11 @@ mkdir -p /var/www/postfixadmin
 chown -R apache:apache /var/www
 
 # Create a sample HTML file for the testing purpose.
-cat > /var/www/rhel.com/index.html << EOF
-<html>
-<head>
-<title>Welcome to rhel.com!</title>
-</head>
-<body>
-<h1>Success! The rhel.com virtual host is working!</h1>
-</body>
-</html>
-EOF
+echo "Success! The rhel.com virtual host is working!" > /var/www/rhel.com/index.html
 
 # Create a virtual host for the website in the directory "/etc/httpd/conf.d"
 cat > /etc/httpd/conf.d/postfixadmin.conf << EOF
-Listen 80
+Listen 443
 <VirtualHost *:443>
 		DocumentRoot /var/www/postfixadmin
 		ServerName postfixadmin
@@ -63,10 +54,12 @@ EOF
 semanage fcontext -a -t httpd_sys_content_t "/srv/rhel.com(/.*)?"
 restorecon -Rv /var/www/rhel.com
 
+# Check the configuration syntax.
+apachectl configtest
+
 # Restart the apache service.
 systemctl restart httpd
 
 # Open the HTTPS port on firewall.
 firewall-cmd --add-port=443/tcp
 firewall-cmd --add-port=443/tcp --permanent
-firewall-cmd --add-service={https,http} --permanent

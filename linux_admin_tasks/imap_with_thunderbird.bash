@@ -54,6 +54,8 @@ postconf -e relay_domains = hash:/etc/postfix/relay_domains
 # Update protocols in /etc/dovecot/dovecot.conf
 protocols = imap lmtp pop3
 
+# The below steps open your postfix as an open relay to the internet.
+# Make sure to allow only trusted networks.
 postconf -e "mynetworks = 0.0.0.0/0"
 
 # Open the firewall.

@@ -31,40 +31,67 @@ _dmarc	3600	 IN 	TXT	"v=DMARC1;p=quarantine"
 # Install Postfix and Mailx mail client.
 dnf -y install postfix mailx
 
-postconf mail_version # -- To check postfix mail version
+# To check postfix mail version.
+postconf mail_version
 
-rpm -ql postfix | grep /usr/sbin # -- to list all associated binaries with postfix
+# To list all the associated binaries with postfix.
+rpm -ql postfix | grep /usr/sbin 
 
-postconf -e "inet_interfaces = all" # -- to allow postconf to edit postfix main.cf
-postconf inet_interfaces  # -- to list interface for postfix
+# To allow postconf to edit postfix main.cf
+postconf -e "inet_interfaces = all" 
+
+# To list interface for postfix
+postconf inet_interfaces  
 postconf -e "inet_protocols = all"
 postconf inet_protocols
-postconf -e "myhostname = <hostname>" # -- to chnage hostname for mail server
-postconf myhostname # -- to list hostname for mail server
-postconf -e "mydomain = <domain_name>" # -- to change your domain name
-postconf mydomain # -- to list my domain
-postconf -e "myorigin = <domain_name>" # -- to change domain name
-postconf myorigin # -- defines default domain name for the server
-postconf -e "mydestination = <domain_name>, \$myhostname, localhost.\$mydomain, localhost" # -- change my destination along with the interface 
-postconf mydestination # -- displays final destination for the our mail server
+
+# To chnage hostname for mail server
+postconf -e "myhostname = <hostname>" 
+
+# To list hostname for mail server
+postconf myhostname 
+
+# To change your domain name
+postconf -e "mydomain = <domain_name>" 
+
+# To list my domain
+postconf mydomain
+
+# To change domain name
+postconf -e "myorigin = <domain_name>"
+
+# Defines default domain name for the server
+postconf myorigin
+
+# Change my destination along with the interface 
+postconf -e "mydestination = <domain_name>, \$myhostname, localhost.\$mydomain, localhost" 
+
+# Displays final destination for the our mail server
+postconf mydestination 
 postconf mail_spool_directory
 postconf mailbox_size_limit
 
 # Enabling TLS in postfix.
 # For TLS httpd is required and certbot(Let's Encrypt)
+# Use openssl to generate a certificate and key.
 # Or, we could generate a Let's Encrypt certificate from punchsalad.com
 
-#postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/postfix.crt"
-#postconf smtpd_tls_cert_file
-#postconf -e "smtpd_tls_key_file = /etc/pki/tls/private/postfix.key"
-#postconf smtpd_tls_key_file
-#postconf -e "smtpd_use_tls = yes"
-#postconf smtpd_use_tls
-#postconf -e "smtp_use_tls = yes"
-#postconf smtp_use_tls
+postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/postfix.crt"
+postconf smtpd_tls_cert_file
+postconf -e "smtpd_tls_key_file = /etc/pki/tls/private/postfix.key"
+postconf -e "smtpd_tls_auth_only = yes"
+
+postconf smtpd_tls_key_file
+postconf -e "smtpd_use_tls = yes"
+postconf smtpd_use_tls
+postconf -e "smtp_use_tls = yes"
+postconf smtp_use_tls
 
 # Open port 25/tcp or add the service SMTP.
 firewall-cmd --add-service=smtp --permanent && firewall-cmd --reload
+
+# Check the configuration
+postfix check
 
 # Start Postfix daemon.
 systemctl daemon-reload
@@ -73,7 +100,7 @@ systemctl enable --now postfix
 # To clear the mailq.
 postsuper -d ALL
 
-echo "This is a test mail." | mail paulpranshu@gmail.com
+echo "This is a test mail." | mail -s "Test mail #1" paulpranshu@gmail.com
 
 
 ####################################################################################################

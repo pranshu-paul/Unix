@@ -6,35 +6,31 @@ echo <message> | sendmail -F <sender_name> someone@example.com
 #############################################################
 #!/bin/bash
 
-export SMART_HOST="mailhost"
-
 # Define email parameters
-from_name="orafclone"
-from_address="orafclone@fclonedb.fineorganics.com"
-to_address="dba@rostantechnologies.com"
+from_name=""
+from_address=""
+to_address="someone@example.com"
 subject="Test Email with Attachment"
 message="This is a test email with an attachment."
-attachment_file="/etc/vfstab"
+attachment_file="/etc/fstab"
 
 # Create a temporary file for the email body
 email_body=$(mktemp)
 cat <<EOT > "$email_body"
 To: $to_address
-From: "$from_name" $from_address
-Subject: $subject
+From: "$from_name" "$from_address"
+Subject: "$subject"
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="boundary-string"
 
 --boundary-string
 Content-Type: text/plain; charset="UTF-8"
 
-$message
+"$message"
 
 --boundary-string
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename="$attachment_file"
-
-$(uuencode "$attachment_file" "$attachment_file")
 
 This is the content of the attachment.
 

@@ -30,6 +30,9 @@ nmtui # Package for this command -- NetworkManager-tui
 ip neigh
 arp -a # -- -a all IP address
 
+# To look for the ports
+getent services | grep -w 443/tcp
+
 # Configuration file location and name.
 /etc/sysconfig/network-scripts/ifcfg-<NETWORK_ALIAS>
 

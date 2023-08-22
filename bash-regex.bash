@@ -151,3 +151,5 @@ IFS=','
 printf "%s\n" "${addr[*]}"| paste
 
 
+getent services | grep -w 993
+

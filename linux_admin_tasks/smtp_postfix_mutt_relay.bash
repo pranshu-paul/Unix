@@ -1,6 +1,7 @@
 # Creating a basic SMTP server for sending and recieving emails.
 
 # Port 25 must be unblocked.
+# Attachments are usually sent in base64.
 
 # Set FQDN in your mail server.
 
@@ -199,3 +200,21 @@ EOF
 
 # Commands output can be also send as stdin to mutt.
 nmcli dev status | mutt -s "Test mail" someone@somwhere.com
+
+####################################################
+
+# To send emails from netcat.
+nc srv04.paulpranshu.xyz 25 << EOF
+HELO paulpranshu.xyz
+MAIL FROM:<paul@ostest.net>
+RCPT TO:<paul@paulpranshu.xyz>
+DATA
+Subject: Test Email #2 from NetCat
+From: Paul <paul@ostest.net>
+To: Recipient <paul@paulpranshu.xyz>
+
+Test email from NetCat.
+
+.
+QUIT
+EOF

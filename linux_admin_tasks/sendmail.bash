@@ -7,15 +7,16 @@ echo <message> | sendmail -F <sender_name> someone@example.com
 #!/bin/bash
 
 # Define email parameters
-from_name=""
-from_address=""
-to_address="someone@example.com"
+from_name="paul"
+to_address="paul@paulpranshu.xyz"
 subject="Test Email with Attachment"
 message="This is a test email with an attachment."
-attachment_file="/etc/fstab"
+attachment_file="/home/paul/testu.tar"
 
 # Create a temporary file for the email body
 email_body=$(mktemp)
+attachment_base64=$(base64 -w 0 "$attachment_file")
+
 cat <<EOT > "$email_body"
 To: $to_address
 From: "$from_name" "$from_address"
@@ -26,13 +27,14 @@ Content-Type: multipart/mixed; boundary="boundary-string"
 --boundary-string
 Content-Type: text/plain; charset="UTF-8"
 
-"$message"
+$message
 
 --boundary-string
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename="$attachment_file"
+Content-Transfer-Encoding: base64
 
-This is the content of the attachment.
+$attachment_base64
 
 --boundary-string--
 EOT

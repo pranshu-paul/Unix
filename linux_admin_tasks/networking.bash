@@ -39,7 +39,10 @@ getent services | grep -w 443/tcp
 # To get the hardware address.
 ip link show enp0s9 | grep link | awk '{print $2}'
 
-# To generate UUID.
+# Free DNS servers by Level 3 Communications.
+# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4, 4.2.2.6
+
+# To generate a UUID.
 uuidgen
 
 # Sample ethernet file for rhel 6,7, and 8.

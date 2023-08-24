@@ -2,17 +2,19 @@
 # This script is EXCLUSIVE for RHEL 8.
 
 # Declare variables and arrays.
-domainName="rhel.com"
-sysName="srv_el8"
-FQDN="${sysName}.${domainName}"
-timeZone="Asia/Kolkata"
+domain_name="rhel.com"
+host_name="srv_el8"
+fqdn="${host_name}.${domain_name}"
+time_zone="Asia/Kolkata"
 
-oraUser=oracle
-oraUid=54321
-primaryGroup=oinstall
-primaryGid=54321
-secondaryGroup=dba
-secondaryGid=54322
+oracle_user=oracle
+oracle_uid=54321
+primary_group=oinstall
+primary_gid=54321
+secondary_group=dba
+secondary_gid=54322
+
+delcare -a packages
 
 packages=(
 "bc.$(uname -m)"
@@ -55,7 +57,7 @@ system_limits=(
 "* hard stack 32768"
 )
 
-kernel_params=(
+kernel_parameters=(
 "net.ipv4.ip_forward=0"
 "net.ipv4.conf.default.rp_filter=1"
 "net.ipv4.conf.default.accept_source_route=0"
@@ -78,30 +80,30 @@ kernel_params=(
 "net.ipv4.ip_local_port_range=9000 65500"
 )
 
-if ! id -u &>/dev/null; then
+if [[ $UID != 0 ]]; then
     echo "Please run this script either with root user or sudo permission."
     exit 1
 fi
 
 set_timezone () {
-if [[ $(timedatectl | grep -o "${Timezone}") != "${Timezone}" ]]; then
-	timedatectl set-timezone "${Timezone}"
-	echo Timezone is "$(timedatectl | grep -o "${Timezone}")."
+if [[ $(timedatectl | grep -o "${time_zone}") != "${time_zone}" ]]; then
+	timedatectl set-timezone "${time_zone}"
+	echo Timezone is "$(timedatectl | grep -o "${time_zone}")."
 else
-	echo -e "\nTimezone is already set.\n$(timedatectl | grep -o ${Timezone})"
+	echo -e "\nTimezone is already set.\n$(timedatectl | grep -o ${time_zone})"
 fi
 }
 
 set_sysname () {
 local ip=$(hostname -I | awk '{print $1}')
-local hosts_entry="${ip} ${FQDN} ${sysName}"
+local hosts_entry="${ip} ${fqdn} ${sysName}"
 
 	if ! grep -oq "${hosts_entry}" /etc/hosts || \
-		[[ "$(hostname)" != "${sysName}" || "$(hostname -f)" != "${FQDN}" ]]; then
-		echo -e "\nChanging hostname to ${sysName} and FQDN to ${FQDN}."
+		[[ "$(hostname)" != "${sysName}" || "$(hostname -f)" != "${fqdn}" ]]; then
+		echo -e "\nChanging hostname to ${sysName} and FQDN to ${fqdn}."
 		echo "${hosts_entry}" >> /etc/hosts
 		hostnamectl set-hostname "${sysName}"
-		echo "Hostname and FQDN changed to ${sysName} and ${FQDN} respectively."
+		echo "Hostname and FQDN changed to ${sysName} and ${fqdn} respectively."
 	else
 		echo "FQDN is already set to $(hostname -f)."
 	fi

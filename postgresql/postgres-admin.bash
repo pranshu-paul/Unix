@@ -13,11 +13,14 @@ LD_LIBRARY_PATH=/usr/lib64
 
 # Required kernal parameters.
 # Shared Memory Available, Shared Memory Max.
-# Parameters can be added in /etc/sysctl.d/postgresql.conf
+# Parameters can be added in /etc/sysctl.d/10-postgresql.conf
 kern.ipc.shmall=32768
 kern.ipc.shmmax=134217728
 vm.overcommit_memory=2
 vm.nr_hugepages=3170
+
+# Apply the kernel parameters.
+sysctl --sysetm
 
 # After adding the kernel parameters.
 # A system reboot is required.

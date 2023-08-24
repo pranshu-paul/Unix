@@ -201,6 +201,25 @@ EOF
 # Commands output can be also send as stdin to mutt.
 nmcli dev status | mutt -s "Test mail" someone@somwhere.com
 
+##################################################
+#!/bin/bash
+
+# Description: The script sends the health check reports through email.
+
+recipient[0]=''
+recipient[1]=''
+recipient[2]=''
+
+attachment[0]=''
+attachment[1]=''
+attachment[2]=''
+
+subject='FOIL PROD Health Check Report'
+
+message='This is an email from Fineorganics Production.'
+
+echo "${message}" | mutt -s "${subject}" "${recipient[0]}" -c "${recipient[*]:1:2}" -a "${attachment[*]}" 
+
 ####################################################
 
 # To send emails from netcat.

@@ -153,3 +153,5 @@ printf "%s\n" "${addr[*]}"| paste
 
 getent services | grep -w 993
 
+
+seinfo --type | grep -E -w passwd_[a-z].+

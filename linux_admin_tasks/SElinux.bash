@@ -17,7 +17,7 @@ policycoreutils-python -- EL7
 systemctl stop auditd;systemctl start auditd
 
 # SElinux commands
-sestatus, getenforce, semanage, chcon, restorecon, getsebool -a, setsebool, sealert
+sestatus, getenforce, semanage, chcon, restorecon, getsebool -a, setsebool, sealert, seinfo, sesearch
 
 # Other command to use selinux.
 ps -axZ, ss -nutlnpZ, id -Z, journalctl
@@ -40,6 +40,11 @@ aureport -a
 
 # To find correct context for a directory and file.
 matchpathcon -V
+
+# To get the list of labels for a service.
+seinfo --type | grep <service_name>
+seinfo --type | grep http
+seinfo --type | grep nfs
 
 # Kernel parameters at boot time.
 # To force auto relable system.

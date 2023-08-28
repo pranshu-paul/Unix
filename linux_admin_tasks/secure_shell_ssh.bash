@@ -92,6 +92,11 @@ ssh-keygen -p -P <old_passphrase> -N <new_passphrase> -f KEYFILE
 # To add a comment in a key.
 ssh-keygen -t rsa -b 4096 -C "COMMENT"
 
+# To connect to a remote host through a SOCKS5 proxy.
+# Use either "ncat" or "netcat" whichever is available.
+ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <user>@<ip_address>
+ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <user>@<ip_address> -p <port>
+
 
 ################# Sample /etc/ssh/sshd_config hardening ################
 Port 2222
@@ -137,7 +142,8 @@ chmod 600 ~/.ssh/authorized_keys
 # This file contains public keys of remote systems.
 # This file must be with the permissions of 600.
 
-ssh-rsa AAAA... # This is the line where key starts the below options can be prepend to this line for keys in authorized_keys file.
+<option> ssh-rsa AAAA... # This is the line where key starts the below options can be prepend to this line for keys in authorized_keys file.
+no-user-rc ssh-rsa AAAA... # This is the line where key starts the below options can be prepend to this line for keys in authorized_keys file.
 
 # This option executes command and logs out of the system.
 # Can not use this option multiple times.
@@ -214,13 +220,13 @@ export SSHPASS='Pa55wo&rd@lin#ux'
 sshpass -e ssh paul@10.0.0.171 -p 2169
 
 ########################################################################
-# echo 'machine <<ip_address>> login <<user_name>> password <password>' > .netrc
+# echo 'machine <ip_address> login <user_name> password <password>' > .netrc
 
 #!/bin/bash
 
 usage () {
 	echo "Usage: $0 <remote_user> <hostname> <port> <file> <destination>" >&2
-	echo 'Sends file to remote host without password.' >&2
+	echo "$0: Sends a file to remote host without password." >&2
 	exit 1
 }
 
@@ -230,16 +236,20 @@ fi
 
 if [[ ! -f ~/.netrc ]]; then
 	echo "File .netrc does not exist in the home folder of $USER." >&2
+	echo -e ".netrc file syntax.\n"
+	echo "machine <ip_address> login <user_name> password <password>"
 	exit 2
 fi
 
-export remote_user="${1}"
-export remote_hostname="${3}"
-export remote_port="${4}"
-export full_file_path="${4}"
-export dest_path="${5}"
+remote_user="${1}"
+remote_hostname="${3}"
+remote_port="${4}"
+full_file_path="${4}"
+dest_path="${5}"
 
-if [[ -d $ "${full_file_path}" ]]; then
+export remote_user remote_hostname remote_port full_file_path dest_path
+
+if [[ -d "${full_file_path}" ]]; then
 	echo "Directory provided!"
 	echo "Please make an archive of the directory by zip or tar."
 	exit 3

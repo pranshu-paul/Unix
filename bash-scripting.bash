@@ -34,3 +34,11 @@ printf "%s\n" "${addr[@]}"
 # Print some specific elements of an array.
 # The below example prints from the fourth element to the ninth element, a total of five elements.
 printf "%s\n" "${addr[@]:3:5}"
+
+
+# Performing an iteration on an array.
+# "!" lists the all index number.
+# "#" lists the total index number.
+for i in "${!attachment[@]}"
+do echo "${attachment[$i]}"
+done

@@ -218,7 +218,7 @@ subject='FOIL PROD Health Check Report'
 
 message='This is an email from Fineorganics Production.'
 
-echo "${message}" | mutt -s "${subject}" "${recipient[0]}" -c "${recipient[*]:1:2}" -a "${attachment[*]}" 
+echo "${message}" | mutt -s "${subject}" "${recipient[0]}" -c "${recipient[@]:1}" -a "${attachment[@]}" 
 
 ####################################################
 

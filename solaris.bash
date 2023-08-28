@@ -3,7 +3,11 @@
 # To list Listening network sockets ipv4.
 netstat -an -f inet | grep LISTEN
 
+# System logs.
+tail -f /var/log/syslogs.
+
 # To send files through email in solaris.
+# sendmail look for "mailhost" relay in /etc/hosts.
 uuencode <file_name> <any_name> | sendmail -f <arbitrary_address> <recipient>
 
 # Hosts file entry.
@@ -50,6 +54,12 @@ uname -m
 
 # Shows total memory.
 prtconf | grep Memory
+
+
+# Vim
+# Use Shift+Left-Click to select text in solaris.
+# System wide configuration file /usr/share/vim/vimrc.
+
 
 
 # To send emails from mutt.

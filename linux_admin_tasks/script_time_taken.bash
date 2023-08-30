@@ -10,4 +10,4 @@ execution_time=$((end_time - start_time))
 hours=$((execution_time / 3600)) 
 minutes=$((execution_time % 3600 / 60))
 
-Script execution time: $hours hour(s) $minutes minute(s)
+echo -e "\nScript execution time: $hours hour(s) $minutes minute(s)"

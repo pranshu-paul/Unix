@@ -104,3 +104,37 @@ bg %1
 
 # To check the system's uptime.
 uptime -p
+
+
+# Operating System Signals.
+
+# Signal	Number	Description
+# SIGHUP	1	Hangup signal
+# SIGINT	2	Interrupt signal
+# SIGQUIT	3	Quit signal
+# SIGKILL	9	Kill signal
+# SIGTERM	15	Termination signal
+# SIGUSR1	10	User-defined signal 1
+# SIGUSR2	12	User-defined signal 2
+# SIGCONT	18	Continue signal
+# SIGSTOP	19	Stop signal
+# SIGTSTP	20	Terminal stop signal
+# SIGTTIN	21	Background read from terminal signal
+# SIGTTOU	22	Background write to terminal signal
+# SIGPIPE	13	Broken pipe signal
+# SIGALRM	14	Alarm clock signal
+# SIGCHLD	17	Child process terminated or stopped signal
+# SIGBUS	10	Bus error signal
+# SIGFPE	8	Floating-point exception signal
+# SIGILL	4	Illegal instruction signal
+# SIGSEGV	11	Segmentation violation signal
+# SIGSYS	12	Bad system call signal
+# SIGTRAP	5	Trace/breakpoint trap signal
+# SIGURG	16	Urgent condition on socket signal
+# SIGXCPU	24	CPU time limit exceeded signal
+# SIGXFSZ	25	File size limit exceeded signal
+
+# Just remove the "SIG" prefix.
+
+kill -HUP <pid>
+kill -KILL <pid>

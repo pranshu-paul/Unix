@@ -42,3 +42,108 @@ printf "%s\n" "${addr[@]:3:5}"
 for i in "${!attachment[@]}"
 do echo "${attachment[$i]}"
 done
+
+
+# Variables
+# The below variables captures the line in a script where it is placed.
+# It can also be used in a terminal.
+echo $LINENO
+
+## Control Flow Statements ##
+if [ condition ]; then
+    # commands to run if condition is true
+else
+    # commands to run if condition is false
+fi
+
+
+if [ condition ]; then
+    # commands to run if condition is true
+elif [ condition ]; then
+	# commands to run if condition is true
+else
+    # commands to run if all the conditions are false
+fi
+
+
+for variable in value1 value2 ... valuen; do
+    # commands to run for each iteration
+done
+
+# Infinite for loop.
+for (( ; ; )); do
+    # commands to run for each iteration
+done
+
+for (( i=0; i<=10; i++ )); do
+	echo $i
+done
+
+
+while [ condition ]; do
+    # commands to run while condition is true
+done
+
+# Infinite while loop.
+while true; do
+    # commands to run while condition is true
+done
+
+until [ condition ]; do
+    # commands to run until condition is true
+done
+
+
+case "$variable" in
+    pattern1)
+        # commands for pattern1
+        ;;
+    pattern2)
+        # commands for pattern2
+        ;;
+    *)
+        # commands for all other cases
+        ;;
+esac
+
+
+while [ condition ]; do
+    if [ another_condition ]; then
+        break  # exit the loop
+    fi
+    # other commands
+done
+
+while [ condition ]; do
+    if [ skip_condition ]; then
+        continue  # skip the rest of this iteration
+    fi
+    # other commands
+done
+
+
+select variable in option1 option2 ... optionN; do
+    case $variable in
+        option1)
+            # commands for option1
+            ;;
+        option2)
+            # commands for option2
+            ;;
+        *)
+            # commands for all other cases
+            ;;
+    esac
+done
+
+
+# Define a function
+# A function can also be difned like "function <function_name> () { <command> }
+
+my_function() {
+    # Commands to be executed inside the function
+    echo "Hello from my_function!"
+}
+
+# Call the function
+my_function

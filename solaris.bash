@@ -4,7 +4,7 @@
 netstat -an -f inet | grep LISTEN
 
 # System logs.
-tail -f /var/log/syslogs.
+tail -f /var/log/syslog
 
 # To send files through email in solaris.
 # sendmail look for "mailhost" relay in /etc/hosts.

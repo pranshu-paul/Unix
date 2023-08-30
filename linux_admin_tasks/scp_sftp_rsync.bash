@@ -89,6 +89,9 @@ rsync -avhez ssh --include 'Rem*' --exclude /path/of/source <user_name>@<ip_addr
 # To remove source files after success full transfer.
 rsync --remove-source-files -azvh /path/of/source <user_name>@<ip_address>:/path/to/destination
 
+rsync --remove-source-files -razvhe "ssh -p <port>" --checksum <user_name>@<ip_address>:<source> <destination>
+rsync --remove-source-files -razvhe "ssh -p 2169" --checksum paul@10.0.0.45:/ballistic/rsync /public
+
 # To copy remote directory files to this local server from ssh.
 rsync -avzhe ssh <user_name>@<ip_address>:/path/of/remote_server /path/of/local_server
 

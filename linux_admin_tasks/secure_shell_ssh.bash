@@ -85,9 +85,20 @@ ssh-keygen -t rsa -b 4096
 # -f for file name -p for password prompt.
 ssh-keygen -f .\id_rsa -p
 
+# For private key authentication.
+# Generate a key pair on the target server.
+# Copy the private key to the client.
+ssh-keygen -t rsa
+
+# Copy the public in the authorized_keys of the server, on the target server.
+cat id_rsa.pub >> authorized_keys
+
+
 # To update a passphrase on a key.
 # The below command can also be used to remove password.
 ssh-keygen -p -P <old_passphrase> -N <new_passphrase> -f KEYFILE
+
+
 
 # To add a comment in a key.
 ssh-keygen -t rsa -b 4096 -C "COMMENT"

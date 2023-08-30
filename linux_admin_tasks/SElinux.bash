@@ -1,4 +1,4 @@
-All processes and files are labled with SElinux label.
+All processes, ports and files are labled with SElinux label.
 SElinux is system wide.
 Implements MAC(Mandatory Access Control).
 SELinux decisions are known as the Access Vector Cache (AVC).

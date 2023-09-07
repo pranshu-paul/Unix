@@ -155,6 +155,8 @@ systemctl restart postfix
 # To test e-mail dry run.
 echo "This is a test email" | mailx -s "Test Subject" -n recipient@example.com
 
+# Troubleshooting
+journalctl -t postfix/smtp
 
 ############################################################################
 # Mutt client configuration

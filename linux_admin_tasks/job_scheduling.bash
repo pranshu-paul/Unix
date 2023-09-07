@@ -1,15 +1,20 @@
 # To install crontab.
 yum -y install cronie
 
+# For more info see man 5 crontab.
+
 # crontab format
-* * * * *  command_to_execute
-- - - - -
-| | | | |
-| | | | +- day of week (0 - 7) (where sunday is 0 and 7)
-| | | +--- month (1 - 12)
-| | +----- day (1 - 31)
-| +------- hour (0 - 23)
-+--------- minute (0 - 59)
+# * * * * *  command_to_execute
+# - - - - -
+# | | | | |
+# | | | | +- day of week (0 - 7) (where sunday is 0 and 7)
+# | | | +--- month (1 - 12)
+# | | +----- day (1 - 31)
+# | +------- hour (0 - 23)
+# +--------- minute (0 - 59)
+
+# To run a command twice a week at 4 pm.
+0 16 * * 1,3 <command_to_run>
 
 
 # To install at.

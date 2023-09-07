@@ -60,8 +60,12 @@ usermod -l <old_name> <new_name>
 # To change a users shell.
 usermod -s /bin/bash <username>
 
-# To change a users description.
+# To change a users description or full name.
+usermod -c "Pranshu Paul" paul
 usermod -c '<description>' '<username>'
+
+# To remove the full name.
+usermod -c "" paul
 
 # To change a users group.
 # This removes the user from its current group.

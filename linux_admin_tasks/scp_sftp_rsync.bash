@@ -62,13 +62,13 @@ get /remote/path /local/path
 
 # ssh public keys also work with rsync.
 
--a -- archive						#--max-size='200k' -- to specify file's maximum size
--v -- verbose						#--progress -- to show progress while transfer
--z -- compress						#--include 'Rem*' -- include all files starting with R
--h -- human readable				#--exclude '*' -- exclude all other files and folder
--e -- specify remote shell to use	#--remove-source-files -- removes source file after transfer
--n -- performs a dry run before transfer
--r -- recursive
+# -a -- archive						#--max-size='200k' -- to specify file's maximum size
+# -v -- verbose						#--progress -- to show progress while transfer
+# -z -- compress						#--include 'Rem*' -- include all files starting with R
+# -h -- human readable				#--exclude '*' -- exclude all other files and folder
+# -e -- specify remote shell to use	#--remove-source-files -- removes source file after transfer
+# -n -- performs a dry run before transfer
+# -r -- recursive
 
 
 # To copy files from this server to remote server.

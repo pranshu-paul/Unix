@@ -157,3 +157,10 @@ getent services | grep -w 993
 seinfo --type | grep -E -w passwd_[a-z].+
 
 seinfo --type | grep -w -E http[a-z].+
+
+
+# echoes only the trailing directory.
+basename <path>
+
+basename /home/root
+

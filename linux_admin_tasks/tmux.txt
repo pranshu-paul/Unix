@@ -1,4 +1,5 @@
 yum -y install tmux
+Terminal multiplexer
 
 ctrl+b , shift+% -- To split a window vertically.
 #ctrl+b , shift+" -- To split a window horizontally.

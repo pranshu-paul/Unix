@@ -11,7 +11,7 @@ server.starttls()
 
 # Your Gmail credentials
 email = 'testing.paulpranshu@gmail.com'
-password = 'xuurxxwvnzfqfamz'  # Replace with your Gmail password
+password = ''  # Replace with your Gmail password
 
 # Recipient's email address
 recipient = 'paulpranshu@gmail.com'

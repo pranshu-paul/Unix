@@ -76,6 +76,9 @@ dnf provides <command_name>
 
 dnf history
 
+# To apply critical updates only.
+dnf upgrade --sec-severity=Critical
+
 # Extracting a package.
 rpm2cpio <package_name> | cpio -idmv
 

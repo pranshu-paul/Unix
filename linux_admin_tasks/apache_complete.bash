@@ -42,6 +42,7 @@ Listen 443
 		SSLEngine on
 		SSLCertificateFile /etc/pki/tls/certs/httpd.crt
 		SSLCertificateKeyFile /etc/pki/tls/private/httpd.key
+		SSLCACertificateFile /etc/pki/tls/certs/ca-bundle.crt
 	<Directory /var/www/postfixadmin>
 			Options Indexes FollowSymLinks
 			Allowoverride none

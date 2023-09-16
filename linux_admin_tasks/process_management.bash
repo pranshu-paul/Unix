@@ -138,3 +138,7 @@ uptime -p
 
 kill -HUP <pid>
 kill -KILL <pid>
+
+kill -SIGSTOP <pid>
+
+kill -SIGCONT <pid>

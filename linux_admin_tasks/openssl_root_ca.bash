@@ -16,6 +16,7 @@ openssl rand -base64 12
 
 #The below steps works properly.
 # Password: windows
+Rwwt#756
 
 # Create a password protected private key, to be used to create the Root Certificate.
 # Create a self-signed root certificate.
@@ -24,12 +25,12 @@ openssl req -new -x509 -sha256 -days 3650 -key root-ca-key.pem -out root-ca-cert
 
 # Generate a csr
 openssl genpkey -algorithm RSA -out server-key.pem
-openssl req -new -sha256 -subj "/CN=paulpranshu.xyz" -key server-key.pem -out server.csr
+openssl req -new -sha256 -subj "/CN=example.com" -key server-key.pem -out server.csr
 
 # Generate a self-signed certifcate.
 # "subjectAltName=DNS:paulpranshu.xyz,IP:144.24.111.213"
 openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem \
--extfile <(printf "subjectAltName=DNS:paulpranshu.xyz,IP:144.24.111.213") -CAcreateserial
+-extfile <(printf "subjectAltName=DNS:example.com,IP:103.240.91.92") -CAcreateserial
 
 # Verify the certifcate.
 openssl verify -CAfile root-ca-cert.pem -verbose server.pem
@@ -43,7 +44,7 @@ update-ca-trust
 
 
 # To verify.
-openssl s_client -connect paulpranshu.xyz:443
+openssl s_client -connect 103.240.91.92:443
 
 # Copy the root certifcate to the OS PKI.
 update-ca-trust enable

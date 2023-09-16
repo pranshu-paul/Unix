@@ -254,8 +254,8 @@ oracle ALL = NOPASSWD: /bin/systemctl start, /bin/systemctl restart vncserver
 # To allow all the wheel group users to run all commands without password.
 %wheel ALL=(ALL)       NOPASSWD: ALL
 
-
-
+# For a single user.
+<username> ALL=(ALL) NOPASSWD:ALL
 
 ############################
 # SAMPLE CONFIGURATION FILES

@@ -61,6 +61,22 @@ alter user <username> password '<password>';
 
 create database <database> owner <username>;
 
+create user pranshu with password 'Mysql#459';
+
+alter role pranshu superuser createdb createrole replication bypassrls;
+
+select current_user;
+
+create schema hr authorization pranshu;
+
+create database hr owner pranshu;
+
+export PGUSER=pranshu
+export PGSSLMODE=require
+export PGDATABASE=hr
+export PGHOST=127.0.0.1
+export PGPORT=5432
+
 alter database <database> owner to <username>;
 
 # For postgres user only.

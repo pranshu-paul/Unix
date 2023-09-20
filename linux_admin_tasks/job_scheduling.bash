@@ -16,6 +16,10 @@ yum -y install cronie
 # To run a command twice a week at 4 pm.
 0 16 * * 1,3 <command_to_run>
 
+# To execute a script at every reboot.
+crontab -e
+@reboot sleep 5m && /path/to/your/script.sh
+
 
 # To install at.
 yum -y install at

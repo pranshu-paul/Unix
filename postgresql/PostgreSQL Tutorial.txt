@@ -220,7 +220,7 @@ Product type is linked to the product. The product is linked to the item which i
 33:28 Altering Tables Many Examples
 
 // Add a new column
-ALTER TABLE sales_item ADD day_of_week VARCHAR(8)
+ALTER TABLE sales_item ADD day_of_week VARCHAR(8);
 
 // Modify a column (Change any Constraint this Way)
 ALTER TABLE sales_item ALTER COLUMN day_of_week SET NOT NULL;
@@ -243,16 +243,16 @@ ALTER TABLE transaction_type RENAME TO transaction;
 
 // Create index based on a single column (Use UNIQUE INDEX for a unique index)
 // Indexes show under indexes tab
-CREATE INDEX transaction_id ON transaction(name)
+CREATE INDEX transaction_id ON transaction(name);
 
 // Create an index based on 2 columns
-CREATE INDEX transaction_id_2 ON transaction(name, payment_type)
+CREATE INDEX transaction_id_2 ON transaction(name, payment_type);
 
 // Delete data in a table
-TRUNCATE TABLE transaction
+TRUNCATE TABLE transaction;
  
 // Drop a table
-DROP TABLE transaction
+DROP TABLE transaction;
 
 39:42 Inserting Data
 INSERT INTO product_type (name) VALUES ('Business');

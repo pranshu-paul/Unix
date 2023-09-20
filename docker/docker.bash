@@ -30,7 +30,7 @@ docker exec -it <contianer_name> bash
 docker exec -it mysql_container bash
 
 # Inside the container.
-# First connect MySQL from inside the container, than we will be able to connect from outside the container.
+# First connect MySQL from outside the container, than we will be able to connect from inside the container.
 mysql -u root -p
 
 # From outside the docker.

@@ -167,6 +167,8 @@ journalctl -t postfix/smtp
 # Here is a sample configuration file(.muttrc).
 
 # Port for imap = 993 and smtp = 587
+# Microsoft 365 IMAP: outlook.office365.com:993
+# Microsoft 365 SMTP: smtp.office365.com:587
 
 # For incoming.
 set folder = "imaps://testing.paulpranshu@gmail.com@imap.gmail.com:993"

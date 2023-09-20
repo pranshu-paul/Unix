@@ -28,6 +28,9 @@ declare -a addr
 # Adding the output of an command in an array.
 readarray -t addr <<< $(find $PWD)
 
+declare -a array
+array=($(<command>))
+
 # Print all the elements.
 printf "%s\n" "${addr[@]}"
 
@@ -40,14 +43,50 @@ printf "%s\n" "${addr[@]:3:5}"
 # "!" lists the all index number.
 # "#" lists the total index number.
 for i in "${!attachment[@]}"
-do echo "${attachment[$i]}"
+	do echo "${attachment[$i]}"
 done
 
+#####
+
+# To create an associative array in bash (Dictionary).
+declare -A array
+
+array[name]=pranshu
+array[age]=23
+array[email]=paulpranshu@gmail.com
+array[phone]=9873514389
+
+
+# Adding a new element in the associative array.
+# It adds elements at the top of the array.
+array+=[country]=India
+array+=([state]=Delhi)
+
+# To delete an element.
+unset array[state]
+
+# To list a particular elements.
+echo "${array[name]}"
+
+# To total number of elements.
+echo "${#array[@]}"
+
+# To list all the elements in an array.
+printf "%s\n" "${array[@]}"
+
+# To list all the elements using a for loop.
+for key in "${!array[@]}"; do
+	echo "${array[$key]}"
+done
+
+#####
 
 # Variables
 # The below variables captures the line in a script where it is placed.
 # It can also be used in a terminal.
 echo $LINENO
+
+#####
 
 ## Control Flow Statements ##
 if [ condition ]; then

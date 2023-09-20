@@ -65,6 +65,9 @@ create user pranshu with password 'Mysql#459';
 
 alter role pranshu superuser createdb createrole replication bypassrls;
 
+alter role postgres set search_path = <new_schema>, public;
+
+
 select current_user;
 
 create schema hr authorization pranshu;

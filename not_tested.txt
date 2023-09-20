@@ -1,0 +1,13 @@
+sudo iscsiadm -m node -o new -T iqn.2015-12.com.oracleiaas:6cf2e7dc-971d-4c6b-b1de-74b553efa208 -p 169.254.2.2:3260
+sudo iscsiadm -m node -o update -T iqn.2015-12.com.oracleiaas:6cf2e7dc-971d-4c6b-b1de-74b553efa208 -n node.startup -v automatic
+sudo iscsiadm -m node -T iqn.2015-12.com.oracleiaas:6cf2e7dc-971d-4c6b-b1de-74b553efa208 -p 169.254.2.2:3260 -l
+
+
+####
+#Udev rules
+KERNEL=="sd*", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", PROGRAM="/sbin/ociudevpersistentnaming %k", SYMLINK+="%c"
+KERNEL=="sd*", SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", PROGRAM="/sbin/ociudevpersistentnaming %k", SYMLINK+="%c"
+
+ACTION=="remove", SUBSYSTEM=="net", RUN+="oci-vnic-hotunplug"
+
+ENV{ID_FS_TYPE}=="vdo", PROGRAM="/usr/bin/systemd-escape -p $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="vdo-start-by-dev@%c"

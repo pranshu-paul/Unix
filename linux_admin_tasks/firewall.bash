@@ -50,7 +50,7 @@ firewall-cmd --remove-rich-rule='rule family="ipv4" source address="<ip_address>
 
 # To add a port forward.
 # --add-forward-port=port=<portid>:proto=tcp:toport=<portid>[:toaddr=<address>[/mask]]
-firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080:toaddr=10.0.0.45
+firewall-cmd --zone=public --add-forward-port=port=443:proto=tcp:toport=8443:toaddr=10.0.0.45
 
 
 # Important configuration file.

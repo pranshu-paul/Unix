@@ -34,6 +34,14 @@ array=($(<command>))
 # Print all the elements.
 printf "%s\n" "${addr[@]}"
 
+# Print a specific index.
+printf "%s\n" "${addr[1]}"
+
+# Print a negative index.
+# If the elements of an array are 6.
+# The below statement prints the fifth index of the elements.
+printf "%s\n" "${addr[-1]}"
+
 # Print some specific elements of an array.
 # The below example prints from the fourth element to the ninth element, a total of five elements.
 printf "%s\n" "${addr[@]:3:5}"

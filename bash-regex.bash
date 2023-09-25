@@ -164,3 +164,8 @@ basename <path>
 
 basename /home/root
 
+# To remove escape ^M characters from all files.
+for file in *; do
+    tr -d '\r' < "$file" > "${file}.temp"
+    mv "${file}.temp" "$file"
+done

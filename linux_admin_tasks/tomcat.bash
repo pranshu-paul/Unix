@@ -38,3 +38,12 @@ export LD_LIBRARY_PATH=/home/tomcat/tomcat9/jdk-11.0.19/lib/jli
 export JAVA_LD_LIBRARY_PATH=/home/tomcat/tomcat9/jdk-11.0.19/lib/jli
 
 java -Djava.library.path=/home/tomcat/tomcat9/jdk-11.0.19/lib/jli
+
+
+
+keytool -genkey -alias tomcat -keyalg RSA -keysize 2048 -keystore tomcat.jks
+
+
+openssl pkcs12 -export -in server.pem -inkey server-key.pem -out keystore.p12 -name tomcat
+
+keytool -importkeystore -srckeystore keystore.p12 -srcstoretype PKCS12 -destkeystore tomcat.jks

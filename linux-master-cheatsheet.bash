@@ -254,72 +254,7 @@ fdisk -l | grep /dev/
 # To install fgrep.
 yum -y install grep
 
-# To install file.
-yum -y install file
 
-# To install findmnt.
-yum -y install util-linux
-
-# To install find.
-yum -y install findutils
-
-# To find in current directory.
-find . -name NAME
-
-# To find in current directory and redirect error to /dev/null.
-find . -name NAME 2>/dev/null
-
-# To find from root node.
-find / -name NAME
-
-# To find directory.
-# If name contains spaces use -name "NAME WITH SPACE"
-find / -type d -name NAME
-
-# To avoid looking into sub directories.
-find / -name NAME -prune
-
-# To allow find into max sub directories.
-find / -name NAME -maxdepth 2
-
-# To allow find into min sub directories.
-# ignore results for first 4 directories.
-find / -name NAME -mindepth 4
-
-# To ignore case while finding.
-find / -iname NAME
-
-# To Delete files older than 30 Days in Linux.
-find /home -type f -mtime +30 | xargs rm -f
-
-# To find files with permissions.
-find / -type f -perm 755 -print
-
-# To find file without permissions.
-find / -type f ! -perm 777 -print
-
-# To find empty files.
-find / -type f -empty
-
-# To find with file size.
-# M -- for megabyte, G -- for gigabyte, K -- for kilobyte
-find / -size +5M
-
-# To find file with modified time.
-# find files more than a day ago but not more than 7 days.
-# other options are -ctime -- change time, -atime -- access time.
-find / -mtime +1 -mtime -7
-
-# To avoid find for looking into other filesystems.
-find / -name NAME -mount
-
-# To execute command for out of find command.
-find / -name NAME -exec COMMAND {} \;
-
-find . -user orap -mtime 10 -exec rm {} \;
-
-# To dlete a particular user owned files.
-find . -user oracle -exec rm -fr {} \;
 
 # To install finger.
 

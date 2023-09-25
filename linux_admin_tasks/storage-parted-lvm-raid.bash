@@ -42,6 +42,8 @@ mount -av
 wipefs -a /dev/sdb1
 wipefs -a /dev/sdb
 
+# To list inodes tree
+tree --inodes -L 2
 
 ######################################################
 # RAID stands for Redundant Array of Independent Disks.

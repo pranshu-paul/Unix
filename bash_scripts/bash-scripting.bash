@@ -94,6 +94,12 @@ done
 # It can also be used in a terminal.
 echo $LINENO
 
+
+#####
+
+# Redirection.
+exec 3>&1 1>"log.log" 2>&1
+
 #####
 
 ## Control Flow Statements ##

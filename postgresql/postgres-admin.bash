@@ -72,6 +72,8 @@ select current_user;
 
 create schema hr authorization pranshu;
 
+show search_path;
+
 create database hr owner pranshu;
 
 export PGUSER=pranshu

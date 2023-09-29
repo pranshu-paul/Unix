@@ -4,7 +4,7 @@
 # SERVER SIDE CONFIGURATON
 
 # Packages required for the NFS server.
-nfs-utils
+nfs-utils libnfsidmap
 
 # Create an NFS share.
 mkdir /nfs-share
@@ -18,7 +18,8 @@ umask 022
 # Check the GID of the secondary group on both the SERVER and CLIENT sides.
 
 # Add the following entry to /etc/exports.
-/nfs-share 10.0.0.171(rw)
+# no_root_squash: root on the client will have the same level of access.
+/nfs-share 10.0.0.171(rw,sync,no_root_squash)
 
 # Start the rpcbind and NFS daemon.
 systemctl enable --now nfs-server rpcbind

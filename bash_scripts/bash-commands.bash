@@ -18,3 +18,17 @@ echo -e "\e[1m\e[4mThis is bold and underlined text\e[0m"
 echo -e "\e[4mThis is underlined text\e[0m"
 
 echo -e "\e[9mThis is strikethrough text\e[0m"
+
+
+#####
+
+# Executes the commands and shell characters inside a variable
+eval
+
+pipe='|'
+
+eval ps -ef $pipe wc -l
+
+nc=netcat
+
+eval $nc

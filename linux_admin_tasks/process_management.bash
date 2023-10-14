@@ -78,6 +78,22 @@ ps -C COMMAND -- searches command PID
 
 ps -ef | awk '{print $2 ',' $8}' | less -- to see only PID and command.
 
+# To list a specific users processes in detail.
+ps aux| head -1; ps aux | grep ^postgres
+
+# To get the command through a PID.
+ps -o comm= -p 1983
+
+# To get command with its options executed.
+ps -o cmd= -p 1983
+
+# To find a process by its name.
+pgrep <process_name>
+
+# To get a process tree.
+pstree <pid>
+pstree <username>
+
 # Background job management.
 # bg - move jobs to the background.
 
@@ -102,9 +118,27 @@ bg %<job_id>
 bg %1
 
 
+# To disown a job.
+# To let it be running after the shell exit.
+# Pause the process
+ctrl-Z or kill -SIGSTOP <pid>
+
+# Check its job-id
+jobs -l
+
+# Send the job to background.
+bg %1
+
+# Disown the job.
+disown %1
+
+
 # To check the system's uptime.
 uptime -p
 
+
+# To list all the signals
+kill -l
 
 # Operating System Signals.
 

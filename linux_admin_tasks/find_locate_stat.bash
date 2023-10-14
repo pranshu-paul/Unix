@@ -59,6 +59,9 @@ find / -iname NAME
 # To Delete files older than 30 Days in Linux.
 find /home -type f -mtime +30 | xargs rm -f
 
+# 30 days only files from today
+find /home -type f -mtime -30 | xargs rm -f
+
 # To find files with permissions.
 find / -type f -perm 755 -print
 
@@ -87,3 +90,8 @@ find . -user orap -mtime 10 -exec rm {} \;
 
 # To delete a particular user owned files.
 find . -user oracle -exec rm -fr {} \;
+
+# Conditional expressions.
+# -a AND; -o OR
+find $PWD -type f -mtime +5 -exec rm -vf {} \; -a \( -type d -empty -delete \)
+find $PWD -type f -mtime +5 -exec rm -vf {} \; -o \( -type d -empty -delete \)

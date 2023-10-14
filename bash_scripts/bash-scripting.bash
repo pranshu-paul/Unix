@@ -94,11 +94,23 @@ done
 # It can also be used in a terminal.
 echo $LINENO
 
+# It returns the name of the function, inside a function when called.
+echo $FUNCNAME
+
+# Shows the level of shells opened.
+echo $SHLVL
+
 
 #####
 
 # Redirection.
-exec 3>&1 1>"log.log" 2>&1
+exec 3>&1 1>"$LOGFILE" 2>&1
+
+# Redirecting all outputs and errors to a file
+exec >> "${log_file}" 2>&1
+
+# To open a new shell and exit the previous one (Fresh environment).
+exec -l bash
 
 #####
 
@@ -196,6 +208,7 @@ done
 my_function() {
     # Commands to be executed inside the function
     echo "Hello from my_function!"
+	echo "Returning the function $FUNCNAME name."
 }
 
 # Call the function

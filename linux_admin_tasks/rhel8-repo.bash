@@ -1,4 +1,4 @@
-curl https://yum.oracle.com/RPM-GPG-KEY-oracle-ol8 > /etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+curl -s https://yum.oracle.com/RPM-GPG-KEY-oracle-ol8 > /etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
 
 cat > /etc/yum.repos.d/rhel.repo << EOF
 [BaseOS]

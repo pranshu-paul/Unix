@@ -29,3 +29,21 @@ curl --ssl-reqd \
 --mail-rcpt 'paulpranshu@gmail.com' \
 --upload-file mail.txt \
 -n
+
+
+curl https://postman-echo.com/get
+
+curl -X POST https://postman-echo.com/post -d "My first POST request."
+
+curl -X PUT https://postman-echo.com/put -d "This is a PUT request."
+
+curl -X DELETE https://postman-echo.com/delete
+
+
+curl "https://postman-echo.com/get?param1=value1&param2=value2"
+
+
+# To make a HTTP GET request.
+curl -w "%{http_code}" -X GET https://postman-echo.com/get
+
+curl -X POST --header 'Content-Type: application/form-data'  https://postman-echo.com/post -d "My first POST request."

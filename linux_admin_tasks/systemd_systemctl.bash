@@ -56,3 +56,23 @@ systemctl mask ctrl-alt-del.target
 
 # To unmask a unit file.
 systemctl unmask ctrl-alt-del.target
+
+vim /etc/systemd/system/oracle-ebs.service
+####
+
+[Unit]
+Description=Oracle E-Business Suite
+DefaultDependencies=no
+Wants=network-pre.target
+Before=network-pre.target shutdown.target reboot.target halt.target
+
+[Service]
+User=oracle
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/bash /u01/scripts/startebs.sh
+ExecStop=/bin/bash /u01/scripts/stopebs.sh
+TimeoutStopSec=3min
+
+[Install]
+WantedBy=multi-user.target

@@ -290,3 +290,80 @@ echo
 exit $?
 
 #####
+
+#!/bin/bash
+: ${DEBUG:=0}
+
+typeset -a list
+
+if [ "$1" = "-t" ]; then
+DEBUG=1
+ read -a list < <( od -Ad -w24 -t u2 /dev/urandom )
+else
+ read -a list
+fi
+numelem=${#list[*]}
+
+showlist()
+ {
+echo "$3"${list[@]:0:$1} ${2:0:1}${list[$1]}${2:1:1} ${list[@]:$1+1};
+ }
+
+for(( i=1; i<numelem; i++ )) do
+ ((DEBUG))&&showlist i "[]" " "
+ for(( j=i; j; j-- )) do
+ [[ "${list[j-1]}" -le "${list[i]}" ]] && break
+ done
+ (( i==j )) && continue
+ list=(${list[@]:0:j} ${list[i]} ${list[j]}\
+ ${list[@]:j+1:i-(j+1)} ${list[@]:i+1})
+ ((DEBUG))&&showlist j "<>" "*"
+done
+echo
+echo "------"
+echo $'Result:\n'${list[@]}
+exit $?
+
+##################################################
+#!/bin/bash
+
+exchange()
+{
+ local temp=${Countries[$1]}
+ Countries[$1]=${Countries[$2]}
+ Countries[$2]=$temp
+ return
+} 
+declare -a Countries # Declare array,
+
+Countries=(Netherlands Ukraine Zaire Turkey Russia Yemen Syria \
+Brazil Argentina Nicaragua Japan Mexico Venezuela Greece England \
+Israel Peru Canada Oman Denmark Wales France Kenya \
+Xanadu Qatar Liechtenstein Hungary)
+
+clear
+echo "0: ${Countries[*]}"
+number_of_elements=${#Countries[@]}
+let "comparisons = $number_of_elements - 1"
+count=1
+while [ "$comparisons" -gt 0 ]
+do
+ index=0
+ while [ "$index" -lt "$comparisons" ]
+ do
+ if [ ${Countries[$index]} \> ${Countries[`expr $index + 1`]} ]
+ then
+ exchange $index `expr $index + 1`
+ fi 
+ let "index += 1"
+ done
+
+let "comparisons -= 1"
+
+echo
+echo "$count: ${Countries[@]}"
+echo
+let "count += 1"
+done
+
+exit 0

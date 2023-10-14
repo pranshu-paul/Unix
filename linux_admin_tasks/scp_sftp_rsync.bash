@@ -24,6 +24,7 @@ scp -v /path/to/local_file <user_name>@<ip_address>:/path/to/remote_server/desti
 
 # To connect a remote system for data transfer.
 # -a attempt to resume file transfer if interreputed.
+# sftp sources remote .bash_profile
 sftp <user_name>@<ip_address>
 
 # To connect a remote system for data transfer with different port.

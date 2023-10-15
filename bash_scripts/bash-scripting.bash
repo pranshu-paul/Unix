@@ -19,13 +19,13 @@ addr[3]="5"
 
 IFS='+'
 
-# To perform a mathmatical operation on the elements of an array.
+# To perform a mathmatical operation on the elements of an array use * as index.
 printf "%s\n" "${addr[*]}"| paste | bc
 
 # Declare an array for string
 declare -a addr
 
-# Adding the output of an command in an array.
+# Adding the output of an command in an array by removing the \n newline character from the end of a line.
 readarray -t addr <<< $(find $PWD)
 
 declare -a array

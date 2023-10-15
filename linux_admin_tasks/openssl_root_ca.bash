@@ -87,6 +87,12 @@ openssl enc -d -aes-256-cbc \
 -in <file_to_decrypt>.enc \
 -out <output_name> 
 
+# To encrypt a file.
+openssl enc -aes-256-cbc -pbkdf2 -in backup-copy -out backup-copy.enc
+
+# To decrypt a file.
+openssl enc -d -aes-256-cbc -pbkdf2 -in backup-copy.enc -out /dev/stdout -pass file:<(echo -n "windows")
+
 # Glossary:
 # Asymmetric Encryption
 

@@ -108,21 +108,20 @@ echo "This is a test mail." | mail -s "Test mail #1" paulpranshu@gmail.com
 # Postfix Relay
 
 # Download Postfix.
-dnf -y install postfix
+dnf -y install postfix cyrus-sasl-plain
 
 # Run the below command to add the SMTP server's credentials.
-cat >> /etc/postfix/sasl_passwd << EOF
-[smtp.gmail.com]:587    testing.paulpranshu@gmail.com:<password>
-EOF
+# More than one email addreses can be added.
+echo '[smtp.office365.com]:587 paulpranshu@outlook.com:<password>' > /etc/postfix/sasl_passwd
 
 # Create a hashed version of the file "/etc/postfix/sasl_passwd".
 # Change it's permissions to 400.
+chmod 600 /etc/postfix/sasl_passwd
 postmap /etc/postfix/sasl_passwd
-chmod 400 /etc/postfix/sasl_passwd
 
 # Set the relayhost.
 # It doesn't deliver locally.
-postconf -e "relayhost = [smtp.gmail.com]:587"
+postconf -e "relayhost = [smtp.office365.com]:587"
 postconf relayhost
 
 # Enable smtp TLS.
@@ -153,10 +152,16 @@ systemctl restart postfix
 
 
 # To test e-mail dry run.
-echo "This is a test email" | mailx -s "Test Subject" -n recipient@example.com
+echo "This is a test email" | mailx -s "Test Subject" -r paulpranshu@outlook.com -n paulpranshu@gmail.com
 
 # Troubleshooting
 journalctl -t postfix/smtp
+
+# To login in IMAP & POP3
+mail -f "imaps://paulpranshu@outlook.com@outlook.office365.com:993"
+mail -f "imaps://paulpranshu@outlook.com@outlook.office365.com:993" <<< <password>
+mail -f "pop3s://paulpranshu@outlook.com@outlook.office365.com:995"
+mail -f "pop3s://paulpranshu@outlook.com@outlook.office365.com:995" <<< <password>
 
 ############################################################################
 # Mutt client configuration
@@ -171,19 +176,20 @@ journalctl -t postfix/smtp
 # Microsoft 365 SMTP: smtp.office365.com:587
 
 # For incoming.
-set folder = "imaps://testing.paulpranshu@gmail.com@imap.gmail.com:993"
-set imap_pass = "<password>"
+set folder = "imaps://paulpranshu@outlook.com@outlook.office365.com:993"
+set imap_pass = "wocndebqvwemwrur"
 
 # For outgoing only.
 set spoolfile = "+INBOX"
-set smtp_url = "smtp://testing.paulpranshu@gmail.com@smtp.gmail.com:587"
-set smtp_pass = "<password>"
-set from = "testing.paulpranshu@gmail.com"
+set smtp_url = "smtp://paulpranshu@outlook.com@smtp.office365.com:587"
+set smtp_pass = "wocndebqvwemwrur"
+set from = "paulpranshu@outlook.com"
 set realname = "Pranshu Paul"
 set editor= "vi"
 set pager = "less"
 set signature = "Sent from Oracle Solaris"
 
+# Another example
 set smtp_url = "smtp://mailsrv2.fineorganics.com:25"
 set from = "prod_ebs@fineorganics.com"
 set edit_headers=yes
@@ -227,13 +233,13 @@ echo "${message}" | mutt -s "${subject}" "${recipient[0]}" -c "${recipient[@]:1}
 ####################################################
 
 # To send emails from netcat.
-nc srv04.paulpranshu.xyz 25 << EOF
+netcat srv04.paulpranshu.xyz 25 << EOF
 HELO paulpranshu.xyz
-MAIL FROM:<paul@ostest.net>
+MAIL FROM:<paulpranshu@outlook.com>
 RCPT TO:<paul@paulpranshu.xyz>
 DATA
 Subject: Test Email #2 from NetCat
-From: Paul <paul@ostest.net>
+From: Paul <paulpranshu@outlook.com>
 To: Recipient <paul@paulpranshu.xyz>
 
 Test email from NetCat.

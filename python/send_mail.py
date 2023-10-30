@@ -4,44 +4,35 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-# SMTP server setup
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.ehlo()
-server.starttls()
+smtp = smtplib.SMTP('smtp.gmail.com', 587)
+smtp.ehlo()
+smtp.starttls()
 
-# Your Gmail credentials
 email = 'testing.paulpranshu@gmail.com'
-password = ''  # Replace with your Gmail password
+password = ''
 
-# Recipient's email address
 recipient = 'paulpranshu@gmail.com'
 
-# Login to your Gmail account
-server.login(email, password)
+smtp.login(email, password)
 
-# Create the email content
-msg = MIMEMultipart()
-msg['From'] = 'NeuralNine'
-msg['To'] = recipient
-msg['Subject'] = 'Test #1'
+message = MIMEMultipart()
+message['From'] = 'Pranshu Paul'
+message['To'] = recipient
+message['Subject'] = 'Test #1'
 
-# Email body
 body = "This is the body of your email."
-msg.attach(MIMEText(body, 'plain'))
+message.attach(MIMEText(body, 'plain'))
 
-# Attach a file
-filename = 'cert.pem'  # Replace with the path to your file
+filename = 'hr.sql'
 attachment = open(filename, 'rb')
 
 part = MIMEBase('application', 'octet-stream')
 part.set_payload(attachment.read())
 encoders.encode_base64(part)
 part.add_header('Content-Disposition', f'attachment; filename= {filename}')
-msg.attach(part)
+message.attach(part)
 
-# Send the email
-text = msg.as_string()
-server.sendmail(email, recipient, text)
+text = message.as_string()
+smtp.sendmail(email, recipient, text)
 
-# Close the connection
-server.quit()
+smtp.quit()

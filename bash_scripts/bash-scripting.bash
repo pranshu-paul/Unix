@@ -48,10 +48,11 @@ printf "%s\n" "${addr[@]:3:5}"
 
 
 # Performing an iteration on an array.
+# If each elements contains space use a for loop.
 # "!" lists the all index number.
 # "#" lists the total index number.
-for i in "${!attachment[@]}"
-	do echo "${attachment[$i]}"
+for i in "${!attachment[@]}";do
+	echo "${attachment[$i]}"
 done
 
 #####

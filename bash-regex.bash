@@ -169,3 +169,6 @@ for file in *; do
     tr -d '\r' < "$file" > "${file}.temp"
     mv "${file}.temp" "$file"
 done
+
+# Translating characters
+tr '<>' ' ' < $CONTEXT_FILE | grep s_login_page | awk '{print $3}'

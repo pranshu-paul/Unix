@@ -75,6 +75,10 @@ nmcli con up dns160
 
 nmcli connection modify enp0s8 +ipv4.routes "<destination>/<cidr> <next_hop>"
 nmcli connection modify enp0s8 +ipv4.routes "0.0.0.0/0 192.168.56.0"
+nmcli connection modify your-eth0-connection +ipv4.routes "0.0.0.0/0 10.0.2.2 100"
+
+# To add temporary routes.
+ip route add 0.0.0.0/0 via 10.0.2.2 src 10.0.2.15 metric 50
 
 # Free DNS servers 8.8.8.8, 8.8.4.4 of google.com
 

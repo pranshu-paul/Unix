@@ -1,25 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
+int **create_matrix(int rows, int cols, int fill_value){
+     int **matrix = malloc(sizeof(int *) * rows);
 
-typedef struct {
-     int x;
-     int y;
-     struct point *next;
-} point;
+     for (int i = 0; i < rows; i++){
+          matrix[i] = malloc(sizeof(int) * cols);
+     }
 
-int main(int argc, char const *argv[])
-{
+     for (int i = 0; i < rows; i++){
+          for (int j = 0; j < cols; j++){
+               matrix[i][j] = fill_value;
+          }
+     }
 
-     point *head = (point *)malloc(sizeof(point));
-
-     //head->x = 4;
-     //head->y = 6;
-     head->next = NULL;
-
-
-     point *p1 = head;
-
-     p1 = p1->next;
-
-     return 0;
+     return matrix;
 }

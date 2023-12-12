@@ -7,12 +7,14 @@ tar -xvf <MySQL>.tar
 
 rpm -ivh *.rpm
 
-rpm -ivh *.rpm --nodeps --force (In case errors occur during the installation)
+rpm -ivh *.rpm --nodeps --force openssl-devel.x86_64 (In case errors occur during the installation)
 
 systemctl enable --now mysqld
 
 grep password /var/log/mysqld.log
 
+# For, downloaded from Red Hat Repo.
+grep password /var/log/mysql/mysqld.log
 mysql -u root -p
 
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql#459';

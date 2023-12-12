@@ -5,7 +5,18 @@
 # Kernel starts this process.
 # Process schedular is integrated in the kernel itself.
 
-# BIOS/UEFI --> From the reserved sector of Hard Drive "Grub" --> kernel with initramfs --> Decompresses the kernel --> mounts the root file system "/" --> systemd
+# Power on
+# Loads BIOS/UEFI from non-programmable read-only memory
+# Run POST (Power On Self Test)
+# Detects the bootable device
+# From the reserved sector of Hard Drive "Grub"
+# Reads /boot/grub2/grub.cfg
+# Decompresses the kernel
+# Loads the kernel with initramfs
+# mounts the root file system "/"
+# systemd
+# Run ".target" files (collection of ".service")
+# Executes /etc/profile
 
 # top -u USER
 top -u pranshu|UID

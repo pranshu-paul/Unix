@@ -52,7 +52,7 @@ grep password /var/log/mysqld.log
 
 mysql -u root -p
 
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql#459'; # This will be the root user's password.
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql@123'; # This will be the root user's password.
 FLUSH PRIVILEGES;
 
 

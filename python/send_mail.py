@@ -4,35 +4,40 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-smtp = smtplib.SMTP('smtp.gmail.com', 587)
+email = 'paulpranshu@outlook.com'
+recipient = 'paulpranshu@gmail.com'
+file_path = 'hr.sql'
+name = 'Pranshu Paul'
+subject = 'Test #7'
+password = ''
+message = "This is the body of your email."
+
+smtp_server = 'smtp.office365.com'
+
+smtp_port = 587
+
+smtp = smtplib.SMTP(smtp_server, smtp_port)
 smtp.ehlo()
 smtp.starttls()
-
-email = 'testing.paulpranshu@gmail.com'
-password = ''
-
-recipient = 'paulpranshu@gmail.com'
-
 smtp.login(email, password)
 
-message = MIMEMultipart()
-message['From'] = 'Pranshu Paul'
-message['To'] = recipient
-message['Subject'] = 'Test #1'
+header = MIMEMultipart()
+header['From'] = name
+header['To'] = recipient
+header['Subject'] = subject
 
-body = "This is the body of your email."
-message.attach(MIMEText(body, 'plain'))
+header.attach(MIMEText(message, 'plain'))
 
-filename = 'hr.sql'
+filename = file_path
 attachment = open(filename, 'rb')
 
 part = MIMEBase('application', 'octet-stream')
 part.set_payload(attachment.read())
 encoders.encode_base64(part)
 part.add_header('Content-Disposition', f'attachment; filename= {filename}')
-message.attach(part)
+header.attach(part)
 
-text = message.as_string()
+text = header.as_string()
 smtp.sendmail(email, recipient, text)
 
 smtp.quit()

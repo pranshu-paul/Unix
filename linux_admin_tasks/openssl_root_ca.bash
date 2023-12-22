@@ -93,6 +93,9 @@ openssl enc -aes-256-cbc -pbkdf2 -in backup-copy -out backup-copy.enc
 # To decrypt a file.
 openssl enc -d -aes-256-cbc -pbkdf2 -in backup-copy.enc -out /dev/stdout -pass file:<(echo -n "windows")
 
+# To get the provider of the cert
+openssl s_client -connect smtp.email.us-ashburn-1.oci.oraclecloud.com:587 -starttls smtp
+
 # Glossary:
 # Asymmetric Encryption
 
@@ -112,6 +115,12 @@ openssl enc -d -aes-256-cbc -pbkdf2 -in backup-copy.enc -out /dev/stdout -pass f
 # Client generates a random session key for symmetric encryption and encrypts using the servers public key.
 # Server decrypts it and use it for the rest of the connection.
 
+
+# To generate an RSA key pair.
+openssl genrsa -out private.pem 4096
+
+# To generate a public key for the private key.
+openssl rsa -in private.pem -pubout -out public.pem
 
 
 #######################################################

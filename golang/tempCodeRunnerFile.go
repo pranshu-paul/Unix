@@ -1,1 +1,1 @@
-gopkg.in/gomail.v2
+aws.String("

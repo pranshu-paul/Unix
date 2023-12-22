@@ -90,6 +90,9 @@ ssh-keygen -f .\id_rsa -p
 # Copy the private key to the client.
 ssh-keygen -t rsa
 
+# To delete an identity from "known_hosts" file.
+ssh-keygen -R <ip_address>
+
 # Copy the public in the authorized_keys of the server, on the target server.
 cat id_rsa.pub >> authorized_keys
 

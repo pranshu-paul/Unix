@@ -75,6 +75,9 @@ find / -type f -empty
 # M -- for megabyte, G -- for gigabyte, K -- for kilobyte
 find / -size +5M
 
+# To return files greater than 100 MB.
+find / -size +100000000c -exec ls -lh {} \;
+
 # To find file with modified time.
 # find files more than a day ago but not more than 7 days.
 # other options are -ctime -- change time, -atime -- access time.
@@ -95,3 +98,13 @@ find . -user oracle -exec rm -fr {} \;
 # -a AND; -o OR
 find $PWD -type f -mtime +5 -exec rm -vf {} \; -a \( -type d -empty -delete \)
 find $PWD -type f -mtime +5 -exec rm -vf {} \; -o \( -type d -empty -delete \)
+
+
+# For solaris
+touch -t 202201010000 start_date
+touch -t 202310180000 end_date
+ 
+find /usr -type f -newer start_date ! -newer end_date -exec ls -l {} \;
+ 
+# Remove temporary files
+rm start_date end_date

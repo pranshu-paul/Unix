@@ -79,7 +79,7 @@ dnf history
 # To apply critical updates only.
 dnf upgrade --sec-severity=Critical
 
-dnf install python3 --downloaddir=$PWD
+dnf download <package_name> --resolve
 
 # Extracting a package.
 rpm2cpio <package_name> | cpio -idmv

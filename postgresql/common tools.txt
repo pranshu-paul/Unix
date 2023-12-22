@@ -5,3 +5,12 @@ pg_dump
 
 
 pg_top from EPEL
+
+
+pgweb
+
+pgadmin web
+
+pg_bouncer
+
+postgrest

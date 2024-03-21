@@ -68,3 +68,7 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 # Or, update the sysctl.conf file.
 net.ipv4.ip_forward=1
+
+
+# Prints the NICs attached to the public zone.
+firewall-cmd --zone=public --list-interfaces

@@ -4,7 +4,7 @@
 # /etc/ssh/sshd_config, /etc/ssh/sshrc, ~/.ssh/rc, ~/.hushlogin, /etc/motd, ~/.authorized_keys
 
 # TO CREATE AUTHORIZED_KEYS FILE.
-cd ~ ; mkdir .ssh ; chmod 700 .ssh ; cd .ssh ; touch authorized_keys ; chmod 600 authorized_keys ; cd ~
+mkdir -v ~/.ssh; chmod -v 700 ~/.ssh; touch ~/.ssh/authorized_keys; chmod -v 600 ~/.ssh/authorized_keys
 
 # TO CHECK LOGS OF SSHD.
 journalctl -f -t sshd
@@ -21,12 +21,17 @@ awk '{print $12}' /var/log/audit/audit.log | grep addr= | sort | uniq -c | sort 
 semanage port -a -t ssh_port_t -p tcp <port>
 firewall-cmd --zone=public --add-service=ssh --permanent
 
+# For remote ssh sessions.
+tmate
+
 # After changing port in sshd_config.
+# Tell SELinux about the change.
+sed -n '15p' /etc/ssh/sshd_config
 # When changing configuration in sshd_config.
 # Use "sshd -t" to check whether the configuration is ok or not.
 # Restart sshd.service "systemctl restart sshd.service"
 # Use "w" command to check who is logged into the system.
-# To force log out a user use "pkill -u <<user_name>>"
+# To force log out a user, use "pkill -u <<user_name>>"
 # Check SElinux context for the each ssh config file.
 # Check SElinux context of ~/.ssh directory if pub-key authentication is not working.
 # Use "restorecon -R -v ~/.ssh" to restore SElinux context.
@@ -84,6 +89,9 @@ ssh-keygen -t rsa -b 4096
 
 # -f for file name -p for password prompt.
 ssh-keygen -f .\id_rsa -p
+
+# To provide a specific path for the key pair.
+ssh-keygen -f .\id_rsa
 
 # For private key authentication.
 # Generate a key pair on the target server.

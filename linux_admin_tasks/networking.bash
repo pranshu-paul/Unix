@@ -114,6 +114,8 @@ gw4 192.168.101.1 \
 autoconnect yes \
 ipv4.never-default yes
 
+# To create a virtual network interface card.
+nmcli connection add type dummy ifname vnic0 con-name vnic0  ipv4.method manual ipv4.addresses 172.16.15.2/24 ipv6.method disabled
 
 # Create a new proxy connection
 nmcli connection add type socks con-name "My SOCKS Proxy" ifname "*" ipv4.method auto ipv6.method auto

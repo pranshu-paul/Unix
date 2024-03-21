@@ -159,7 +159,7 @@ seinfo --type | grep -E -w passwd_[a-z].+
 seinfo --type | grep -w -E http[a-z].+
 
 
-# echoes only the trailing directory.
+# Prints the trailing directory only.
 basename <path>
 
 basename /home/root
@@ -172,3 +172,9 @@ done
 
 # Translating characters
 tr '<>' ' ' < $CONTEXT_FILE | grep s_login_page | awk '{print $3}'
+
+# To drop a certain column and return the remaining after that.
+history | cut -d " " -f5-
+
+# Same as above using the column number to drop.
+history | cut --complement -d ' ' -f 3

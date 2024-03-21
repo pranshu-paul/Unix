@@ -10,48 +10,47 @@
 int MainMenu(void);
 void OpMenu(float *num1, float *num2);
 
-int main(void) {
+void main(void) {
 	float num1 = 0, num2 = 0;
 
-	while (1)
-	{
+	while (1) {
 		system("cls");
 
 		int option = MainMenu();
 
-		if (option == QUIT)
-		{
+		if (option == QUIT) {
 			exit(0);
 		}
 
-		switch (option)
-		{
-		case ADDITION:
-			OpMenu(&num1, &num2);
-			printf("\nThe sum of %.2f and %.2f is %.2f", num1, num2, num1+num2);
-			break;
-		case SUBTRACTION:
-			OpMenu(&num1, &num2);
-			printf("\nThe difference between %.2f and %.2f is %.2f", num1, num2, num1-num2);
-			break;
-		case MULTIPLICATION:
-			OpMenu(&num1, &num2);
-			printf("\nThe product of %.2f and %.2f is %.2f", num1, num2, num1*num2);
-			break;
-		case DIVISION:
-			OpMenu(&num1, &num2);
-			if (num2 !=0)
-			{
-				printf("\nThe quotient of %.2f and %.2f is %.2f", num1, num2, num1/num2);
-			} else
-			{
-				printf("\nCannot divide by zero.");
-			}
-			break;
-		default:
-			printf("\nInvalid option number.");
-			getchar();
-			break;
+		switch (option) {
+			case ADDITION:
+				OpMenu(&num1, &num2);
+				printf("\nThe sum of %.2f and %.2f is %.2f", num1, num2,
+					   num1 + num2);
+				break;
+			case SUBTRACTION:
+				OpMenu(&num1, &num2);
+				printf("\nThe difference between %.2f and %.2f is %.2f", num1,
+					   num2, num1 - num2);
+				break;
+			case MULTIPLICATION:
+				OpMenu(&num1, &num2);
+				printf("\nThe product of %.2f and %.2f is %.2f", num1, num2,
+					   num1 * num2);
+				break;
+			case DIVISION:
+				OpMenu(&num1, &num2);
+				if (num2 != 0) {
+					printf("\nThe quotient of %.2f and %.2f is %.2f", num1,
+						   num2, num1 / num2);
+				} else {
+					printf("\nCannot divide by zero.");
+				}
+				break;
+			default:
+				printf("\nInvalid option number.");
+				getchar();
+				break;
 		}
 
 		printf("\n\nPress any key to continue...");
@@ -59,20 +58,20 @@ int main(void) {
 		getchar();
 	}
 
-	return 0;
+	//return 0;
 }
 
 int MainMenu(void) {
 	printf("Choose an option.\n\n");
-		printf("1) Addition\n");
-		printf("2) Subtraction\n");
-		printf("3) Multiplication\n");
-		printf("4) Division\n");
-		printf("5) Quit\n");
+	printf("1) Addition\n");
+	printf("2) Subtraction\n");
+	printf("3) Multiplication\n");
+	printf("4) Division\n");
+	printf("5) Quit\n");
 
-		int option = 0;
-		printf("\nEnter the option number: ");
-		scanf("%d", &option);
+	int option = 0;
+	printf("\nEnter the option number: ");
+	scanf("%d", &option);
 	return option;
 }
 

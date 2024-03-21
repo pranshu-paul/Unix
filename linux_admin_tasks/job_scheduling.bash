@@ -20,6 +20,9 @@ yum -y install cronie
 crontab -e
 @reboot sleep 5m && /path/to/your/script.sh
 
+# Runs a command every two minutes
+*/2 * * * * <command/script>
+
 
 # To install at.
 yum -y install at

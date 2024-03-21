@@ -1,22 +1,24 @@
 package main
 
 import (
+	"log"
+
 	"gopkg.in/gomail.v2"
 )
 
 func main() {
-	// Set up email connection
 	d := gomail.NewDialer("smtp.office365.com", 587, "paulpranshu@outlook.com", "wocndebqvwemwrur")
 
-	// Create email message
 	m := gomail.NewMessage()
 	m.SetHeader("From", "paulpranshu@outlook.com")
 	m.SetHeader("To", "paulpranshu@gmail.com")
 	m.SetHeader("Subject", "Your Subject")
-	m.SetBody("text/plain", "Hello, this is the email body.")
+	m.SetBody("text/html", "<h1>Hello, this is the email body.</h1>")
+	m.Attach("C:\\Users\\Pranshu\\OneDrive\\Unix\\golang\\aws\\lambda.json")
 
-	// Send email
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	err := d.DialAndSend(m)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 }

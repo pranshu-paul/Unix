@@ -45,3 +45,16 @@ mtr -c 10 --report "$target_host"
 # To check on which Protocol the interface is: TCP or UDP
 
 tcpdump -i ens3 -n -c 5 -v | grep -o -E 'UDP|TCP'
+
+
+
+# To create a socket and start the service as a request comes.
+while true; do
+	netcat -l -w 1 80
+	service nginx start
+	break
+done
+
+ncat -l -p 80 --sh-exec "systemctl start nginx"
+
+ncat -l -p 80 --exec "/usr/bin/systemctl start nginx"

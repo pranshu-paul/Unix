@@ -37,6 +37,9 @@ unset HISTTIMEFORMAT
 
 history -d <offset>
 
+# To get the command only
+history | cut -d " " -f5-
+
 # default PS1 = [\u@\h \W]\$
 # default PS2 = >
 

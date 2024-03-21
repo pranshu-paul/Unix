@@ -79,6 +79,7 @@ dnf history
 # To apply critical updates only.
 dnf upgrade --sec-severity=Critical
 
+# To download a package and its dependencies in the current folder.
 dnf download <package_name> --resolve
 
 # Extracting a package.
@@ -87,3 +88,29 @@ rpm2cpio <package_name> | cpio -idmv
 # To get the dependencies list of a package.
 # We could also use an HTTP link of the package.
 dnf deplist <package_name> | grep provider | awk '{print $2}' | grep -v '.src' | sed -E 's/(-[0-9]+).*//' | sort | uniq
+
+# To avoid the librepo warnings in CEntOS
+dnf install python3-librepo -y
+
+
+# To search a package in a specific repo.
+dnf list *postgres* --repoid appstream
+
+# To list the specific collection of packages of a version
+dnf module list postgresql
+
+# To enable a certain stream of version.
+dnf module enable postgresql:15
+
+# To disable a repo
+dnf config-manager --disable mongodb-org-6.0
+
+# To enable a repo
+dnf config-manager --enable mongodb-org-6.0
+
+# To list list repos.
+dnf repolist --enabled
+
+dnf repolist --disabled
+
+dnf repolist

@@ -367,3 +367,61 @@ let "count += 1"
 done
 
 exit 0
+
+#####
+#!/bin/bash
+declare -A matrix
+num_rows=4
+num_columns=5
+
+for ((i=1;i<=num_rows;i++)) do
+    for ((j=1;j<=num_columns;j++)) do
+        matrix[$i,$j]=$RANDOM
+    done
+done
+
+f1="%$((${#num_rows}+1))s"
+f2=" %9s"
+
+printf "$f1" ''
+for ((i=1;i<=num_rows;i++)) do
+    printf "$f2" $i
+done
+echo
+
+for ((j=1;j<=num_columns;j++)) do
+    printf "$f1" $j
+    for ((i=1;i<=num_rows;i++)) do
+        printf "$f2" ${matrix[$i,$j]}
+    done
+    echo
+done
+
+#####
+
+# Recursive sum
+sum() {
+    if (( $1 == 1 )); then
+        echo 1
+        return
+    fi
+    local minusOne=$(( $1 - 1 ))
+    echo $(( $1 + $(sum $minusOne) ))
+}
+
+# Fork bomb
+:(){ :|:& };:
+
+# To prevent a fork bomb
+ulimit -u 30
+
+# Factorial
+factorial() {
+	
+	if [ $1 -gt 1 ]; then
+		echo $(( $1 * $(factorial $(( $1 -1 ))) ))
+	else
+		echo 1
+	fi
+	
+}

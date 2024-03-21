@@ -2,8 +2,11 @@
 
 # Arrays
 
-# Declaring an array.
+# Declare an array.
 declare -a addr
+
+# Declare a local array (inside a function).
+local -a addr
 
 # Adding elements into an array.
 addr=("1" "2" "3" "4" "5" "6" "7")
@@ -22,6 +25,9 @@ IFS='+'
 # To perform a mathmatical operation on the elements of an array use * as index.
 printf "%s\n" "${addr[*]}"| paste | bc
 
+# BSD expression. (IFS is not required)
+paste -s -d '+' <(printf "%s\n" "${addr[*]}") | bc
+
 # Declare an array for string
 declare -a addr
 
@@ -30,6 +36,10 @@ readarray -t addr <<< $(find $PWD)
 
 declare -a array
 array=($(<command>))
+
+# To capture all the files and directories excluding the current and parent in an array.
+declare -a files
+files=(* .[^.]*)
 
 # Print all the elements.
 printf "%s\n" "${addr[@]}"
@@ -150,6 +160,28 @@ while [ condition ]; do
     # commands to run while condition is true
 done
 
+while read out; do
+	((size+=out))
+done < <(ls -lAR | awk '{print $5}')
+
+i=1; while [ $i -le 10 ]; do
+  ((sum+=i))
+  ((i++))
+done
+
+# A do-while loop
+num=1
+
+while true
+do
+   echo Number: $num
+   let num++
+
+   if [ $num -lt 5 ]; then
+       break
+   fi
+done
+
 # Infinite while loop.
 while true; do
     # commands to run while condition is true
@@ -170,6 +202,17 @@ case "$variable" in
     *)
         # commands for all other cases
         ;;
+esac
+
+variable=true
+
+case "$variable" in
+    true)
+        echo true;;
+    false)
+        echo false;;
+    *)
+        echo Not a boolean;;
 esac
 
 

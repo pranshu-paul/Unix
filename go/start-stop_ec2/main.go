@@ -1,0 +1,63 @@
+package main
+
+import (
+	"context"
+	"log"
+	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+)
+
+type data struct {
+	InstanceIds []string `json:"instanceIds"`
+	Action      string   `json:"action"`
+}
+
+func checkError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func createEC2Client(ctx context.Context) *ec2.Client {
+	cfg, err := config.LoadDefaultConfig(ctx)
+	checkError(err)
+
+	return ec2.NewFromConfig(cfg)
+}
+
+func startInstance(ctx context.Context, val *data, client *ec2.Client) {
+	output, err := client.StartInstances(ctx, &ec2.StartInstancesInput{
+		InstanceIds: val.InstanceIds,
+	})
+	checkError(err)
+
+	log.Println(output.StartingInstances[0].CurrentState.Name)
+}
+
+func stopInstance(ctx context.Context, val *data, client *ec2.Client) {
+	output, err := client.StopInstances(ctx, &ec2.StopInstancesInput{
+		InstanceIds: val.InstanceIds,
+	})
+	checkError(err)
+	log.Println(output.StoppingInstances[0].CurrentState.Name)
+}
+
+func handler(ctx context.Context, val *data) {
+	switch strings.ToLower(val.Action) {
+	case "start":
+		startInstance(ctx, val, createEC2Client(ctx))
+	case "stop":
+		stopInstance(ctx, val, createEC2Client(ctx))
+	default:
+		log.Fatal("Invalid action provided.")
+	}
+}
+
+func main() {
+	handler(context.Background(), &data{
+		InstanceIds: []string{"i-05be445de2a83e423", "i-02fb9cbdd300067ec"},
+		Action:      "stop",
+	})
+}

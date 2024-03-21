@@ -1,8 +1,10 @@
 # Storage Administration
 
+# /sys direcctory contains the "view" of physical drives.
+
 # For the devices name starting with "sd"
-dmesg | grep SCSI
-journalctl -k | grep SCSI
+dmesg | grep -e SCSI | grep sd
+journalctl -k | grep SCSI | grep sd
 
 # Lists the block drives with their file systems.
 lsblk -f
@@ -33,12 +35,60 @@ mount -t xfs UUID="3847161a-699b-4d0f-92c9-58d61c9c8344" /mnt
 UUID="3847161a-699b-4d0f-92c9-58d61c9c8344" /mnt defaults 0 0
 
 # Reload the system daemons after updating the "/etc/fstab"
-systemctl daemon-Reload
+systemctl daemon-reload
 
 # Verify the entry in "/etc/fstab"
 mount -av
 
+# The Systemd approach to mount a file systemd over the /etc/fstab file.
+
+# Create a "mnt.mount" unit file in the /etc/systemd/system directory.
+# "<name>.mount" name must be equal to "Where" of the unit file.
+
+systemctl edit mnt.mount --full --force
+
+# Or
+
+cat << EOF > /etc/systemd/system/mnt.mount
+[Unit]
+Description=Mounts sdb1
+
+[Mount]
+What=/dev/sdb1
+Where=/mnt
+Type=xfs
+Options=defaults
+EOF
+
+
+# Create a unit file to automount the filesystem.
+cat << EOF > /etc/systemd/system/mnt.automount
+[Unit]
+Description=Automounts sdb1
+
+[Automount]
+Where=/mnt
+TimeoutIdleSec=10min
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Refresh the unit files.
+systemctl daemon-reload
+
+# To mount the device.
+systemctl start mnt.mount
+
+# To unmount the device.
+systemctl stop mnt.mount
+
+# To permanently enable the device at every boot.
+systemctl enable --now mnt.automount
+
 # To remove any FS signature.
+
+# First remove the parititon then the device itself.
 wipefs -a /dev/sdb1
 wipefs -a /dev/sdb
 
@@ -85,10 +135,10 @@ mdadm --zero-superblock /dev/sda1 /dev/sdb1
 # This command will remove all data also from the drive.
 # First remove file system signature from the partitions.
 # WARNING! THE BELOW COMMAND CAN WIPE ALL THE DATA ON A DRIVE SO, USE IT CAREFULLY.
-wipefs -a /dev/sd[a-d]1
+wipefs -a /dev/sd[b-d]1
 
 # Then remove the partitions.
-wipefs -a /dev/sd[a-d]
+wipefs -a /dev/sd[b-d]
 
 cat /dev/null > /etc/mdadm.conf
 
@@ -221,4 +271,41 @@ systemctl daemon-reload
 # Creating partitions from "fdisk".
 # The below command is creating a GPT partition with complete size and saving it.
 printf "g\nn\n1\n\n\nw\n" | fdisk /dev/sdc
+
+
+##################################
+# Script to create a raid
+for char in {b..g}; do
+	parted /dev/sd${char} mklabel gpt
+	parted /dev/sd${char} mkpart primary 0% 99%
+	parted /dev/sd${char} set 1 raid on
+	parted /dev/sd${char} print
+done
+
+
+mdadm --examine /dev/sd[b-g]1
+
+mdadm --create /dev/md0 --level=6 --raid-devices=6 /dev/sd[b-g]1
+
+mdadm --examine /dev/sd[b-g]1
+
+for char in {b..g}; do
+	blkid | grep /dev/sd${char}1 | awk '{print $2}'
+done
+
+mdadm --detail /dev/md0
+
+mkfs.xfs /dev/md0
+
+mdadm -E -s -v >> /etc/mdadm.conf
+
+lsblk  -f /dev/sd[b-g]1
+
+partprobe -s
+
+echo "$(blkid /dev/md0 | awk '{print $2}') /mnt xfs defaults 0 0" >> /etc/fstab
+
+restorecon -Rv /mnt
+
+mount -av
 

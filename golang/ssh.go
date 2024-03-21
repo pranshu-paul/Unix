@@ -13,19 +13,28 @@ func checkError(err error) {
 	}
 }
 
-func runSSHCommand(host, user, privateKeyPath, command string, port string) {
-	privateKey, err := os.ReadFile(privateKeyPath)
+type data struct {
+	host           string
+	user           string
+	privateKeyPath string
+	command        string
+	port           string
+}
+
+func runSSHCommand(val *data) {
+	privateKey, err := os.ReadFile(val.privateKeyPath)
 	checkError(err)
 
 	signer, err := ssh.ParsePrivateKey(privateKey)
 	checkError(err)
 
-	authMethod := []ssh.AuthMethod{ssh.PublicKeys(signer)}
 	hostKeyCallback := ssh.InsecureIgnoreHostKey()
 
-	config := &ssh.ClientConfig{User: user, Auth: authMethod, HostKeyCallback: hostKeyCallback}
-
-	client, err := ssh.Dial("tcp", host+":"+port, config)
+	client, err := ssh.Dial("tcp", val.host+":"+val.port, &ssh.ClientConfig{
+		User:            val.user,
+		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: hostKeyCallback,
+	})
 	checkError(err)
 	defer client.Close()
 
@@ -33,21 +42,18 @@ func runSSHCommand(host, user, privateKeyPath, command string, port string) {
 	checkError(err)
 	defer session.Close()
 
-	output, err := session.CombinedOutput(command)
+	output, err := session.CombinedOutput(val.command)
 	checkError(err)
 
-	fmt.Printf("Output from %s:\n%s\n", host, output)
+	fmt.Printf("Output from %s:\n%s\n", val.host, output)
 }
 
 func main() {
-	hosts := []string{"168.138.114.133"}
-	users := []string{"paul"}
-	port := "2169"
-	privateKeyPaths := []string{"C:\\Users\\Pranshu\\.ssh\\id_rsa"}
-
-	command := "echo Hello, SSH! From $HOSTNAME"
-
-	for i := 0; i < len(hosts); i++ {
-		runSSHCommand(hosts[i], users[i], privateKeyPaths[i], command, port)
-	}
+	runSSHCommand(&data{
+		host:           "150.230.237.232",
+		user:           "paul",
+		privateKeyPath: "C:\\Users\\Pranshu\\.ssh\\id_rsa",
+		command:        "echo Hello, SSH! From $HOSTNAME; ls",
+		port:           "2169",
+	})
 }

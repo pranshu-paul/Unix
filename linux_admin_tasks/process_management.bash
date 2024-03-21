@@ -18,6 +18,13 @@
 # Run ".target" files (collection of ".service")
 # Executes /etc/profile
 
+# To provide the environment variables to a command instead of exporting to the shell.
+env a=7 bash -c 'echo $a'
+
+# To calculate the executing time of a command.
+TIMEFORMAT='%R seconds %P%% CPU usage'
+time echo {1..30000} >/dev/null 
+
 # top -u USER
 top -u pranshu|UID
 
@@ -82,6 +89,9 @@ ps -aux -- all processes from user x
 
 ps -ef -- all processes in ASCII format.
 
+# To get the long list of all the processes of all the users
+ps -alx
+
 # ps -au USER
 ps -au pranshu
 
@@ -100,6 +110,9 @@ ps -o cmd= -p 1983
 
 # To find a process by its name.
 pgrep <process_name>
+
+# To print the process id, user id, real user id, effective user id; with its command and arguments
+ps -eo pid,user,ruser,euser,args
 
 # To get a process tree.
 pstree <pid>

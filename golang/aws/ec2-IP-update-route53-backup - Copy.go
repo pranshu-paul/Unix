@@ -73,7 +73,7 @@ func main() {
 	changeVal := &changeRecord{
 		zoneid:      "Z014611832PD0HCGBA9SF",
 		name:        "paulpranshu.xyz",
-		instanceIds: []string{"i-09d289e8a50e86f64"},
+		instanceIds: []string{"i-02ad441585b263b78"},
 		action:      "UPSERT",
 		record:      "A",
 		ttl:         3600,

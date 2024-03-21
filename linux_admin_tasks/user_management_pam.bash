@@ -128,59 +128,15 @@ chage -E 1-JAN-2022 <username>
 
 chgrp <group> <file>
 
+# To change the full name of the user.
+chfn
+
+# To delete a specific entry
+chfn <user> -o ""
+chfn <user> -p ""
+
 
 # Roles
-#u - user (owner of the file)
-#g - group (members of file's group)
-#o - global (all users who are not owner and not part of group)
-#a - all (all 3 roles above)
-
-# Numeric representations
-7 - full (rwx)
-6 - read and write (rw-)
-5 - read and execute (r-x)
-4 - read only (r--)
-3 - write and execute (-wx)
-2 - write only (-w-)
-1 - execute only (--x)
-0 - none (---)
-
-# Set user to read/write/execute to (myscript.sh), octal notation.
-chmod 755 myscript.sh
-
-# Remove read/write/execute from (myscript.sh), symbolic mode.
-chmod = myscript.sh
-
-# Set user to read/write/execute, and group and others to read only permission to (myscript.sh), symbolic mode.
-
-chmod u=rwx, go=r myscript.sh
-
-
-# Package = coreutils
-chown - change file owner and group
-
-# -v verbose can be used to to make logs.
-# To change a file's owner.
-chown <user> <file>
-
-# To change a file's owner and group:
-chown <user>:<group> <file>
-
-# To change a directory's owner recursively:
-chown -R <user> <directory>
-
-# To change ownership to match another file:
-chown --reference=<reference_file> <file>
-
-
-# setfacl
-setfacl --modify user:<user>:<perms> <file>
-setfacl --modify user:opc:rw test
-
-# Removing all ACLs.
-setfacl -b <file>
-
-
 
 # To run command as second user.
 su - USER -c '<command>'
@@ -214,21 +170,35 @@ vlock -a
 # optional: The success or failure of this module doesn't affect the overall authentication result.
 
 
-
-
-
-
 # Add the following line or uncomment in the file "/etc/pam.d/su" to avoid the users using the "su" command who are not in the "wheel" group.
 auth            requisite       pam_wheel.so use_uid
 
 
-faillock --user USERNAME --reset
+## Enabling pam_faillock to prevent brute force attacks.
+# For more details: man 5 faillock.conf
+authselect check
+
+authselect enable-feature with-faillock
+
+authselect select sssd with-faillock
+
+cat << EOF > /etc/security/faillock.conf
+deny=3
+unlock_time=600
+silent
+even_deny_root
+EOF
+
+# To unlock a user.
+faillock --user <username> --reset
+
+# To disable the feature
 ##############################################################################
 # Sudoers file configuration.
 # ALWAYS EDIT THE SUDOERS FILE CAREFULLY.
 # Use "vim' not "vi" because it highlights the syntax.
 
-export EDITOR=vim
+export EDITOR=$(which vim)
 # If editing the "/etc/sudoers" file directly.
 # Use the below command to check whether the syntax is correct or not.
 # ALWAYS USE THE BELOW COMMAND FIRST TO VERIFY THE SYNTAX IN THE SUDOERS FILE.

@@ -74,7 +74,7 @@ func setRecord(instanceIDs []string, zoneid string, name string, action string) 
 func main() {
 	zoneid := "Z014611832PD0HCGBA9SF"
 	name := "paulpranshu.xyz"
-	instanceIDs := []string{"i-09d289e8a50e86f64"}
+	instanceIDs := []string{"i-02ad441585b263b78"}
 	action := "DELETE"
 
 	publicIPs := setRecord(instanceIDs, zoneid, name, action)

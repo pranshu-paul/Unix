@@ -40,9 +40,9 @@ Listen 443
 		CustomLog /var/log/httpd/postfixadmin_access.log combined
 		ErrorLog /var/log/httpd/postfixadmin_error.log
 		SSLEngine on
-		SSLCertificateFile /etc/pki/tls/certs/httpd.crt
-		SSLCertificateKeyFile /etc/pki/tls/private/httpd.key
-		SSLCACertificateFile /etc/pki/tls/certs/ca-bundle.crt
+		SSLCertificateFile /home/paul/ca/httpd-cert.pem
+		SSLCertificateKeyFile /home/paul/ca/httpd.pem
+		SSLCACertificateFile /home/paul/ca/ca.pem
 	<Directory /var/www/postfixadmin>
 			Options Indexes FollowSymLinks
 			Allowoverride none

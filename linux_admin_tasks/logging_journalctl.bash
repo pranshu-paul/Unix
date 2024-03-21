@@ -45,6 +45,11 @@ journalctl -p 3
 # To check logs from specific date.
 journalctl -S "2020-10-30 18:17:16"
 
+# To get the critical messages. (Which not authorized person is using the sudo command.)
+journalctl -p crit
+
+# To trace the what ran by the sudo comamnd.
+journalctl -r -t sudo
 
 # To search for a specific command on a specific date.
 journalctl -b --since="2023-08-15 00:00:00" --until="2023-08-15 23:59:59" | grep "COMMAND=ls"

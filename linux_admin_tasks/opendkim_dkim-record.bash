@@ -66,7 +66,7 @@ systemctl enable --now opendkim
 opendkim-testkey -d paulpranshu.xyz -s default -k /etc/opendkim/keys/default.private -vvv
 
 # Verifing through the host command.
-host -t txt default._domainkey.paulpranshu.xyz ns29.domaincontrol.com
+host -t txt default._domainkey.paulpranshu.xyz
 
 # Check the private key from openssl.
 openssl rsa -in /etc/opendkim/keys/default.private -check

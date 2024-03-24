@@ -51,6 +51,16 @@ chmod = myscript.sh
 chmod u=rwx, go=r myscript.sh
 
 
+# To inherit the user's ownership temprarily of an executable, use SUID.
+chmod -v 4755 <file>
+
+# To inherit the goup's ownership for the newly files created in a directory, use SGID.
+chmod -v 2775 <directory>
+
+# To prevent the file deletion from other users use, sticky bit.
+chmod -v 1755 <directory/executable_file>
+
+
 # Package = coreutils
 chown - change file owner and group
 
@@ -67,8 +77,12 @@ chown -R <user> <directory>
 # To change ownership to match another file:
 chown --reference=<reference_file> <file>
 
+# To change the group of a file or directory.
+chgrp <group> <file/directory>
+
 
 # setfacl
+# ACL must be enabled for the file system in the mounting options (/etc/fstab or mount).
 setfacl --modify user:<user>:<perms> <file>
 setfacl --modify user:opc:rw test
 
@@ -98,9 +112,7 @@ chattr
 export VERSION_CONTROL=numbered
 install -b -v -D <file> <destination>
 
-
-
 # To copy and change the ownership of a file or folder in a single command. (root only)
-install -v -o <user> -g <group> <file> <destination>
+install -v -m 644 -o <user> -g <group> <file> <destination>
 
 shred

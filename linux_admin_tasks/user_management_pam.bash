@@ -126,8 +126,6 @@ chage -m 90 -M 100 <username>
 # To set account expiry date.
 chage -E 1-JAN-2022 <username>
 
-chgrp <group> <file>
-
 # To change the full name of the user.
 chfn
 

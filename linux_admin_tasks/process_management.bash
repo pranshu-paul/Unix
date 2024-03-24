@@ -164,6 +164,9 @@ uptime -p
 # To list all the signals
 kill -l
 
+# To get the environment variables in a running process.
+tr '\0' '\n' < /proc/<pid>/environ
+
 # Operating System Signals.
 
 # Signal	Number	Description

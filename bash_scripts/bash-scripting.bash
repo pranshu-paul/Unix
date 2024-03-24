@@ -120,8 +120,30 @@ exec 3>&1 1>"$LOGFILE" 2>&1
 # Redirecting all outputs and errors to a file
 exec >> "${log_file}" 2>&1
 
+# Same as the above command.
+exec &>> "${log_file}"
+
 # To open a new shell and exit the previous one (Fresh environment).
 exec -l bash
+
+# To create a standard error message. Redirect the error using the file descriptor.
+echo "Some error" >&2
+
+# To create a redirection space instead in a file. Create named pipes.
+# It doesn't consume space on drive.
+mkfifo my_pipe
+
+ls -lR / &> my_pipe
+
+# Later the output can be seen from the pipe file.
+cat < my_pipe
+
+# cat <(ls -l) becomes cat /dev/fd/63
+
+# Redirect the output of a command to another command as a file.
+cat <(ls -l)
+nl <(ping -c4 google.com)
+
 
 #####
 

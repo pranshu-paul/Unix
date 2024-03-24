@@ -2,7 +2,10 @@ curl -T /u01/app/oracle/product/12.1.0.2/dbhome_1/appsutil/log.zip \
 -u "amit@rostantechnologies.com" "ftps://transport.oracle.com/issue/3-30514507571/"
 
 # To retreive th. header.
-curl -I https://google.com
+curl -I https://www.google.com
+
+# To return the exit code only.
+curl -s -o /dev/null -w "%{http_code}" https://www.google.com
 
 
 curl http://169.254.169.254/opc/v1/instance/

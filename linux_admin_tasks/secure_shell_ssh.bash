@@ -119,6 +119,9 @@ ssh-keygen -t rsa -b 4096 -C "COMMENT"
 ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <user>@<ip_address>
 ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <user>@<ip_address> -p <port>
 
+# To jump from a host when the other host is not available publicly.
+ssh -J paul@168.138.114.133:2169 pranshu@10.0.0.108 -p 2169
+
 
 ################# Sample /etc/ssh/sshd_config hardening ################
 Port 2222

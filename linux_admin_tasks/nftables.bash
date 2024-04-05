@@ -57,3 +57,14 @@ table ip nat {
 # Also enable packet-forwarding at the kernel level.
 echo 'net.ipv4.ip_forward = 1' > /etc/sysctl.d/95-ipv4_forward.conf
 sysctl --system
+
+
+# It can also block (layer 7).
+# based on the protocol: HTTP, SMTP, DNS
+
+####
+chain prerouting {
+        type nat hook prerouting priority 0;
+        # Redirect incoming traffic on port 8080 to internal server at port 80
+        tcp dport 8080 redirect to :80
+    }

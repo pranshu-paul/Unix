@@ -92,6 +92,11 @@ dnf deplist <package_name> | grep provider | awk '{print $2}' | grep -v '.src' |
 # To avoid the librepo warnings in CEntOS
 dnf install python3-librepo -y
 
+# List the available packages only.
+dnf list installed bash
+
+# Get the info of an installed package.
+dnf info installed bash
 
 # To search a package in a specific repo.
 dnf list *postgres* --repoid appstream
@@ -114,3 +119,6 @@ dnf repolist --enabled
 dnf repolist --disabled
 
 dnf repolist
+
+# Completely sync a repo.
+dnf reposync  --repoid=epel -p=epel

@@ -40,7 +40,7 @@ getent services | grep -w 443/tcp
 ip link show enp0s9 | grep link | awk '{print $2}'
 
 # Free DNS servers by Level 3 Communications.
-# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4, 4.2.2.6
+# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4, 4.2.2.5, 4.2.2.6
 
 # To generate a UUID.
 uuidgen
@@ -78,9 +78,24 @@ nmcli connection modify enp0s8 +ipv4.routes "0.0.0.0/0 192.168.56.0"
 nmcli connection modify your-eth0-connection +ipv4.routes "0.0.0.0/0 10.0.2.2 100"
 
 # To add temporary routes.
-ip route add 0.0.0.0/0 via 10.0.2.2 src 10.0.2.15 metric 50
+# Both are same.
+ip route add default via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
+ip route add 0.0.0.0/0 via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
+
+# To delete the default route.
+ip route del default
 
 # Free DNS servers 8.8.8.8, 8.8.4.4 of google.com
+
+# To add a DNS server to a live system.
+nmcli con mod ens3 +ipv4.dns 8.8.8.8
+
+nmcli con up ens3
+
+# To remove a DNS server from a live system.
+nmcli con mod ens3 -ipv4.dns 8.8.8.8
+
+nmcli con up ens3
 
 # nmcli commands to assign static ip.
 nmcli con modify <DEVICE_NAME> ipv4.method manual ipv4.addresses <IP_ADDRESS>/<CIDR> ipv4.gateway <GATEWAY> ipv4.dns <DNS_SERVER>
@@ -126,6 +141,23 @@ nmcli connection modify "My SOCKS Proxy" ipv4.proxy 127.0.0.1:1080 ipv6.proxy 12
 # Activate the SOCKS proxy connection
 nmcli connection up "My SOCKS Proxy"
 
+
+
+# Disable IPv6
+cat > /etc/sysctl.d/disable-ipv6.conf << EOF
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+EOF
+
+# Other kernel parameters.
+# Ignore all ipv4 icmp requests.
+net.ipv4.icmp_echo_ignore_all = 1
+
+# Ignore all ipv4 broadcast requests.
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Apply the changes.
+sysctl --system
 
 # To list on which ports the system is listening. -- l listening, n output in numbers, t TCP protocol, p PID.
 # ss - shows system sockets.

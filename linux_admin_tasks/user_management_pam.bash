@@ -167,6 +167,8 @@ vlock -a
 # sufficient: If this module succeeds, no further authentication is performed.
 # optional: The success or failure of this module doesn't affect the overall authentication result.
 
+# The below directory contains the available pam modules.
+ls /usr/lib64/security
 
 # Add the following line or uncomment in the file "/etc/pam.d/su" to avoid the users using the "su" command who are not in the "wheel" group.
 auth            requisite       pam_wheel.so use_uid

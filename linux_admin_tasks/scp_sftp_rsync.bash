@@ -42,6 +42,9 @@ sftp -i private_key <user_name>@<ip_address>
 # To preserve the files modificate time.
 sftp -p <user_name>@<ip_address>
 
+# To use a jump host.
+sftp -P 2169 -J paul@168.138.114.133:2169 paul@10.0.0.108
+
 # To upload a file from a windows machine.
 # After login into sftp.
 # -r option to "put" recursively with folder only.

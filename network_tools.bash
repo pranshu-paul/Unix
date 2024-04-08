@@ -30,7 +30,10 @@ nmcli dev show ens3
 
 nmcli con modify <connection_name> ifname <interface>
 
-# Network Layer #
+# Shows received, transferred packets. RX and TX
+ip -s link show ens3
+
+# ===== Network Layer ===== #
 ipcalc
 
 tcpdump -i eth0 ip
@@ -83,9 +86,6 @@ nmcli con add type vpn
 # net.ipv4.tcp_max_syn_backlog
 sysctl
 
-
-# Port forwarding.
-ssh 
 
 # With the port and protocol only.
 nftables

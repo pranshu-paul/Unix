@@ -122,3 +122,7 @@ dnf repolist
 
 # Completely sync a repo.
 dnf reposync  --repoid=epel -p=epel
+
+dnf group list
+
+dnf group info 'Minimal Install'

@@ -21,9 +21,15 @@ pwd -P
 rm -rfv --no-preserve-root lg/.*
 
 
+# To take backup of a file.
+cp -v /etc/hosts{,.bak}
+
 # To copy the directory without copying itself.
 cp  --recursive --no-target-directory --verbose /etc/skel lg/
 cp  -rvT /etc/skel lg/
+
+# To change a file's extension.
+mv -v test{.txt,.sh}
 
 #u - user (owner of the file)
 #g - group (members of file's group)
@@ -51,13 +57,24 @@ chmod = myscript.sh
 chmod u=rwx, go=r myscript.sh
 
 
-# To inherit the user's ownership temprarily of an executable, use SUID.
+# To preserve the user's ownership of an executable, use SUID.
 chmod -v 4755 <file>
+
+# 'S' means the file is not an executable 'x'
+# To set read-only permissions and make the file immutable.
+chmod -v 4644 <file>
 
 # To inherit the goup's ownership for the newly files created in a directory, use SGID.
 chmod -v 2775 <directory>
 
-# To prevent the file deletion from other users use, sticky bit.
+# To inherit the group ownership and prevent the grop members from deleting the files they don't own inside the directory.
+chmod -v 3775 <directory>
+
+# To prevent a file deletion from other users use, sticky bit.
+# Upper case T means that the file is not an executable.
+chmod -v 1666 <file>
+
+# To prevent a directory deletion from other users use, sticky bit.
 chmod -v 1755 <directory/executable_file>
 
 

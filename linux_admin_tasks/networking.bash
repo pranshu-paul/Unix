@@ -23,12 +23,20 @@ ip addr show ens3 | grep inet
 ip -4 a | grep inet # -- To get ipv4 address only.
 hostname -I
 
+
+# Shows the layer 2 recived and transffered packets.
+ip -s link show ens3
+
 # To configure the network in linux.
 nmtui # Package for this command -- NetworkManager-tui
 
 # To see the local area network IP addresses on your network.
 ip neigh
 arp -a # -- -a all IP address
+
+# To get route for a specific ip.
+ip route get 8.8.8.8
+
 
 # To look for the ports
 getent services | grep -w 443/tcp

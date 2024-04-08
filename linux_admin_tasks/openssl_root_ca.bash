@@ -21,7 +21,7 @@ Rwwt#756
 # Create a password protected private key, to be used to create the Root Certificate.
 # Create a self-signed root certificate.
 openssl genpkey -algorithm RSA -aes256 -out root-ca-key.pem -pkeyopt rsa_keygen_bits:4096
-openssl req -new -x509 -sha256 -days 3650 -key root-ca-key.pem -out root-ca-cert.pem -subj "/CN=Root CA"
+openssl req -new -x509 -sha256 -days 3650 -key root-ca-key.pem -out root-ca-cert.pem -subj "/CN=Pranshu Root CA"
 
 # Generate a csr
 openssl genpkey -algorithm RSA -out server-key.pem
@@ -29,8 +29,7 @@ openssl req -new -sha256 -subj "/CN=paulpranshu.ddns.net" -key server-key.pem -o
 
 # Generate a self-signed certifcate.
 # "subjectAltName=DNS:paulpranshu.xyz,IP:144.24.111.213"
-openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem \
--extfile <(printf "subjectAltName=DNS:paulpranshu.ddns.net,IP:129.154.225.98") -CAcreateserial
+openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem -extfile <(printf "subjectAltName=IP:192.168.1.12") -CAcreateserial
 
 # Verify the certifcate.
 openssl verify -CAfile root-ca-cert.pem -verbose server.pem

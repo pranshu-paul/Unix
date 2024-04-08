@@ -1,0 +1,127 @@
+---
+
+# Install the following ansible modules.
+# ansible-galaxy collection install ansible.posix
+# ansible-galaxy collection install community.general
+
+- name: Configure a new server
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Installing the Apache web server.
+      ansible.builtin.dnf:
+        name: httpd
+        state: latest
+
+    - name: Copy chrony configuration to node
+      ansible.builtin.copy:
+        src: /root/http.pcap
+        dest: /ansibles
+        mode: '0600'
+        owner: root
+        group: root
+    
+    - name: Stop the Apache web server
+      ansible.builtin.systemd:
+        name: httpd
+        state: stopped
+        enabled: yes
+        masked: no
+
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /root/http.pcap
+        owner: paul
+        group: nitesh
+        mode: '0644'
+        
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /test
+        state: directory
+        mode: '0755'
+    
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - bash-completion
+        - vim
+        - nginx
+        - python3-libselinux
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: ansible
+
+    - name: Add entry to /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "127.0.0.1 ansible"
+        state: present
+
+    - name: Disable SELinux enforcing
+      ansible.builtin.shell:
+        cmd: setenforce 0
+    
+    - name: Update the SElinux config file
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=permisive'
+
+    - name: Set timezone to Asia/Kolkata
+      community.general.timezone:
+        name: Asia/Kolkata
+
+    - name: Add lines to limits.conf
+      ansible.builtin.blockinfile:
+        path: /etc/security/limits.d/01_limits.conf
+        block: |
+          * soft nofile 1024
+          * hard nofile 65536
+          * soft nproc 16384
+        create: yes
+
+    - name: Add lines to sysctl.conf
+      ansible.builtin.lineinfile:
+        path: /etc/sysctl.d/10-sysctl.conf
+        line: "{{ item }}"
+        create: yes
+      loop:
+        - "net.ipv4.ip_forward = 0"
+        - "net.ipv4.conf.default.rp_filter = 1"
+
+    - name: Create primary group with GID 54321
+      ansible.builtin.group:
+        name: dba
+        gid: 54321
+
+    - name: Create secondary group with GID 54322
+      ansible.builtin.group:
+        name: oinstall
+        gid: 54322
+
+    - name: Create Oracle user
+      ansible.builtin.user:
+        name: oracle
+        group: dba
+        uid: 54321
+        groups: oinstall
+
+    - name: Execute shell script
+      ansible.builtin.script:
+        cmd: /root/data
+
+    - name: get all managed vhosts
+      shell: find /etc/nginx/sites-enabled/ -type f -name \*-managed.conf
+      register: nginx_managed_virtual_hosts
+
+    - name: delete all managed nginx virtual hosts
+      file:
+        path: "{{ item }}"
+        state: absent
+        with_items: "{{ nginx_managed_virtual_hosts.stdout_lines }}"

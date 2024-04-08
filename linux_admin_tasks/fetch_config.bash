@@ -51,7 +51,7 @@ fi
 
 # List only the user installed packages.
 echo -e "\nUser installed packages."
-dnf history userinstalled
+rpm --last -q $(dnf history userinstalled | sed '1d') | column -t
 
 # DNS servers
 echo -e "\nDNS servers available."
@@ -74,6 +74,18 @@ done
 echo -e "\nMount with their file system and total storage."
 df -hT --total
 
+# Print the physical volumes.
+echo -e "\nPhysical volumes"
+pvdisplay
+
+# Print the volume groups.
+echo -e "\nVolumes groups and physical volumes in a group."
+vgdisplay
+
+# Print the logical volumes
+echo -e "\nLogical volumes on a volume group."
+lvdisplay
+
 # /etc/fstab
 echo -e "\nCurrent File system table."
 grep -vE '^#|^$' /etc/fstab | column -t
@@ -85,12 +97,19 @@ grep -vE '^#|^$' /etc/fstab | column -t
 echo -e "\nCurrent sshd_config"
 sudo grep -vE '^#|^$' /etc/ssh/sshd_config
 
+# Applied sshd configuration in the /etc/ssh/ssh_config.d directory.
+echo -e "\nCurrent sshd_config in the /etc/ssh/ssh_config.d directory"
+sudo grep -vE '^#|^$' /etc/ssh/ssh_config.d/*
+
 # Kernel Parameters.
 echo -e "\nCurrent kernel parameters"
 grep -vE '^#|^$' /etc/sysctl.conf
 
 echo -e "\nKernel parameters in the sysctl.d directory."
 cat /etc/sysctl.d/* | grep -vE '^#|^$'
+
+echo -e "\nKernel parameters in the /usr/lib/sysctl.d directory."
+cat /usr/lib/sysctl.d/* | grep -vE '^#|^$'
 
 # ulmits
 echo -e "\nApplied OS limits."

@@ -50,6 +50,8 @@ rpm -ivh <package_name> --nodeps --force
 # To query the dependent package of the library.
 rpm -qf <full_library_path>
 
+# To get date wise history of packages installed in rhel 8.
+rpm --last -q $(dnf history userinstalled | sed '1d') | column -t
 
 
 ##########################

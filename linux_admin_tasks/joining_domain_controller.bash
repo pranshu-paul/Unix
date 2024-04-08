@@ -8,7 +8,7 @@ nmcli con show
 nmcli connection modify "System eth0" +ipv4.dns "172.31.83.180"
 
 # Restart the NetworkManager daemon.
-systemctl restart NetworkManager
+nmcli con up "System eth0"
 
 # Verify the domain name.
 getent hosts paulpranshu.org

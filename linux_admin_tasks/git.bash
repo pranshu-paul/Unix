@@ -15,3 +15,6 @@ git commit -a -m commit
 
 # Push the changes.
 git push
+
+# Update the repo if the changes are made to another server.
+git pull

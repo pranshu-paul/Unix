@@ -30,7 +30,7 @@ tcpdump -nnv udp dst port 53
 tcpdump -nvni ens3 udp and host 8.8.8.8 and port 53
 
 # To capture ICMP packets.
-tcpdump -nnvi ens3 icmp
+tcpdump -nnvi ens33 icmp
 
 # Capture from a specific source to a specific destination and port.
 tcpdump -i eth0 src 192.168.1.1 and dst 192.168.1.2 and dst port 80

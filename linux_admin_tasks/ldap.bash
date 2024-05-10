@@ -1,26 +1,27 @@
 # Configuring LDAP server.
 
 # Packages required for LDAP.
-packages=(\
-cracklib \
-cyrus-sasl-lib \
-glibc \
-gcc \
-gcc-c++ \
-elfutils-libelf-devel \
-kernel-headers \
-glibc-headers \
-libdb \
-libdb-utils \
-libtool-ltdl \
-libxcrypt \
-openssl-libs \
-perl-libs \
-cyrus-sasl-devel \
-libtool-ltdl-devel \
-libdb-devel libtool \
-autoconf perl \
-perl-devel)
+packages=(
+cracklib
+cyrus-sasl-lib
+glibc
+gcc
+gcc-c++
+elfutils-libelf-devel
+kernel-headers
+glibc-headers
+libdb
+libdb-utils
+libtool-ltdl
+libxcrypt
+openssl-libs
+perl-libs
+cyrus-sasl-devel
+libtool-ltdl-devel
+libdb-devel libtool
+autoconf perl
+perl-devel
+)
 
 # Install development tools.
 dnf groupinstall "Development Tools" -y

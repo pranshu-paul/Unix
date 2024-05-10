@@ -3,7 +3,7 @@ curl -s https://yum.oracle.com/RPM-GPG-KEY-oracle-ol8 > /etc/pki/rpm-gpg/RPM-GPG
 cat > /etc/yum.repos.d/rhel.repo << EOF
 [Latest]
 name=Latest
-baseurl=http://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64
+baseurl=http://yum.oracle.com/repo/OracleLinux/OL8/latest/x86_64
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle

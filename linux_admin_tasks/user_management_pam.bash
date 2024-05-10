@@ -43,7 +43,7 @@ useradd <username>
 
 # UID, GID 100 - 999 are reserved for administartors.
 # -c COMMENT, -g GID,-m creates home directory, -r creates system user, -s login sheel, -u UID
-useradd -c Administrator -m -r -s /bin/bash -u 201 pranshu
+useradd -c Administrator -m -r -s /bin/bash -u 201 pranshu -k /etc/skel
 
 # add user with a expiry date.
 useradd -e YYYY-MM-DD <username>
@@ -100,18 +100,32 @@ passwd -u <username>
 # Deletes the user password.
 passwd -d <username>
 
+# Force expire a user password.
+passwd -e <username>
+
 echo $RANDOM $RANDOM | sha512sum | head -c 16 | passwd --stdin <user_name>
 
 # Shows last logins.
 last
 
+# Shows last reboot
+last reboot
+
+# SHows only five reboot?
+last reboot -n 5
+
+# Shows for a specific user.
+last pranshu
+
 # Shows last failed logins.
 lastb
 
-
+# Shows for a specific user.
+lastb paul
 
 # Changes shell of the user.
 chsh <username> 
+chsh -s $(which bash) paul
 
 # To install chage.
 yum -y install shadow-utils
@@ -133,7 +147,15 @@ chfn
 chfn <user> -o ""
 chfn <user> -p ""
 
+# To change passwords of multiple users.
 
+cat > passwords << EOF
+paul:Mysql#459
+pranshu:Mysql#459
+EOF
+
+chpasswd -c SHA512 < passwords
+ 
 # Roles
 
 # To run command as second user.
@@ -149,50 +171,6 @@ vlock
 # To lock all tty.
 vlock -a
 
-
-############################################################################
-# module-type control-flag module-path [module-options]
-
-# module-type: auth, account, password, and session
-
-# auth: Performs user authentication tasks, such as checking passwords, biometric data, or hardware tokens.
-# account: Performs checks on the user's account status, such as account expiration, access time restrictions, and account lockout.
-# password: Enforces password policies, enforces password change intervals, and validates new passwords.
-# session: Sets up and manages user sessions, handles session-related tasks like creating directories, mounting filesystems, and setting environment variables.
-
-# control-flag: required, requisite, sufficient, and optional
-
-# required: If this module fails, authentication fails immediately.
-# requisite: If this module fails, no further authentication is performed.
-# sufficient: If this module succeeds, no further authentication is performed.
-# optional: The success or failure of this module doesn't affect the overall authentication result.
-
-# The below directory contains the available pam modules.
-ls /usr/lib64/security
-
-# Add the following line or uncomment in the file "/etc/pam.d/su" to avoid the users using the "su" command who are not in the "wheel" group.
-auth            requisite       pam_wheel.so use_uid
-
-
-## Enabling pam_faillock to prevent brute force attacks.
-# For more details: man 5 faillock.conf
-authselect check
-
-authselect enable-feature with-faillock
-
-authselect select sssd with-faillock
-
-cat << EOF > /etc/security/faillock.conf
-deny=3
-unlock_time=600
-silent
-even_deny_root
-EOF
-
-# To unlock a user.
-faillock --user <username> --reset
-
-# To disable the feature
 ##############################################################################
 # Sudoers file configuration.
 # ALWAYS EDIT THE SUDOERS FILE CAREFULLY.
@@ -206,7 +184,8 @@ visudo -c
 visudo -c -f <path_to_the_sudoers_file>
 
 # Format
-# user machine.ip=(from_which_users) [NOPASSWD:]commands
+# user machine.ip=(as_which_users) [NOPASSWD:]commands
+# who where = (as_whom) what
 # % - indicates group names.
 
 This is the directory "/etc/sudoers.d" where custom files can be added.
@@ -226,6 +205,14 @@ oracle ALL = NOPASSWD: /bin/systemctl start, /bin/systemctl restart vncserver
 
 # For a single user.
 <username> ALL=(ALL) NOPASSWD:ALL
+
+# To avoid the allocation of tty.
+echo 'Defaults use_pty' >> /etc/sudoers.d/custom
+
+# To make sure that default credential caching time is 15 minutes.
+echo 'Defaults env_reset, timestamp_timeout=15' >> /etc/sudoers.d/custom/etc/sudoers.d/custom
+
+# Avoid use of NOPASSWD for privilege escalation.
 
 ############################
 # SAMPLE CONFIGURATION FILES
@@ -264,3 +251,16 @@ pwmake 64
 
 # To change a users password with prompted.
 pwmake 64 | passwd --stdin <user_name>
+
+# Disable the root account.
+# Do not give any user the wheel group membership.
+# Deny the users to use sudo -i or sudo -s who have been given sudo privileges.
+# Override the wheel group behaviour why creating the file in /etc/sudoers.d
+pranshu  ALL=(ALL) NOEXEC: /bin/sudo -i, /bin/sudo -s, NOPASSWD: ALL
+%wheel  ALL=(ALL) NOEXEC: /bin/sudo -i, /bin/sudo -s, NOPASSWD: ALL
+
+# Allow only the wheel group or a specifc group to use the su command.
+auth            requisite       pam_wheel.so use_uid group=<group_name>
+
+# Change the root user shell.
+chsh -s /sbin/nologin root

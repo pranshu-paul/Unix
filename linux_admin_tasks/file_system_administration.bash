@@ -1,3 +1,10 @@
+# File system administration
+
+# Print the current working directory.
+
+# Long listing of the current directory.
+ls -l
+
 ls -ltr --time-style=full-iso
 
 # Dereference the symbolic link and prints the physical path.
@@ -106,6 +113,8 @@ setfacl --modify user:opc:rw test
 # Removing all ACLs.
 setfacl -b <file>
 
+# Remove ACL of a file for a user.
+setfacl -x u:<user> <file>
 
 # Top 10 files sorted by size.
 du -ah | sort -rh | head -n 10
@@ -113,11 +122,18 @@ du -ah | sort -rh | head -n 10
 # Prints size of the files greater than 100 MiB
 find $PWD -size +100000000c -print
 
-
+# List attributes of a directory and file.
 lsattr
 
-chattr
+# Change attributes of a file or directory.
+# Make the file appendable only.
+chattr +a <file/directory>
 
+# Make the file immutable.
+chattr +i <file/directory>
+
+# To truncae a file.
+truncate --size 0 <file>
 
 # To create version controlled backups.
 # Values available for the variable "VERSION_CONTROL".
@@ -132,4 +148,38 @@ install -b -v -D <file> <destination>
 # To copy and change the ownership of a file or folder in a single command. (root only)
 install -v -m 644 -o <user> -g <group> <file> <destination>
 
+# To truncate a file and the file non-recoverable.
 shred
+
+# To mount in temporary file system in the virtual memory of a system.
+mount -t tmpfs -o mode=755,size=128M tmpfs /mnt
+
+# To avoid use of any special devices.
+mount -o nodev /dev/sda1 /mnt
+
+# To avoid any privilege escalation attack.
+mount -o nosuid /dev/sda1 /mnt
+
+# To avoid execution of any binary and shell scripts.
+mount -o noexec /dev/sda1 /mnt
+
+# To mount an iso.
+mount -o ro,loop /dev/sr0 /mnt
+
+# To mount for a specific UID and GID.
+mount -o uid=<uid>,gid=<gid> path/to/device_file path/to/target_director
+
+# To print the PIDs of the processes on the mount point when unable to unmount.
+fuser -mu /mnt
+
+# Kill the process with associated with the mount point.
+fuser -ck /mnt
+
+# To unmount a file system when not able to unmount or an NFS.
+umount -l /mnt
+
+# Hide the processes of the root user from the other users.
+mount -o remount,rw,hidepid=2 /proc
+
+# Add the below entry in the /etc/fstab file.
+proc /proc proc defaults,hidepid=2 0

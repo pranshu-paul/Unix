@@ -1,10 +1,10 @@
 # To install firewall-cmd.
 # firewall-cmd uses netfilter at its backend.
-yum -y install firewalld
+dnf -y install firewalld
 
 # To get more help about firewall.
 man firewall-cmd
-man firewalld.conf
+man 5 firewalld.conf
 
 # List all current rules and ports defined.
 firewall-cmd --list-all
@@ -17,6 +17,9 @@ firewall-cmd --permanent --set-target=DROP
 # This option adds port immediatley, but removes port after reboot.
 # The below option is an example of stateless rule.
 firewall-cmd --add-port=<port>/<protocol>
+
+# To add rules while the firewall is not running.
+firewall-offline-cmd --add-port=80/tcp
 
 # To add, remove, and query icmp block.
 # We could also use the option "--permanent".

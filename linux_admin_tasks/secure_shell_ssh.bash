@@ -123,6 +123,10 @@ ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <use
 ssh -J paul@168.138.114.133:2169 pranshu@10.0.0.108 -p 2169
 
 ################# Sample /etc/ssh/sshd_config hardening ################
+mkdir /etc/ssh/sshd_config.d
+
+Include /etc/ssh/sshd_config.d/*
+
 Port 2222
 Protocol 2
 X11Forwarding no
@@ -159,6 +163,16 @@ AllowUsers *@<ip_address> *@<ip_address> *@<ip_address>
 AllowUsers <user_name>@<ip_address>
 ##############################################################################
 
+# ssh client options
+
+Host *
+	User pranshu
+	IdentityFile C:\Users\Pranshu\.ssh\id_rsa
+	IdentitiesOnly yes
+	PreferredAuthentications publickey
+	IdentitiesOnly yes
+	Ciphers aes256-ctr
+	PasswordAuthentication no
 
 ##########################################################################################################
 ~/.ssh/authorized_keys

@@ -204,6 +204,10 @@ lvdisplay
 
 # To extend a logical volume. [-L|--size]
 lvextend --size +1G /dev/<vg_group_name>/<logical_volume>
+lvextend --size +900M /dev/vg-00/my_vol
+
+# Extend the existing XFS file system.
+xfs_growfs /mnt
 
 # To resize a logical volume. [-L|--size]
 # Resize the file system first (xfs_growfs)
@@ -238,19 +242,31 @@ partprobe -s
 blkid | grep /dev/sdc1 | awk '{print $2}'
 
 # Sample for SWAP partitons "/etc/fstab".
-UUID="c6cbbcf6-5262-4b8c-913b-638919fcbd9f" none swap defaults 0 0
+UUID="304786a6-f5b5-4067-b009-e3304d792b8c" none swap defaults 0 0
 
 # After making any changes in "/etc/fstab"
 systemctl daemon-reload 
 
 # Verify the SWAP partition.
-swapon -s
+swapon /dev/vg00/swap
+
+swapon -sv
 
 
 # To remove a SWAP partition.
 swapoff /dev/sdc1
 
 # Wipe the File System and partition signatures.
+
+
+# To change the priority of a swap partition.
+swapoff /dev/vg00/swap01
+
+wipefs -a /dev/vg00/swap01
+
+mkswap /dev/vg00/swap01
+
+swapon -vp -4 /dev/vg00/swap01
 
 ######################################## Sample fstab file #############################################
 /etc/fstab

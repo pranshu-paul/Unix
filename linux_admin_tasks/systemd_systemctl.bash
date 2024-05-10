@@ -47,6 +47,8 @@ systemctl daemon-reload
 # To list failed services.
 systemctl list-units --state failed --type service
 
+# Reset to inactive a failed unit file.
+systemctl reset-failed sssd
 
 # To clean the temp directory.
 systemd-tmpfiles --clean

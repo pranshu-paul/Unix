@@ -18,11 +18,11 @@ curl ifconfig.co
 
 # The below must be created.
 From: testing.paulpranshu@gmail.com
-To: "Pranshu Paul" paulpranshu@gmail.com
+To: paulpranshu@gmail.com
 Subject: This is a test.
 
 Hi Pranshu,
-I’m sending this mail with curl thru my gmail account.
+I am sending this mail with curl thru my gmail account.
 Bye!
 
 # Add username and password in ~/.netrc.
@@ -37,6 +37,8 @@ curl --ssl-reqd \
 --upload-file mail.txt \
 -n
 
+curl -s --url 'smtp://172.19.8.192:587' --mail-from 'alert@nexgplatoforms.com' --mail-rcpt 'envisior.support@nexgplatforms.com' --upload-file ma
+il.txt -n
 
 curl https://postman-echo.com/get
 

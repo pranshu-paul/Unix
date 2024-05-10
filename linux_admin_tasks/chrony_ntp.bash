@@ -65,10 +65,17 @@ sed -n '24p' /etc/chrony.conf
 firewall-cmd --add-service=ntp
 firewall-cmd --add-service=ntp --permanent
 
+# If the server is showing any time server with this ^* then the NTP clients can sync the time.
+
 chronyc tracking
 
 # Same steps for the client.
 # Just add the below line.
 # And do not add the "allow" line in the client.
-server 192.168.100.6 iburst
+# 0.in.pool.ntp.org :Indian NTP server
+# 139.59.15.185 Digital Ocean India NTP server
+server 192.168.100.6
+
+# To check the connected clients.
+chronyc clients
 

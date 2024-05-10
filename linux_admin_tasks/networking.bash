@@ -5,7 +5,8 @@
 103.240.90.232  dbprd.mmtc-pamp.com  dbprd
 103.240.90.231  ebsprod.mmtc-pamp.com  ebsprod
 
-ipcalc
+# To list available networks can be made in /16 network.
+ipcalc 172.16.0.0/16 -S 20
 
 # To list the network cards.
 lshw -class network -short
@@ -92,8 +93,26 @@ ip route add 0.0.0.0/0 via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
 
 # To delete the default route.
 ip route del default
+ip route del default metric 100
 
 # Free DNS servers 8.8.8.8, 8.8.4.4 of google.com
+
+# Create a VLAN
+nmcli connection add type vlan0 dev ens3 id 100 ip4 10.0.0.65/26 gw4 10.0.0.1 ipv6.method disabled
+nmcli connection add type vlan1 dev ens3 id 200 ip4 10.0.0.129/26 gw4 10.0.0.1 ipv6.method disabled
+
+nmcli con up vlan0
+nmcli con up vlan1
+
+# Add the routes.
+ip route add 10.0.0.128/26 via 10.0.0.1 dev ens3.100
+ip route add 10.0.0.64/26 via 10.0.0.1 dev ens3.200
+
+# Enable ip forwarding.
+sysctl -w net.ipv4.ip_forward=1
+
+# Verify the internal jump.
+ssh -J 10.0.0.129:2169 10.0.0.65 -p 2169
 
 # To add a DNS server to a live system.
 nmcli con mod ens3 +ipv4.dns 8.8.8.8
@@ -106,7 +125,7 @@ nmcli con mod ens3 -ipv4.dns 8.8.8.8
 nmcli con up ens3
 
 # nmcli commands to assign static ip.
-nmcli con modify <DEVICE_NAME> ipv4.method manual ipv4.addresses <IP_ADDRESS>/<CIDR> ipv4.gateway <GATEWAY> ipv4.dns <DNS_SERVER>
+nmcli con modify <CONNECTION_NAME> ipv4.method manual ipv4.addresses <IP_ADDRESS>/<CIDR> ipv4.gateway <GATEWAY> ipv4.dns <DNS_SERVER>
 
 nmcli dev show ens224
 

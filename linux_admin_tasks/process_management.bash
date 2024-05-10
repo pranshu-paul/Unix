@@ -18,6 +18,14 @@
 # Run ".target" files (collection of ".service")
 # Executes /etc/profile
 
+# Print the BIOS info.
+dmidecode -t memory
+dmidecode -t processor
+dmidecode -t bios
+
+# Prints system memory with swap.
+free -hw
+
 # To provide the environment variables to a command instead of exporting to the shell.
 env a=7 bash -c 'echo $a'
 
@@ -31,7 +39,7 @@ top -u pranshu|UID
 # top -o option.
 top -o %CPU
 top -o VIRT
-top -o $MEM -- highest memory usage at top.
+top -o %MEM -- highest memory usage at top.
 
 # To monitor a PID ONLY.
 top -p PID
@@ -49,6 +57,18 @@ u -- for changing view to user specific.
 # To find a zombie process.
 ps aux | grep -e Z -e '<defunct>' | grep -v grep
 
+# List processes by the executable name.
+ps -fp $(pidof sshd)
+
+# Print the process and by its executable name.
+ps --forest -C sshd -o pid,ppid,comm,euser,ruser,stime,pmem,pcpu
+ps --forest -C sudo -o pid,ppid,comm,euser,ruser,stime,pmem,pcpu
+
+# Print different options of processes.
+ps --forest -eo pid,ppid,euser,ruser,stime,stat,pcpu,pmem,ni,rss,thcount,comm --sort=-pcpu
+
+# List only processes that are running
+ps -e -o pcpu,cpu,nice,state,cputime,args --sort -pcpu | sed '/^ 0.0 /d'
 
 # To check last log for root -u = user.
 lastlog -u root
@@ -83,6 +103,9 @@ lshw | less
 
 # List less details of hardware.
 lshw -short | less
+
+# To list Cores, sockets, and cores per socket.
+lscpu | grep -E '^CPU\(s\)|Socket|Core\(s\)'
 
 # Process monitoring.
 ps -aux -- all processes from user x
@@ -168,6 +191,9 @@ kill -l
 tr '\0' '\n' < /proc/<pid>/environ
 
 # Operating System Signals.
+
+# Hide the processes of the root user from the other users.
+mount -o remount,rw,hidepid=2 /proc
 
 # Signal	Number	Description
 # SIGHUP	1	Hangup signal

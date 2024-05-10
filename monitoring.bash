@@ -39,6 +39,16 @@ done
 
 # ============================================================================== #
 
+#!/bin/bash
+
+while true
+do
+	if ! ss -4lnt | grep -q :80; then
+		echo "SMS command here"
+	fi
+	sleep 2
+done
+
 kill -19 <ppid> # To pause the process.
 
 kill -18 <ppid> # To continue the process.

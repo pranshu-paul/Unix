@@ -17,5 +17,9 @@ curl -s https://api.telegram.org/bot6925765422:AAFdDHEfxyopvpyYd2lmBqy13IqtXgJ0L
 # To send a message
 curl -s --data "text=message $RANDOM" --data "chat_id=6738720838" https://api.telegram.org/bot6925765422:AAFdDHEfxyopvpyYd2lmBqy13IqtXgJ0LPI/sendMessage | jq
 
+# To send SMS from the address bar of a browser.
+https://api.telegram.org/bot6925765422:AAFdDHEfxyopvpyYd2lmBqy13IqtXgJ0LPI/sendMessage?text=message%20success&chat_id=6738720838
+
+
 # To send a file.
 curl -s -F document=@"/etc/fstab" https://api.telegram.org/bot6925765422:AAFdDHEfxyopvpyYd2lmBqy13IqtXgJ0LPI/sendDocument?chat_id=6738720838 | jq

@@ -34,7 +34,7 @@ nmcli con modify <connection_name> ifname <interface>
 ip -s link show ens3
 
 # ===== Network Layer ===== #
-ipcalc
+ipcalc 172.16.0.0/16 -S 20
 
 tcpdump -i eth0 ip
 

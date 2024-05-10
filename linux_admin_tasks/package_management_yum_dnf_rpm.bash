@@ -47,8 +47,8 @@ rpm -qa | grep <package_name_matching_string>
 # To install packages without dependencies.
 rpm -ivh <package_name> --nodeps --force
 
-# To query the dependent package of the library.
-rpm -qf <full_library_path>
+# To query the package, to which the file is related.
+rpm -qf <file>
 
 # To get date wise history of packages installed in rhel 8.
 rpm --last -q $(dnf history userinstalled | sed '1d') | column -t
@@ -128,3 +128,7 @@ dnf reposync  --repoid=epel -p=epel
 dnf group list
 
 dnf group info 'Minimal Install'
+
+# Exclude a list of packages.
+vim /etc/yum.conf
+exclude=nano

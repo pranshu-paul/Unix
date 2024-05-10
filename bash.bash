@@ -35,6 +35,12 @@ HISTTIMEFORMAT="%Y-%m-%d %T "
 
 unset HISTTIMEFORMAT
 
+# To avoid command from being written in the history.
+HISTCONTROL=ignoreboth
+
+# Just add a space before typing an commands.
+# [root@srv ~]# <space>ls
+
 history -d <offset>
 
 # To get the command only

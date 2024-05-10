@@ -1,3 +1,5 @@
+# NFtables netfilter
+
 nft add table inet main_table
 
 nft add chain inet main_table input { type filter hook input priority filter \; }

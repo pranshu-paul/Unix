@@ -1,5 +1,5 @@
 # Download the below packages.
-dnf -y install httpd openssl mod_ssl
+dnf -y install httpd mod_ssl
 
 # Enable and start the apache server.
 systemctl enable --now httpd
@@ -11,8 +11,7 @@ sed -i '45s/^Listen 80/#Listen 80/' /etc/httpd/conf/httpd.conf
 sed -n '45p' /etc/httpd/conf/httpd.conf
 
 # Create a self signed certificate for the https protocol.
-openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout httpd.key -out httpd.crt \
--subj "/C=IN/ST=Delhi/L=Delhi/O=OSWebAdmin/OU=Linux administration/CN=*.oswebadmin.com" &> /dev/null
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout server.key -out server.crt -subj "/CN=*.example.com"
 
 # Move the files created earlier in their respective directories.
 mv httpd.crt /etc/pki/tls/certs/
@@ -22,28 +21,29 @@ mv httpd.key /etc/pki/tls/private/
 restorecon -Rrv /etc/pki/tls/certs/httpd.crt
 restorecon -Rrv /etc/pki/tls/private/httpd.key
 
+echo "$(hostname -I | awk '{print $1}') niteshkumar.org" >> /etc/hosts
+
 # Create a directory for the website to be made.
-mkdir -p /var/www/postfixadmin
+mkdir -p /var/www/niteshkumar.org
 
 # Change ownership and group membership to apache.
 chown -R apache:apache /var/www
 
 # Create a sample HTML file for the testing purpose.
-echo "Success! The rhel.com virtual host is working!" > /var/www/rhel.com/index.html
+echo "Success! The $(hostname) virtual host is working!" > /var/www/niteshkumar.org/index.html
 
 # Create a virtual host for the website in the directory "/etc/httpd/conf.d"
-cat > /etc/httpd/conf.d/postfixadmin.conf << EOF
+cat > /etc/httpd/conf.d/niteshkumar.org.conf << EOF
 Listen 443
 <VirtualHost *:443>
-		DocumentRoot /var/www/postfixadmin
-		ServerName postfixadmin
-		CustomLog /var/log/httpd/postfixadmin_access.log combined
-		ErrorLog /var/log/httpd/postfixadmin_error.log
+		DocumentRoot /var/www/niteshkumar.org
+		ServerName niteshkumar.org
+		CustomLog /var/log/httpd/niteshkumar_access.log combined
+		ErrorLog /var/log/httpd/niteshkumar_error.log
 		SSLEngine on
-		SSLCertificateFile /home/paul/ca/httpd-cert.pem
-		SSLCertificateKeyFile /home/paul/ca/httpd.pem
-		SSLCACertificateFile /home/paul/ca/ca.pem
-	<Directory /var/www/postfixadmin>
+		SSLCertificateFile /etc/pki/tls/certs/httpd.crt
+		SSLCertificateKeyFile /etc/pki/tls/private/httpd.key
+	<Directory /var/www/niteshkumar.org>
 			Options Indexes FollowSymLinks
 			Allowoverride none
 			Require all granted
@@ -52,10 +52,11 @@ Listen 443
 EOF
 
 # Tell SElinux about the changes made.
-semanage fcontext -a -t httpd_sys_content_t "/srv/rhel.com(/.*)?"
-restorecon -Rv /var/www/rhel.com
+semanage fcontext -a -t httpd_sys_content_t "/srv/niteshkumar.org(/.*)?"
+restorecon -Rv /var/www/niteshkumar.org
 
 # Check the configuration syntax.
+# ignore the ServerName warning, if Syntax OK prints.
 apachectl configtest
 
 # Restart the apache service.

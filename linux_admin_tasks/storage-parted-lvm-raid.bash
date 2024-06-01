@@ -1,5 +1,17 @@
 # Storage Administration
 
+# Synchronizes all pending I/O operations.
+sync
+
+# Clears page cache (contiguous block of memory)
+echo 1 > /proc/sys/vm/drop_caches
+
+# Clears directory entries and index nodes.
+echo 2 > /proc/sys/vm/drop_caches
+
+# Clear the all caches.
+echo 3 > /proc/sys/vm/drop_caches   # Clear all caches
+
 # /sys direcctory contains the "view" of physical drives.
 
 # For the devices name starting with "sd"
@@ -243,6 +255,8 @@ blkid | grep /dev/sdc1 | awk '{print $2}'
 
 # Sample for SWAP partitons "/etc/fstab".
 UUID="304786a6-f5b5-4067-b009-e3304d792b8c" none swap defaults 0 0
+UUID="304786a6-f5b5-4067-b009-e3304d792b8c" none swap pri=4  0 0
+UUID="304786a6-f5b5-4067-b009-e3304d792b8c" none swap pri=10  0 0
 
 # After making any changes in "/etc/fstab"
 systemctl daemon-reload 
@@ -251,7 +265,7 @@ systemctl daemon-reload
 swapon /dev/vg00/swap
 
 swapon -sv
-
+swapon --show
 
 # To remove a SWAP partition.
 swapoff /dev/sdc1

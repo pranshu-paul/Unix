@@ -1,5 +1,16 @@
 # Hardening and system auditing
 
+# Ensure the below paths exist on a speretae partition or LVM.
+# With noexec, nosuid, and nodev.
+# noexec not on /home and /var
+/dev/shm           
+/home              
+/var               
+/var/tmp           
+/var/log           
+/var/log/audit     
+/tmp      
+
 # Audit
 grep TMOUT /etc/profile /etc/bashrc /etc/profile.d/*
 
@@ -9,6 +20,28 @@ echo 'readonly TMOUT=3600; export TMOUT' > /etc/profile.d/tmout.sh
 # Set a local terminal warning before the users login.
 echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue
 echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue.net
+
+# Tuning kernel parameters.
+# Precedence of the parameters matters.
+
+# Controls the default maxmimum size of a mesage queue
+kernel.msgmnb = 65536
+
+# Controls the maximum size of a message, in bytes
+kernel.msgmax = 65536
+
+# Controls the maximum shared segment size, in bytes
+kernel.shmmax = 68719476736
+
+# Controls the maximum number of shared memory segments, in pages
+kernel.shmall = 4294967296
+
+# Controls the System Request debugging functionality of the kernel
+kernel.sysrq = 0
+
+# Controls whether core dumps will append the PID to the core filename.
+# Useful for debugging multi-threaded applications.
+kernel.core_uses_pid = 1
 
 # Audit.
 grep -o 'ipv6.disable=[0,1]' /boot/efi/EFI/centos/grubenv
@@ -24,12 +57,17 @@ sysctl -a --pattern disable_ipv6
 echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 
-# To disable a specific interface.
+# To disable the future interface.
 echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 
+# To disable a specific interface.
 echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+# Refresh the connection.
+# Any temporary settings will be removed such as routes.
+nmcli con up ens33
 
 # Disable IP forwarding.
 echo "net.ipv4.ip_forward = 0" >> /etc/sysctl.d/10-np-custom.conf
@@ -37,6 +75,9 @@ sysctl -w net.ipv4.ip_forward=0
 
 # Disable packet forwards.
 echo "net.ipv4.conf.all.send_redirects = 0" >> /etc/sysctl.d/10-np-custom.conf
+
+# Enable ignoring broadcasts request.
+echo net.ipv4.icmp_echo_ignore_broadcasts = 1  >> /etc/sysctl.d/10-np-custom.conf
 
 # Audit
 for file in /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
@@ -57,6 +98,21 @@ done
 
 sysctl -a --pattern net.ipv4.tcp_syncookies
 
+# Controls source route verification.
+echo net.ipv4.conf.all.rp_filter = 1  >> /etc/sysctl.d/10-np-custom.conf
+sysctl -w net.ipv4.conf.default.rp_filter=1
+
+# Do not accept source routing.
+echo net.ipv4.conf.all.accept_source_route = 1 >> /etc/sysctl.d/10-np-custom.conf
+sysctl -w net.ipv4.conf.all.accept_source_route=1
+
+#
+kernel.yama.ptrace_scope = 1
+kernel.randomize_va_space = 2
+net.ipv4.conf.all.secure_redirects = 0
+kernel.unknown_nmi_panic = 1
+net.ipv4.conf.all.log_martians = 1
+
 # Define password policies in the login.defs file.
 
 PASS_MAX_DAYS   35
@@ -67,7 +123,7 @@ grep ^PASS_MAX_DAYS  /etc/login.defs
 cat /etc/shadow | cut -d : -f 1,5 | grep [0-9]
 
 
-PASS_MIN_DAYS   7
+PASS_MIN_DAYS   0
 chage --mindays 7 <user>
 
 # Audit PASS_MIN_DAYS
@@ -83,18 +139,18 @@ chage --warndays 7 <user>
 cat /etc/shadow | cut -d : -f 1,6 | grep [0-9]
 
 # Disable systemd dump storage for backtraces /etc/systemd/coredump.conf.
-echo 'storage=none' >> /etc/systemd/coredump.conf
+echo 'Storage=none' >> /etc/systemd/coredump.conf
 
 # Audit
 grep -i '^storage=[n,e,j]' /etc/systemd/coredump.conf
 
 #  Ensure core dump backtraces /etc/systemd/coredump.conf
-echo 'processsizemax=0' >> /etc/systemd/coredump.conf
+echo 'ProcessSizeMax=0' >> /etc/systemd/coredump.conf
 
-grep -i '^processsizemax=[0-9][bkmgtpe]*' /etc/systemd/coredump.conf
+grep -i '^processizemax=[0-9][bkmgtpe]*' /etc/systemd/coredump.conf
 
 # Harden the SSH service /etc/ssh/sshd_config
-# Directory /etc/ssh/ssh_config.d can be used to enforce the rules instead of editing the main sshd_config
+# Directory /etc/ssh/sshd_config.d can be used to enforce the rules instead of editing the main sshd_config
 AllowGroups root,wheel
 Protocol 2
 Port 2169
@@ -112,13 +168,21 @@ ClientAliveInterval 600
 ClientAliveCountMax 0
 UsePAM yes
 X11Forwarding no
+SyslogFacility AUTHPRIV
 AllowTcpForwarding yes
+ChallengeResponseAuthentication no
 StrictModes yes
 MaxSessions 10
+MaxStartups 10:30:60
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
+MACs -hmac-md5,hmac-md5-96,hmac-ripemd160,hmac-sha1-96,umac-64@openssh.com,hmac-md5-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,umac-64-etm@openssh.com
 
 cp -v sshd_config{,.bak}
 
-# Comment the line.
+# Comment the line in the crypto policies FIPS mode.
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 # Audit
@@ -148,6 +212,8 @@ EOF
 grep -vE '^#|^$' /etc/security/pwhistory.conf
 
 # Implement the custom pam configs forcefully.
+# maxrepeat = 3
+# maxsequence = 3
 cat > /etc/security/pwquality.conf.d/pwquality.conf << EOF
 enforce_for_root
 minlen = 9
@@ -160,8 +226,13 @@ usercheck = 1
 retry = 3
 EOF
 
+# Apply the changes.
+authselect select sssd with-pwhistory without-nullok
+
+# Ensure that the pam_unix is secureand uses sha512 does not remeber=0 authtok.
+
 # Audit
-grep -vE '^#|^$' /etc/security/pwquality.conf.d/*.conf /etc/security/pwquality.conf
+grep -r -vE '^#|^$' /etc/security/pwquality.conf.d /etc/security/pwquality.conf
 
 # Ensure the "su" command is restricted to a specific group only such as sugroup.
 # /etc/pam.d/su
@@ -232,6 +303,8 @@ blacklist squashfs
 
 # Use pam_faillock to protect from brute force.
 authselect select sssd with-faillock
+authselect select sssd with-pwhistory
+authselect select sssd without-nullok
 
 cat > /etc/security/faillock.conf << EOF
 deny=4
@@ -254,7 +327,7 @@ awk -F: '($3 == 0) { print $1 }' /etc/passwd
 # Restrict the sudoers to enter in the root shell.
 echo "Defaults noexec" >> /etc/sudoers
 
-# The below command can tamper the sudoers file.
+# The sed command can tamper the sudoers file.
 sudo sed -i '$d' /etc/sudoers
 
 # Might to not be able to run cron jobs.
@@ -273,13 +346,11 @@ echo "Defaults passwd_timeout=2" >> /etc/sudoers
 # Monitor the bash history.
 vim /etc/profile.d/history.sh
 
-readonly HISTSIZE=1000
-readonly HISTFILESIZE=2000
+readonly HISTSIZE=2000
+readonly HISTFILESIZE=3000
 readonly HISTTIMEFORMAT="%Y-%m-%d %T "
 readonly PROMPT_COMMAND='history -a'
-user=$(who am i | awk '{print $1}')
-name=$(whoami)
-readonly HISTFILE="/var/log/bash_history/${user}_as_$(whoami)_history"
+readonly HISTFILE="/var/log/bash_history/$(who am i | awk '{print $1}')_as_$(whoami)_history"
 export HISTFILE HISTSIZE HISTFILESIZE PROMPT_COMMAND
 
 sudo mkdir /var/log/bash_history
@@ -331,5 +402,36 @@ mount -o remount,rw,noexec,hidepid=2 /proc
 # Setting system wide crypto policies.
 update-crypto-policies --show
 
-# Secure modes avaalable: FIPS, FUTURE
-update-crypto-policies --set FUTURE
+# Secure the SSH CBC
+update-crypto-policies --set DEFAULT:NO-SHA1:NO-SSHCBC:NO-WEAKMAC
+
+# Enable the fips mode.
+fips-mode-setup --enable
+
+fips-mode-setup --check
+
+# Secure modes available: DEFAULT, FIPS, FUTURE
+update-crypto-policies --set DEFAULT
+
+# To prevent a fork bomb
+ulimit -u 30
+
+# To set a user level hard limit.
+/etc/security/limits.d/pranshu.conf
+pranshu hard nproc 30
+
+# Set password on GRUB.
+# Default user name will be root.
+grub2-setpassword
+
+# Run the vulnerability test.
+
+# Install the OpenSCAP scanner.
+dnf -y install openscap-scanner
+
+wget -O - https://www.redhat.com/security/data/oval/v2/RHEL8/rhel-8.oval.xml.bz2 | bzip2 --decompress > rhel-8.oval.xml
+
+oscap oval eval --report vulnerability.html rhel-8.oval.xml
+
+# Scanning a remote system for vulnerabilities.
+oscap-ssh joesec@machine1 22 oval eval --report remote-vulnerability.html rhel-8.oval.xml

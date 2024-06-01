@@ -37,6 +37,11 @@ sed -n '15p' /etc/ssh/sshd_config
 # Use "restorecon -R -v ~/.ssh" to restore SElinux context.
 # Use "aureport" command if some one is brute forcing.
 
+**********************************************************************
+*                      Authorized Access Only                        *
+*            All activities are logged and monitored.                *
+*               Unauthorized access is not allowed.                  *
+**********************************************************************
 
 #######################################
 # General SSH commands.

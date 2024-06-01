@@ -20,11 +20,35 @@
 
 # Print the BIOS info.
 dmidecode -t memory
+sudo dmidecode -t memory | head -12
+
 dmidecode -t processor
+sudo dmidecode -t processor | head -30
+
 dmidecode -t bios
+
+# To get a summary about the inter process.
+ipcs --human -u
 
 # Prints system memory with swap.
 free -hw
+
+# To print process id information.
+pidstat -w 1
+
+# For CPU
+pidstat -u
+
+# For I/O
+pidstat -d
+
+# To get the system performance report.
+perf record
+
+perf sched report
+
+# System Activity Report.
+sar
 
 # To provide the environment variables to a command instead of exporting to the shell.
 env a=7 bash -c 'echo $a'
@@ -65,6 +89,9 @@ ps --forest -C sshd -o pid,ppid,comm,euser,ruser,stime,pmem,pcpu
 ps --forest -C sudo -o pid,ppid,comm,euser,ruser,stime,pmem,pcpu
 
 # Print different options of processes.
+export PS_FORMAT="ruser,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser,stat,flags,stime,thcount,comm:25"
+ps -e -o pid,stat,comm,wchan=WIDE-WCHAN-COLUMN
+ps -e | grep -v ^root
 ps --forest -eo pid,ppid,euser,ruser,stime,stat,pcpu,pmem,ni,rss,thcount,comm --sort=-pcpu
 
 # List only processes that are running
@@ -104,6 +131,15 @@ lshw | less
 # List less details of hardware.
 lshw -short | less
 
+# Prints all the buses.
+lspci -nn
+
+# Poweroff the server
+sudo shutdown -h now
+
+# Restart the server
+sudo shutdown -r now
+
 # To list Cores, sockets, and cores per socket.
 lscpu | grep -E '^CPU\(s\)|Socket|Core\(s\)'
 
@@ -140,6 +176,9 @@ ps -eo pid,user,ruser,euser,args
 # To get a process tree.
 pstree <pid>
 pstree <username>
+
+# Get the unvironment and details of the running process.
+cat /proc/2382461/status
 
 # Background job management.
 # bg - move jobs to the background.

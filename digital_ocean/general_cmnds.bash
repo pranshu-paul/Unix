@@ -11,5 +11,5 @@ doctl compute droplet create --image centos-stream-8-x64 --size s-1vcpu-1gb --ss
 
 doctl compute droplet list
 
-doctl compute droplet delete 416806366
+doctl compute droplet delete 417973754
 

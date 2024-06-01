@@ -14,6 +14,7 @@ ethtool ens3
 # Datalink Layer #
 tcpdump
 tcpdump -i eth0 -e
+tcpdump -nnei ens3
 
 # Adjusts the maximum transmission unit (MTU).
 # disbale ipv6
@@ -25,6 +26,7 @@ ip link set dev ens3 addr 02:00:17:00:b8:5c
 
 ip neigh show
 
+ip neigh get 10.0.0.1 dev ens3
 
 nmcli dev show ens3
 
@@ -62,6 +64,7 @@ sysctl
 
 # Transport Layer #
 ip tcp_metrics show
+ip tcp_metrics show address 8.8.8.8
 
 ss
 

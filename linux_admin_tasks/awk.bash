@@ -6,6 +6,14 @@ ldd $(which sshd) | awk '{$4=""}1' | grep -E '^libp[a-m]+'
 # Prints the string if matches the input.
 echo manager | awk '/manager/ {print}'
 
+# To remove the column number two.
+nmcli con sh | awk '{ $2=""; print $0 }'
+
+# To remove specific number of columns.
+nmcli con sh | awk '{$2=$3=$4=""; print $0}'
+
+# To remove a range of columns from 1 to 5.
+nmcli con sh | awk '{for(i=1; i<=5; i++) $i=""; print $0}'
 
 # Print the first and third column sperated by :
 awk -F : '{print $1,$3}' /etc/passw
@@ -47,6 +55,23 @@ awk 'BEGIN{print ENVIRON["PATH"]}'
 # To print only the first column and the last column.
 awk 'BEGIN{FS=":"; OFS=":"} {print $1,$NF}' /etc/passwd
 
+# To print the last column only.
+nmcli con sh --active | sed '1d' | awk '{print $NF}'
+
+# To print the second row only.
+nmcli con sh | awk 'NR==2 {print}'
+
+# To print the last row only.
+awk 'END {print}'
+
+# To print a rnage of rows from 1 to 7.
+nmcli con sh | awk 'NR>=1 && NR<=7 {print}'
+
+# To remove a specific row.
+nmcli con sh | awk 'NR != 3'
+
+# To remove two rows.
+nmcli con sh | awk 'NR != 3 && NR != 5'
 
 awk 'BEGIN{test="Welcome to LikeGeeks website" print test}'
 

@@ -95,6 +95,8 @@ chown <user> <file>
 # To change a file's owner and group:
 chown <user>:<group> <file>
 
+sudo chown $(id -u):$(id -g) <file>
+
 # To change a directory's owner recursively:
 chown -R <user> <directory>
 
@@ -107,14 +109,55 @@ chgrp <group> <file/directory>
 
 # setfacl
 # ACL must be enabled for the file system in the mounting options (/etc/fstab or mount).
+# X: means a conditional executable permission.
 setfacl --modify user:<user>:<perms> <file>
 setfacl --modify user:opc:rw test
+
+# Print the ACL on a file or directory.
+getfacl -p <file>
 
 # Removing all ACLs.
 setfacl -b <file>
 
 # Remove ACL of a file for a user.
 setfacl -x u:<user> <file>
+
+# Grant permissions to multiple users and groups. Beyond the file owner and the file's group.
+# These affilations are called named users and named groups.
+
+# Display a file ACL settings.
+getfacl <file/directory>
+
+# Mask entry sets the maximum possible permissions for all the named users, and groups.
+
+# To save a directory ACL recursively into a file.
+getfacl -R /dir1 > file1
+
+# The output can be used to create or transfer the ACLs to another directory.
+setfacl --set-file=file1
+
+# Allow the user to enter in the directory.
+setfacl -m u:nitesh:r-X /app01/traces
+
+# Create ACL for the user satish.pandey to read the future objects on the directory.
+setfacl -m d:u:nitesh:r-X /app01/traces
+setfacl -m d:g::--- /app01/traces
+setfacl -m d:o::--- /app01/traces
+
+# Set the default mask.
+setfacl -m d:m:r-X /app01/traces
+
+# Process user should be as a named user on the file to access the file.
+# Process group should be as a named group on the file to access the file.
+
+# The file system where the ACLs being appliead should not have noacl in the mount options
+mount -o remount,acl /app01/traces
+
+# To delete a default named user ACL
+setfacl -x d:u:<user> <directory>
+
+# To delete the all the default ACL entries on a directory.
+setfacl -k <directory>
 
 # Top 10 files sorted by size.
 du -ah | sort -rh | head -n 10
@@ -175,6 +218,11 @@ fuser -mu /mnt
 # Kill the process with associated with the mount point.
 fuser -ck /mnt
 
+# To kill a user's temp session
+fuser -ck /run/user/0
+
+sudo umount  -fl /run/user/0
+
 # To unmount a file system when not able to unmount or an NFS.
 umount -l /mnt
 
@@ -182,4 +230,4 @@ umount -l /mnt
 mount -o remount,rw,hidepid=2 /proc
 
 # Add the below entry in the /etc/fstab file.
-proc /proc proc defaults,hidepid=2 0
+proc /proc proc defaults,noexec,hidepid=2 0 0

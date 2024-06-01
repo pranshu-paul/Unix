@@ -34,19 +34,19 @@ last reboot -n 5
 
 # Last failed logins.
 echo -e "\nLast failed logins"
-sudo lastb
+sudo lastb -n 10
 
 # Hosts table.
 echo -e "\nHost entries in the /etc/hosts file."
-getent hosts
+getent hosts | column -t -N IP,Hostname,FQDN,HostnameAlias,FQDN_Alias
 
 # Which users can login locally.
 echo -e "\nUsers that can login locally."
-getent passwd | grep sh$
+getent passwd | grep bash$ | column -s : -t -N User,Password,UID,GID,Description,Home,Shell
 
 # Which users are in the wheel group.
 echo -e "\nUsers that are in the wheel group."
-getent group wheel
+getent group wheel | column -s : -t -N Group,Password,GID,Members
 
 # Password expiry related directives.
 echo -e "\nCurrent password ageing paramaters"
@@ -54,17 +54,19 @@ grep ^PASS /etc/login.defs
 
 # Current systems password policies.
 echo -e "\nCurrent password quality set."
-grep pam_pwquality /etc/pam.d/*  | column -t
+grep -r pam_pwquality /etc/pam.d/* | column -t -s : -N File,Output
+
+# Current applied switch user policy.
+echo -e "\nCurrent applied su policy."
+grep pam_wheel /etc/pam.d/su | sed '/^#/d' | column -t
 
 # Which users are through domain.
 domain_name=$(realm list | grep -w 'domain-name:' | awk '{print $2}')
 
-if [[ -n ${domain_name} ]]
-then
+if [ -n ${domain_name} ]; then
 	users=($(realm list  | grep -w permitted-logins: | cut -d ' ' -f 4-))
 	echo -e "\nUsers that can login through the domain."
-	echo ${users[@]}
-	
+	echo ${users[@]}	
 fi
 
 # List only the user installed packages.
@@ -77,20 +79,21 @@ grep -vE '^#|^;' /etc/resolv.conf
 
 # Time servers
 echo -e "\nTime servers."
-chronyc sources | grep '^\^\*'
+grep -i '^server' /etc/chrony.conf
 
 # Cron jobs by user
 echo -e "\nCron jobs scheduled by the users."
 users=($(sudo ls /var/spool/cron))
 
 for user in ${users[@]}; do
-	echo -e "\nCronjobs of user ${user}"
+	echo -e "\nCronjobs of the user ${user}"
 	sudo cat  /var/spool/cron/${user}
 done
 
-# Mount points with their file system time
-echo -e "\nMount with their file system and total storage."
-df -hT --total
+# Mount points with their file system time.
+echo -e "\nFile system with inodes."
+export FIELD_LIST=source,fstype,itotal,iused,iavail,ipcent,size,used,avail,pcent,file,target
+df -h --output=$FIELD_LIST --total
 
 # Print the physical volumes.
 echo -e "\nPhysical volumes"
@@ -106,21 +109,30 @@ sudo lvdisplay
 
 # /etc/fstab
 echo -e "\nCurrent File system table."
-grep -vE '^#|^$' /etc/fstab | column -t
+grep -vE '^#|^$' /etc/fstab | column -t -N DEVICE_NAME,MOUNT_POINT,FILE_SYSTEM,OPTIONS,DUMP,PASS
 
 # Application / Database directories
 # To check the mount options applied.
-mount | grep app01
+echo -e "\nSpecific directories with their mount options."
+mount_options() {
+mount | grep "$1" | column -t -N Device,_,MountPoint,_,FileSystem,Options
+}
 
-mount | grep data01
+mount_options app01
+mount_options data01
+
+# ACLs on the specific directories.
+echo -e "\nACL on the specific directories."
+find / -maxdepth 1 -name data01 -type d -exec getfacl {} -p \;
+find / -maxdepth 1 -name app01 -type d -exec getfacl {} -p \;
 
 # Applied sshd configuration.
 echo -e "\nCurrent sshd_config"
 sudo grep -vE '^#|^$' /etc/ssh/sshd_config
 
-# Applied sshd configuration in the /etc/ssh/ssh_config.d directory.
-echo -e "\nCurrent sshd_config in the /etc/ssh/ssh_config.d directory"
-sudo grep -vE '^#|^$' /etc/ssh/ssh_config.d/*
+# Current tuned profile.
+echo -e "\nCurrent active tuned profile."
+tuned-adm active
 
 # Kernel Parameters.
 echo -e "\nCurrent kernel parameters"
@@ -132,9 +144,18 @@ cat /etc/sysctl.d/* | grep -vE '^#|^$'
 echo -e "\nKernel parameters in the /usr/lib/sysctl.d directory."
 cat /usr/lib/sysctl.d/* | grep -vE '^#|^$'
 
+echo -e "\nCurrent sudoers directives."
+grep -vE '^#|^$' /etc/sudoers
+
+echo -e "\nCurrent sudoers directives in the /etc/sudoers.d directory."
+grep -vE '^#|^$' /etc/sudoers.d/*
+
 # ulmits
 echo -e "\nApplied OS limits."
 grep -vE '^#|^$'  /etc/security/limits.conf
+
+echo -e "\nApplied OS limits in the /etc/security/limits.d directory."
+grep -r -vE '^#|^$' /etc/security/limits.d
 
 # Firewall state
 echo -e "\nFirewall state"
@@ -142,17 +163,20 @@ systemctl is-active firewalld
 
 # SElinux status
 echo -e "\nSElinux status."
-sestatus
+getenforce
 
 # Main routing table.
 echo -e "\nKernel routing table"
 ip route show
 
 echo -e "\nNICs and their configs"
-ip addr show
+ip -br link show
 
 echo -e "\nNICs with their gateways and routes"
-nmcli dev show | cat
+nmcli -p -f general,ip4 device show | cat
+
+echo -e "\nNo. of established connection of processes."
+sudo ss -Hntup state established | cut -d '"' -f 2 |  sort | uniq -c | sort -nr | column -t -N EstabCount,Process
 
 # Enabled repos.
 echo -e "\nEnabled repos"
@@ -175,8 +199,13 @@ echo -e "\nCurrently disabled services."
 systemctl list-unit-files --state=disabled | cat
 
 # What processes are running other than root.
-echo -e "\nProcesses running other than root."
-ps -eo pid,ppid,cmd,pmem,pcpu,user,time,euser,stat,flags,stime,wchan --sort=-pcpu | grep -v root
+echo -e "\nProcesses running other than root sorted by %CPU."
+export PS_FORMAT="ruser:20,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser:20,stat,flags,stime,thcount,comm:25"
+ps -e --sort=-pcpu | grep -v root
+
+echo -e "\nBusiness specific processes sorted by %CPU."
+export PS_FORMAT="ruser:20,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser:20,stat,flags,stime,thcount,comm:25"
+ps -e --sort=-pcpu | grep -E 'ksmppd|bearerbox|sqlbox|gluster|mysqld' | column -t -N RUSER,PID,PPID,NICE,WCHAN,PMEM,PCPU,TIME,EUSER,STAT,FLAGS,STIME,THCOUNT,COMM
 
 # Which sockets are listening.
 echo -e "\nSockets that are listening."

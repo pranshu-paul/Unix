@@ -17,7 +17,7 @@ ls -l ?????.txt		# -- To search for a file with a five-character name.
 # existing, nil   numbered if numbered backups exist, simple otherwise
 # simple, never   always make simple backups
 export VERSION_CONTROL=numbered
-install -b -v -D <file> <destination>
+install -b -v -D -m 644 <file> <destination>
 
 install -v -owner postgres <file_1> <file_2> <destination>
 

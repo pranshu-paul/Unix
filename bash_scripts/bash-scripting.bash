@@ -106,16 +106,17 @@ done
 echo $LINENO
 
 # It returns the name of the function, inside a function when called.
-echo $FUNCNAME
+func() { echo $FUNCNAME; }; func
 
 # Shows the level of shells opened.
 echo $SHLVL
 
+echo $BASH_COMMAND
 
 #####
 
 # Redirection.
-exec 3>&1 1>"$LOGFILE" 2>&1
+exec 3>&1 1> "$LOGFILE"
 
 # Redirecting all outputs and errors to a file
 exec >> "${log_file}" 2>&1
@@ -279,3 +280,60 @@ my_function() {
 
 # Call the function
 my_function
+
+# To execute command parallely in a script
+#!/bin/bash
+
+hosts=("141.148.218.174" "141.148.218.174")
+
+declare -a pids
+declare -A exit_codes
+
+for host in "${hosts[@]}"; do
+    echo "$host" &
+    pids+=("$!")
+	
+	for ((i = 0; i < ${#pids[@]}; i++)); do
+		wait "${pids[$i]}"
+		exit_codes["${pids[$i]}"]=$?
+	done
+	
+done
+
+echo "Exit codes:"
+for pid in "${!exit_codes[@]}"; do
+    echo "PID: $pid, Exit code: ${exit_codes[$pid]}"
+done
+
+# Pass arrays and associative arrays to a function.
+
+#!/bin/bash
+
+declare -a gl_array=(
+	"element1"
+	"element2"
+)
+
+declare -A gl_dict=(
+	["key1"]=value1
+	["key2"]=value2
+)
+
+func() {
+    local -n array=$1
+    local -n dict=$2
+
+    for el in "${array[@]}"; do
+        for key in "${!dict[@]}"; do
+            echo "$el $key ${dict[$key]}"
+        done
+    done
+}
+
+main() {
+    func gl_array gl_dict
+}
+
+main
+
+###################################################################################

@@ -415,6 +415,10 @@ sum() {
 # To prevent a fork bomb
 ulimit -u 30
 
+# To set a user level hard limit.
+/etc/security/limits.d/pranshu.conf
+pranshu hard nproc 30
+
 # Factorial
 factorial() {
 	

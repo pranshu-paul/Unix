@@ -27,14 +27,18 @@ locate <name>
 # To execute a command on the output of a command.
 ls . | xargs -i file {}
 
+# Remove some file out of the some command
+grep grepconf /etc/profile.d/* | cut -d : -f 1 | xargs -i rm {}
+
 # To install find.
 yum -y install findutils
 
 # To find in current directory.
-find . -name <name> -print
+find . -name <name> -ls
 
 # To find from root node.
 find / -name <name> -print
+find / -name <name> -ls
 
 # To find a file not equal to the name.
 find $PWD -maxdepth 1 ! -name <name> -print

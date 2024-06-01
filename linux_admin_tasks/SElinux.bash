@@ -53,6 +53,9 @@ autorelabel=1
 # To boot in enforcing mode.
 enforcing=0
 
+# To set permisive for a particular.
+semanage permissive -a httpd_t
+
 # Avoid kernel to load any part of selinux.
 selinux=0
 

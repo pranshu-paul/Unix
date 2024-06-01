@@ -24,6 +24,11 @@ ip addr show ens3 | grep inet
 ip -4 a | grep inet # -- To get ipv4 address only.
 hostname -I
 
+# To store packets in buffer during the transfer and recive.
+nmcli con mod ens3 ethtool.ring-rx 4096
+nmcli con mod ens3 ethtool.ring-tx 4096
+
+nmcli con up ens3
 
 # Shows the layer 2 recived and transffered packets.
 ip -s link show ens3
@@ -49,8 +54,15 @@ getent services | grep -w 443/tcp
 ip link show enp0s9 | grep link | awk '{print $2}'
 
 # Free DNS servers by Level 3 Communications.
-# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4, 4.2.2.5, 4.2.2.6
+# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4
 
+# To add DNS servers with options
+nmcli con mod ens3 +ipv4.dns "8.8.8.8 4.2.2.2"
+nmcli con mod ens3 +ipv4.dns-options "attempts:1 timeout:1"
+/etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 4.2.2.2
+options timeout:1 attempts:2
 # To generate a UUID.
 uuidgen
 
@@ -81,19 +93,6 @@ nmcli dev connect ens160
 nmcli dev disconnect ens160
 nmcli con down dns160
 nmcli con up dns160
-
-nmcli connection modify enp0s8 +ipv4.routes "<destination>/<cidr> <next_hop>"
-nmcli connection modify enp0s8 +ipv4.routes "0.0.0.0/0 192.168.56.0"
-nmcli connection modify your-eth0-connection +ipv4.routes "0.0.0.0/0 10.0.2.2 100"
-
-# To add temporary routes.
-# Both are same.
-ip route add default via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
-ip route add 0.0.0.0/0 via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
-
-# To delete the default route.
-ip route del default
-ip route del default metric 100
 
 # Free DNS servers 8.8.8.8, 8.8.4.4 of google.com
 
@@ -142,8 +141,7 @@ nmcli con down ens224 && nmcli con up ens224
 # To restart a connection.
 nmcli con down ens3 && nmcli con up ens3
 
-# To create a subnet.
-
+# To calculate a network addresses.
 ipcalc 192.168.100.1/24 -S 27
 
 nmcli connection add con-name <any_subnet_name> ifname <interface_name> type ethernet ip4 <ip_address>/<cidr> gw4 <gateway>
@@ -191,6 +189,9 @@ sysctl --system
 # The below commands runs better with the root user.
 ss -lntp # Package = iproute
 ss -lntp | grep smon
+
+ss -no state all '( dport = :2169 or sport = :2169 )'
+
 netstat -lntp # -- For the old distros. # Package = net-tools
 
 

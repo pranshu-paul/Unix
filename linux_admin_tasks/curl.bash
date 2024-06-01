@@ -5,7 +5,7 @@ curl -T /u01/app/oracle/product/12.1.0.2/dbhome_1/appsutil/log.zip \
 curl -I https://www.google.com
 
 # To return the exit code only.
-curl -s -o /dev/null -w "%{http_code}" https://www.google.com
+curl -s -o /dev/null -w "%{http_code}\n" https://www.google.com
 
 
 curl http://169.254.169.254/opc/v1/instance/

@@ -13,6 +13,20 @@ firewall-cmd --list-all
 # targets available ACCEPT, DROP, REJECT
 firewall-cmd --permanent --set-target=DROP
 
+# To make the all temporary changes permanent.
+firewall-cmd --runtime-to-permanent
+
+# Create firewall rules for an interface.
+firewall-cmd --zone=trusted --add-interface=ens36
+firewall-cmd --runtime-to-permanent
+
+# Set the zone on the interface.
+nmcli con mod ens36 connection.zone trusted
+nmcli con up ens36
+
+# List the rules in the zone.
+firewall-cmd --zone=trusted --list-all
+
 # To add a new port.
 # This option adds port immediatley, but removes port after reboot.
 # The below option is an example of stateless rule.

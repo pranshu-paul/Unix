@@ -127,6 +127,9 @@ dnf reposync  --repoid=epel -p=epel
 
 dnf group list
 
+# Checks the whihc package requires the server to reboot.
+dnf needs-restarting -r
+
 dnf group info 'Minimal Install'
 
 # Exclude a list of packages.

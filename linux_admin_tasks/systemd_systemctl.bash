@@ -87,3 +87,7 @@ TimeoutStopSec=3min
 
 [Install]
 WantedBy=multi-user.target
+
+# First reload the daemon or if not possible restart it.
+systemctl try-reload-or-restart
+

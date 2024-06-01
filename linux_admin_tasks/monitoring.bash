@@ -2,24 +2,26 @@
 
 log_file=/home/pranshu/out_$(basename $0)_$(date +%d_%b).log
 
-exec &>> ${log_file}
+# exec &>> ${log_file}
 
-echo -e "\nDate and time when the script is running."
+print_header() {
+    echo -e "\n========================================================================================================================================="
+    echo  " 				$1 "
+    echo -e "========================================================================================================================================="
+}
+
+print_header " Date and time when the script is running."
 date
 
-echo -e "\nHostname, OS version, CPU architecture, and kernel version."
-hostnamectl
+print_header " Hostname"
+hostname
 
-echo -e "\nNICs breifing."
-ip -4 -br addr show
+print_header " Server IP Addresses."
+ip -4 -br addr show | grep -w UP
 
-echo -e "\nKernel routing table."
-ip route show
+print_header " Number of cores and CPU percentage"
+echo -e "Number of cores: $(nproc)"
 
-echo -e "\nNumber of CPU(s), Socket(s), and Core(s) per socket."
-lscpu | grep -E '^CPU\(s\)|Socket|Core\(s\)'
-
-echo -e "\nCPU percentage."
 cpu_usage() {
 first_reading=$(grep -w "^cpu" /proc/stat)
 sleep 1
@@ -33,7 +35,7 @@ total_time=0; total_idle=0; total_non_idle=0
 for ((i = 1, j = 1; i < ${#first_values[@]}, j < ${#second_values[@]}; i++, j++))
 do
     total_time=$((total_time + second_values[j] - first_values[i]))
-    if [[ $i -eq 4 || $i -eq 5 || $j -eq 4 || $j -eq 5 ]]; then
+    if [[ $i -eq 4 || $j -eq 4 || $i -eq 5  || $j -eq 5 ]]; then
         total_idle=$((total_idle + second_values[j] - first_values[i]))
     fi
 done
@@ -42,94 +44,80 @@ total_non_idle=$((total_time - total_idle))
 
 cpu_usage=$(awk "BEGIN {printf \"%.2f\", ($total_non_idle / $total_time) * 100}")
 
-echo "$cpu_usage"
+echo "CPU Percentage: $cpu_usage%"
 }
 
 cpu_usage
 
-echo -e "\nMemory usage."
+print_header " Memory usage."
 free -hw
 
-echo -e "\nMemory percentage."
-mem_usage() {
-readarray -t memory <<< $(awk '{print $2}' /proc/meminfo)
-
-mem_total=0; mem_free=0; buffers=0; cached=0
-
-for (( i = 0; i < ${#memory[@]}; i++ ))
+printf "\n%s" "Memory percentage: "
+total=0
+for (( i=0; i<1; i++ ))
 do
-	if [[ $i -eq 0 ]]; then
-		mem_total=${memory[$i]}
-	elif [[ $i -eq 1 ]]; then
-		mem_free=${memory[$i]}
-	elif [[ $i -eq 3 ]]; then
-		buffers=${memory[$i]}
-	elif [[ $i -eq 4 ]]; then	
-		cached=${memory[$i]}
-	fi
+    mem_usage=$(free | awk '/Mem/ {printf "%.2f\n", $3/$2 * 100.0}')
+    total=$(awk "BEGIN {print $total + $mem_usage}")
+    sleep 1
 done
-	mem_used=$((mem_total - (mem_free + buffers + cached)))
-	memory_usage=$(awk "BEGIN {printf \"%.2f\", ($mem_used / ($mem_total)) * 100}")
 
-echo "$memory_usage"
-}
-mem_usage
+average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
+printf "%s\n" "$average%"
+
+printf "%s" "Swap percentage: "
+total=0
+for (( i=0; i<1; i++ ))
+do
+    swap_usage=$(free | awk '/Swap/ {printf "%.2f\n", $3/$2 * 100.0}')
+    total=$(awk "BEGIN {print $total + $swap_usage}")
+    sleep 1
+done
+
+average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
+printf "%s\n" "$average%"
+
+print_header " Currently logged in users, uptime, and load average."
+w
 
 export PS_FORMAT="ruser,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser,stat,flags,stime,thcount,comm:25"
-echo -e "\nTop CPU consuming processes."
+print_header " Top CPU consuming processes."
 ps -e --sort=-pcpu | grep -v grep | head
 
-echo -e "\nTop Memory consuming processes."
+print_header " Top Memory consuming processes."
 ps -e --sort=-pmem | grep -v grep | head
 
-echo -e "\nProcesses running other than root."
-ps -e | grep -v ^root
+print_header " Any zombie processes."
+ps -e | grep Z | grep -v ps
 
-echo -e "\nAny zombie processes."
-ps -e | grep Z | grep -v grep
+print_header " Business specific processes."
+ps -e | head -1; ps -e | grep -v ps | grep -E 'ksmppd|bearerbox|sqlbox|gluster|mysqld'
 
-echo -e "\nI/O utilization."
+print_header " Number of open files."
+lsof -n | wc -l
+
+print_header " Number of processes."
+ps -eLF | wc -l
+
+print_header " I/O utilization."
 vmstat -aw 2 5 | sed '3d'
 
-echo -e "\nUptime and load average."
-uptime
+print_header " Today failed logins."
+sudo lastb -wi | grep -vwE 'btmp|^$'
 
-echo -e "\nToday reboots"
-last reboot -s today | head -15
+print_header " Mount points, inodes with their file system and total storage."
+export FIELD_LIST=source,fstype,itotal,iused,iavail,ipcent,size,used,avail,pcent,target
+df -h --output=$FIELD_LIST --sync --total | grep -vE 'tmpfs|nfs4|fuse.glusterfs'
 
-echo -e "\nToday failed logins."
-sudo lastb -s today | head -15
+print_header " Failed units."
+systemctl list-units --state=failed --all --no-pager
 
-echo -e "\nToday logins."
-sudo last -s today | head -15
+print_header " No. of established connection of processes."
+sudo ss -Hntup state established | cut -d '"' -f 2 |  sort | uniq -c | sort -nr | column -t -N EstabCount,Process
 
-echo -e "\nMount with their file system and total storage."
-df -hT --total
+print_header " Data packets statistics."
+for nic in $(nmcli con sh --active | sed '1d' | awk '{print $4}'); do
+	ip -stat addr show "$nic"
+done
 
-echo -e "\nPhysical volumes"
-sudo pvdisplay
-
-echo -e "\nVolumes groups and physical volumes in a group."
-sudo vgdisplay
-
-echo -e "\nLogical volumes on a volume group."
-sudo lvdisplay
-
-echo -e "\nFailed units."
-systemctl list-units --state=failed --all | cat
-
-
-echo -e "\nSockets that are listening."
-sudo ss -lntup
-
-echo -e "\nEstablished connections."
-ss -sntp
-
-echo -e "\nData packets statistics."
-ip -stat addr
-
-echo -e "\nError logs"
-journalctl -r -S today -p err | head -20
-
-echo -e "\nAlert logs"
-journalctl -r -S today -p alert | head -20
+print_header " Program-Crash-Report"
+journalctl -r -t systemd-coredump -S today | grep -w systemd-coredump

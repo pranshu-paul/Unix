@@ -31,9 +31,11 @@ tcpdump -nvni ens3 udp and host 8.8.8.8 and port 53
 
 # To capture ICMP packets.
 tcpdump -nnvi ens33 icmp
+tcpdump -nnvi ens33 src 172.19.8.113 and icmp
 
 # Capture from a specific source to a specific destination and port.
-tcpdump -i eth0 src 192.168.1.1 and dst 192.168.1.2 and dst port 80
+tcpdump -nnvi ens33 src 172.19.4.103 and dst 192.168.1.2 and dst port 80
+tcpdump -nnvi ens33 src 172.19.4.103
 
 # Capture layer 2 ARP messages.
 tcpdump -nnvi ens3 arp

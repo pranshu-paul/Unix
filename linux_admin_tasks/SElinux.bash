@@ -38,8 +38,16 @@ journalctl -r -t sealert
 ausearch -m avc,AVC,USER_AVC,SELINUX_ERR
 aureport -a
 
+# To change the context temporarily
+chcon -t httpd_sys_content_t ost-config.php
+
 # To find correct context for a directory and file.
 matchpathcon -V
+
+# Relabel the file ost-config.php with httpd_sys_rw_content_t for read write.
+# Always provide abosule path.
+semanage fcontext -a -t httpd_sys_rw_content_t "/var/www/helpdesk.paulpranshu.xyz/upload/include/ost-config.php"
+restorecon -Rrv /var/www/helpdesk.paulpranshu.xyz/upload/include/ost-config.php
 
 # To get the list of labels for a service.
 seinfo --type | grep <service_name>

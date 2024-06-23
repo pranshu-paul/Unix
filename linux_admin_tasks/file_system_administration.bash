@@ -54,7 +54,7 @@ mv -v test{.txt,.sh}
 0 - none (---)
 
 # Set user to read/write/execute to (myscript.sh), octal notation.
-chmod 755 myscript.sh
+chmod 0755 myscript.sh
 
 # Remove read/write/execute from (myscript.sh), symbolic mode.
 chmod = myscript.sh
@@ -71,17 +71,17 @@ chmod -v 4755 <file>
 # To set read-only permissions and make the file immutable.
 chmod -v 4644 <file>
 
-# To inherit the goup's ownership for the newly files created in a directory, use SGID.
+# To inherit the goup's membership for the newly files created in a directory, use SGID.
 chmod -v 2775 <directory>
 
-# To inherit the group ownership and prevent the grop members from deleting the files they don't own inside the directory.
+# To inherit the group membership and prevent the grop members from deleting the files they don't own inside the directory.
 chmod -v 3775 <directory>
 
 # To prevent a file deletion from other users use, sticky bit.
 # Upper case T means that the file is not an executable.
 chmod -v 1666 <file>
 
-# To prevent a directory deletion from other users use, sticky bit.
+# To prevent a directory deletion from other users use sticky bit directory under the /.
 chmod -v 1755 <directory/executable_file>
 
 

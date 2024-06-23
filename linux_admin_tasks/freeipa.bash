@@ -4,7 +4,7 @@
 echo '10.122.0.2 ipasrv.paulpranshu.org ipasrv' >> /etc/hosts
 
 # Set a static hostname for the server.
-hostnamectl set-hostname ipasrv.paulpranshu.org --static
+hostnamectl set-hostname ipasrv.paulpranshu.org
 
 # Launch the shell again.
 exec -l bash
@@ -36,13 +36,6 @@ ipa --version
 # All to use the ipa commands.
 kinit admin
 
-# Default the users can login to any host.
-ipa hbacrule-show allow_all
-
-# Disable the default rule that allow all the users to login from any host.
-ipa hbacrule-disable allow_all
-
-
 ## USER ##
 
 # To create a new user.
@@ -58,7 +51,6 @@ ipa user-mod pranshu.paul --password
 
 # To print the status of a user.
 ipa user-status pranshu.paul
-
 
 # To unlock a user after getting locked by multiple incorrect passwords.
 ipa user-unlock pranshu.paul
@@ -87,10 +79,35 @@ timedatectl set-timezone Asia/Kolkata
 vi /etc/resolv.conf
 nameserver 10.122.0.2
 
-# Verify that the IPA server hostname should return.
+# Verify that the IPA server hostname should e returned.
 host -t SRV _kerberos._udp.paulpranshu.org
 host -t SRV _ldap._tcp.paulpranshu.org
 
 dnf -y module install idm
 
 ipa-client-install --mkhomedir
+
+
+
+# Host based access control #
+
+# Create a HBAC rule.
+ipa hbacrule-add <rule_name>
+
+# Add the user in the rule.
+ipa hbacrule-add-user --user=<username> <rule_name>
+
+# Add a host in the rule.
+ipa hbacrule-add-host --hosts=<client_dns> <rule_name>
+
+# Add the service sshd in the rule.
+ipa hbacrule-add-service --hbacsvcs=sshd <rule_name>
+
+# By default the users can login to any host.
+ipa hbacrule-show allow_all
+
+# Disable the default hbac rules.
+ipa hbacrule-disable allow_all
+
+# Disable the default rule that allow all the users to login from any host.
+ipa hbacrule-disable allow_systemd-user

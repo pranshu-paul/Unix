@@ -31,6 +31,7 @@ func startInstance(ctx context.Context, val *data, client *ec2.Client) {
 	output, err := client.StartInstances(ctx, &ec2.StartInstancesInput{
 		InstanceIds: val.InstanceIds,
 	})
+
 	checkError(err)
 
 	log.Println(output.StartingInstances[0].CurrentState.Name)
@@ -40,6 +41,7 @@ func stopInstance(ctx context.Context, val *data, client *ec2.Client) {
 	output, err := client.StopInstances(ctx, &ec2.StopInstancesInput{
 		InstanceIds: val.InstanceIds,
 	})
+	
 	checkError(err)
 	log.Println(output.StoppingInstances[0].CurrentState.Name)
 }

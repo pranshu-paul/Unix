@@ -1,16 +1,22 @@
 package main
 
+// Description: Updates A record in route 53
+// Date: 18-Jun-2024
+// State: Working
+
 import (
 	"context"
 	"fmt"
-	"log"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 )
 
+// TODO: Change the data type of InstanceId to slices of []byte
+// TODO: Try using pointers members
 type data struct {
 	Name       string   `json:"name"`
 	Ttl        int64    `json:"ttl"`
@@ -19,28 +25,30 @@ type data struct {
 	Action     string   `json:"action"`
 }
 
-func checkError(err error) {
+func handler(ctx context.Context, val *data) (string, error) {
+
+	// Load the default config and return it as type aws.Config
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Sprintln("Could not load the configuration."), err
 	}
-}
 
-func (val *data) updateDns(ctx context.Context) (string, error) {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile("pranshu"))
-	checkError(err)
-
+	// Pass the struct as an argument and return a pointer to an ec2 client
 	ec2_client := ec2.NewFromConfig(cfg)
+	input := &ec2.DescribeInstancesInput{InstanceIds: val.InstanceId}
 
-	result, err := ec2_client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
-		InstanceIds: val.InstanceId,
-	})
-	checkError(err)
+	// Call the method associated with the ec2 client and pass the instance id
+	// TODO: Change the context.Background to ctx
+	result, _ := ec2_client.DescribeInstances(context.Background(), input)
 
-	if result.Reservations[0].Instances[0].PublicIpAddress == nil {
-		log.Fatal("The instance does not have a public IP address.")
+	// Declare a slice outside the loop body
+	var ip []string
+	for _, reservation := range result.Reservations {
+		for _, instance := range reservation.Instances {
+			// Append the value in slice ip
+			ip = append(ip, *instance.PublicIpAddress)
+		}
 	}
-
-	ip := result.Reservations[0].Instances[0].PublicIpAddress
 
 	client := route53.NewFromConfig(cfg)
 
@@ -53,26 +61,23 @@ func (val *data) updateDns(ctx context.Context) (string, error) {
 					Name: &val.Name,
 					Type: types.RRTypeA,
 					TTL:  &val.Ttl,
-					ResourceRecords: []types.ResourceRecord{{
-						Value: ip,
-					}},
+					ResourceRecords: []types.ResourceRecord{
+						{Value: &ip[0]},
+					},
 				},
 			}},
 		},
 	})
-	checkError(err)
 
-	return fmt.Sprintf("Change status: %v\n", output.ChangeInfo.Status.Values()), nil
+	if err != nil {
+		return fmt.Sprintln("Could not update the record."), err
+	}
+
+	return fmt.Sprintf("DNS Name: %s, Instance ID: %s, Public IP: %s, Action: %s, Record Type: %s, Status: %s", val.Name, val.InstanceId, ip[0], val.Action, types.RRTypeA, output.ChangeInfo.Status.Values()), nil
 }
 
 func main() {
-	values := &data{
-		Name:       "paulpranshu.xyz",
-		Ttl:        3600,
-		ZoneId:     "Z014611832PD0HCGBA9SF",
-		Action:     "UPSERT",
-		InstanceId: []string{"i-0a1668a1a4a53fbef"},
-	}
 
-	values.updateDns(context.Background())
+	lambda.Start(handler)
+
 }

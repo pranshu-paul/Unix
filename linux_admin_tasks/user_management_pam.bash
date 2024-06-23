@@ -74,6 +74,10 @@ usermod -g <groupname> <username>
 # To add a user into a group with overriding previous.
 usermod -aG <groupname> <username>
 
+# To remove a user from a group
+gpasswd -d <user> <group>
+gpasswd -d paul wheel
+
 # Locks out the user.
 usermod -L <username>
 
@@ -220,6 +224,14 @@ echo 'Defaults env_reset, timestamp_timeout=15' >> /etc/sudoers.d/custom/etc/sud
 # To edit the /etc/passwd file.
 vipw
 
+# To edit the /etc/shadow file.
+vipw -s
+
+# To edit the /etc/group file
+vigr
+
+# To edit the /etc/gshaddow
+vigr -s
 
 username:password:UID:GID:comment:home-directory:login-shell
 

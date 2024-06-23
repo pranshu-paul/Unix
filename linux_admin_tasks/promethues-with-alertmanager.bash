@@ -9,7 +9,7 @@ id prometheus
 install -v -d -m 755 -o prometheus /etc/prometheus/{consoles,console_libraries}
 install -v -d -m 755 -o prometheus /var/lib/prometheus
 
-curl -Lo prometheus-2.24.0.linux-amd64.tar.gz https://github.com/prometheus/prometheus/releases/download/v2.24.0/prometheus-2.24.0.linux-amd64.tar.gz
+curl -Lo prometheus-2.24.0.linux-amd64.tar.gz https://github.com/prometheus/prometheus/releases/download/v2.53.0-rc.1/prometheus-2.53.0-rc.1.linux-amd64.tar.gz
 
 tar -zxpvf prometheus-2.24.0.linux-amd64.tar.gz && cd prometheus-2.24.0.linux-amd64
 

@@ -39,6 +39,10 @@ tcpdump -nnvi ens33 src 172.19.4.103
 
 # Capture layer 2 ARP messages.
 tcpdump -nnvi ens3 arp
+tcpdump -nnvi ens34 arp
 
 # Capture packets from a portrange.
 tcpdump portrange 21-25
+
+# To capture broadcast
+tcpdump -i ens34 -nvn 'broadcast'

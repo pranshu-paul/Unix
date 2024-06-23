@@ -3,6 +3,13 @@
 # Synchronizes all pending I/O operations.
 sync
 
+# To trim a solid state drive.
+fstrim /
+
+# Prints how much data is in the cache
+# Commit the data using sync and verify again 
+cat /proc/meminfo | grep -E 'Dirty|Writeback'
+
 # Clears page cache (contiguous block of memory)
 echo 1 > /proc/sys/vm/drop_caches
 
@@ -13,6 +20,9 @@ echo 2 > /proc/sys/vm/drop_caches
 echo 3 > /proc/sys/vm/drop_caches   # Clear all caches
 
 # /sys direcctory contains the "view" of physical drives.
+
+# To view the major and minor number
+stat -c '%n %t:%T' /dev/sda1 /dev/sda2 /dev/sda3
 
 # For the devices name starting with "sd"
 dmesg | grep -e SCSI | grep sd

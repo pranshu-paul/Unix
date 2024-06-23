@@ -22,64 +22,74 @@ echo "Authorized uses only. All activity may be monitored and reported." > /etc/
 echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue.net
 
 # Tuning kernel parameters.
+# Applying a parameter individually
+# sysctl -w <paramater>=<value>
 # Precedence of the parameters matters.
 
-# Controls the default maxmimum size of a mesage queue
-kernel.msgmnb = 65536
-
-# Controls the maximum size of a message, in bytes
-kernel.msgmax = 65536
-
-# Controls the maximum shared segment size, in bytes
-kernel.shmmax = 68719476736
-
-# Controls the maximum number of shared memory segments, in pages
-kernel.shmall = 4294967296
+exec &>> /etc/sysctl.d/10-custom.conf
 
 # Controls the System Request debugging functionality of the kernel
-kernel.sysrq = 0
+echo "kernel.sysrq = 0"
 
 # Controls whether core dumps will append the PID to the core filename.
 # Useful for debugging multi-threaded applications.
-kernel.core_uses_pid = 1
-
-# Audit.
-grep -o 'ipv6.disable=[0,1]' /boot/efi/EFI/centos/grubenv
-
-for file in /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
-do
-	grep disable_ipv6 ${file}
-done
-
-sysctl -a --pattern disable_ipv6
+echo "kernel.core_uses_pid = 1"
 
 # Disable IPv6.
-echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-
-# To disable the future interface.
-echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
-
-# To disable a specific interface.
-echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-
-# Refresh the connection.
-# Any temporary settings will be removed such as routes.
-nmcli con up ens33
+# default: disable the new interfaces.
+# all: disable all the interfaces.
+echo "net.ipv6.conf.all.disable_ipv6 = 1"
+echo "net.ipv6.conf.default.disable_ipv6 = 1"
+echo "net.ipv6.conf.lo.disable_ipv6 = 1"
 
 # Disable IP forwarding.
-echo "net.ipv4.ip_forward = 0" >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv4.ip_forward=0
+echo "net.ipv4.ip_forward = 0"
 
 # Disable packet forwards.
-echo "net.ipv4.conf.all.send_redirects = 0" >> /etc/sysctl.d/10-np-custom.conf
+echo "net.ipv4.conf.all.send_redirects = 0"
+
+# Disable multicast forwarding.
+echo "net.ipv4.conf.all.mc_forwarding = 0"
 
 # Enable ignoring broadcasts request.
-echo net.ipv4.icmp_echo_ignore_broadcasts = 1  >> /etc/sysctl.d/10-np-custom.conf
+echo "net.ipv4.icmp_echo_ignore_broadcasts = 1"
 
-# Audit
+# Avoid SYN floods at the kernel level.
+# Avoid Denial-of-Service if the system not getting ACKs.
+echo "net.ipv4.tcp_syncookies = 1"
+
+# Enables reverse path filtering
+# Drops packets with source addresses that should not have been able to be received on the interface they were received on.
+# Set 1 for strict and 2 for loose filtering.
+# The kernel verifies that the source address of the packet is reachable via the same interface.
+# Prevents IP spoofing
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Do not accept source routing.
+echo "net.ipv4.conf.all.accept_source_route = 0"
+
+# Restricts the use of ptrace, a debugging tool 
+echo "kernel.yama.ptrace_scope = 1"
+
+# Enable full address space randomization
+echo "kernel.randomize_va_space = 2"
+
+echo "net.ipv4.conf.all.secure_redirects = 0"
+
+# Reboots the node in case of voltage fluctuations, peripheral failures, buggy firmware.
+# To verify the interrupts cat /proc/interrupts | grep NMI
+echo "kernel.unknown_nmi_panic = 1"
+
+# Enabled logging of invalid source addresses
+# Logs suspicious packets
+echo "net.ipv4.conf.all.log_martians = 1"
+echo "net.ipv4.conf.default.log_martians = 1"
+
+# Prevent new modules from loading
+echo "kernel.modules_disabled = 1"
+
+# ===== Audit ===== #
 for file in /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
 do
 	grep send_redirects ${file}
@@ -87,31 +97,27 @@ done
 
 sysctl -a --pattern net.ipv4.conf.all.send_redirects
 
-# Avoid SYN floods at the kernel level.
-echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.d/10-np-custom.conf
+grep -o 'ipv6.disable=[0,1]' /boot/efi/EFI/centos/grubenv
 
-# Audit
 for file in /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
 do
-	grep tcp_syncookies ${file}
+	grep disable_ipv6 "$file"
+done
+
+sysctl -a --pattern disable_ipv6
+
+for file in /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
+do
+	grep tcp_syncookies "$file"
 done
 
 sysctl -a --pattern net.ipv4.tcp_syncookies
 
-# Controls source route verification.
-echo net.ipv4.conf.all.rp_filter = 1  >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv4.conf.default.rp_filter=1
+# ===== Audit ===== #
 
-# Do not accept source routing.
-echo net.ipv4.conf.all.accept_source_route = 1 >> /etc/sysctl.d/10-np-custom.conf
-sysctl -w net.ipv4.conf.all.accept_source_route=1
-
-#
-kernel.yama.ptrace_scope = 1
-kernel.randomize_va_space = 2
-net.ipv4.conf.all.secure_redirects = 0
-kernel.unknown_nmi_panic = 1
-net.ipv4.conf.all.log_martians = 1
+# Refresh the connection.
+# Any temporary settings will be removed such as routes.
+nmcli con up ens33
 
 # Define password policies in the login.defs file.
 
@@ -271,7 +277,6 @@ fuser -n tcp <port> -k
 
 # Keep the system minimal
 systemctl set-default multi-user.target
-
 systemctl isolate multi-user.target
 
 # Disable Ctrl+Alt+Delete
@@ -281,6 +286,10 @@ systemctl mask ctrl-alt-del.target
 # Audit
 systemctl is-enabled ctrl-alt-del.target
 systemctl is-active ctrl-alt-del.target
+
+# To avoid Ctrl-Alt-Del pressed more than 7 times in 2 seconds
+/etc/systemd/system.conf
+CtrlAltDelBurstAction=none
 
 # Remove unwanted SUID and SGID binaries to avoid privilege escalation attack
 # Audit -mount can be used in the place of -xdev
@@ -301,16 +310,14 @@ blacklist cramfs
 blacklist udf
 blacklist squashfs
 
-# Use pam_faillock to protect from brute force.
-authselect select sssd with-faillock
-authselect select sssd with-pwhistory
-authselect select sssd without-nullok
-
 cat > /etc/security/faillock.conf << EOF
 deny=4
 unlock_time=60
 even_deny_root
 EOF
+
+# Use pam_faillock to protect from brute force.
+authselect select sssd with-faillock with-pwhistory without-nullok
 
 # Audit.
 grep -vE '^#|^$' /etc/security/faillock.conf

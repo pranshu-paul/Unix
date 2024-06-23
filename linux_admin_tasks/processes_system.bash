@@ -50,6 +50,9 @@ perf sched report
 # System Activity Report.
 sar
 
+# Prints only running processes.
+while true; do ps aux | awk '$8 ~ "R"'| grep -vE 'ps|awk'; sleep 0.5 ; done
+
 # To provide the environment variables to a command instead of exporting to the shell.
 env a=7 bash -c 'echo $a'
 

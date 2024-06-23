@@ -8,6 +8,12 @@
 # To list available networks can be made in /16 network.
 ipcalc 172.16.0.0/16 -S 20
 
+# To fetch the MAC address of the IP
+ip neigh show 192.168.1.11
+
+# Ping and fetch the MAC of a target from source
+timeout 5 arping -I ens33 -s 192.168.1.11 192.168.1.12
+
 # To list the network cards.
 lshw -class network -short
 lspci | grep network
@@ -25,8 +31,8 @@ ip -4 a | grep inet # -- To get ipv4 address only.
 hostname -I
 
 # To store packets in buffer during the transfer and recive.
-nmcli con mod ens3 ethtool.ring-rx 4096
-nmcli con mod ens3 ethtool.ring-tx 4096
+nmcli con mod ens33 ethtool.ring-rx 8192
+nmcli con mod ens33 ethtool.ring-tx 8192
 
 nmcli con up ens3
 
@@ -53,15 +59,14 @@ getent services | grep -w 443/tcp
 # To get the hardware address.
 ip link show enp0s9 | grep link | awk '{print $2}'
 
-# Free DNS servers by Level 3 Communications.
-# 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4
-
 # To add DNS servers with options
 nmcli con mod ens3 +ipv4.dns "8.8.8.8 4.2.2.2"
 nmcli con mod ens3 +ipv4.dns-options "attempts:1 timeout:1"
 /etc/resolv.conf
-nameserver 8.8.8.8
-nameserver 4.2.2.2
+nameserver 9.9.9.9
+nameserver 208.67.222.222
+# Qaud 9: 9.9.9.9
+# Cisco: 208.67.222.222
 options timeout:1 attempts:2
 # To generate a UUID.
 uuidgen

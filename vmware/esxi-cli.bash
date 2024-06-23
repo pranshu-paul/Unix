@@ -70,3 +70,30 @@ esxcli network firewall get
 
 # Print the uplinks available.
 esxcli network vswitch standard list
+
+# To get the current software profile and license
+esxcli software profile get
+
+# Get the patches andlist them from customerconnect.vmware.com/patch
+
+# To patch the hypervisior
+esxcli software profile update -d https://hostupdate.vmware.com/software/VUM/PRODUCTION/main/vmw-depot-index.xml -p ESXI-8.0.0-20513097-standard
+
+
+# Change NTP and make it persistant on web UI.
+# Host --> Manage --> System --> Time & Date --> Edit NTP Settings --> Use Network Time Protocl (Start and stop with host)
+# Start the service
+
+
+# Set a log host for logging
+esxcli system syslog config set --loghost=<ip>
+
+# Restart the syslog service
+esxcli system syslog reload
+
+
+# Connect the esxi host to a iSCSI target
+# Enableing Software iSCSI create an iSCSI initiator
+# VMKernel adapter is required to communicate with the iSCSI target
+# Storage --> Adapters --> Software iSCSI --> Enabled
+

@@ -1,254 +1,120 @@
-// Source code structure.
-// Compiler compiles codes to machine code.
+// Quick Sort
 
-/*
-Author: Pranshu Paul
-Program: Hello, World!
-Description: This program prints hello, world to the screen!
-*/
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-int main(void)
+void swap(int *x, int *y);
+void quicksort(int array[], int length);
+void quicksort_recursion(int array[], int low, int high);
+int partition(int array[], int low, int high);
+
+int main()
 {
-     printf("Hello, World!\n");
+  // create a test array
+  int a[] = {10,11,23,44,8,15,3,9,12,45,56,45,45};
+  int length = 13;
+  
+  // use quicksort to sort the array
+  quicksort(a, length);
+  
+  // print out the array to ensure it has been sorted
+  for (int i = 0; i < length; i++)
+    printf("%d ", a[i]);
+  printf("\n");
 
-//     int speed = 20;
-//     int time = 7;
-//
-//     int distance = speed * time;
-//
-//     printf("Distance = %d", distance);
-//
-//     int speed, time = 0;
-//
-//     printf("Speed: ");
-//     scanf("%d", &speed);
-//
-//     printf("Time: ");
-//     scanf("%d", &time);
-//
-//     int distance = speed * time;
-//
-//     printf("Distance = %d\n", distance);
-//
-//     float x, y = 0;
-//
-//     printf("x: ");
-//     scanf("%f", &x);
-//
-//     printf("y: ");
-//     scanf("%f", &y);
-//
-//     printf("x * y = %.2f", x * y);
-
-//     char c = 'd';
-//
-//     printf("Enter a character: ");
-//     scanf("%c", &c);
-//
-//     printf("The character entered is: %c\n", c);
-//     printf("The decimal number of the character entered is: %d\n", c);
-
-     double x = 5.2, y = 2.5;
-
-     int a = 9, b = 4;
-
-     double mutl = x * y;
-     double add = x + y;
-     double div = x / y;
-     double sub = x - y;
-     
-     // modulus operator takes only: int, short
-     // no "double"
-     int mod = a % b;
-
-     printf("mult: %.2f\n", mutl);
-     printf("add: %.2f\n", add);
-     printf("div: %.2f\n", div);
-     printf("sub: %.2f\n", sub);
-     printf("mod: %d\n", mod);
-
-//     int grade = 60;
-
-//     printf("Grade: ");
-//     scanf("%d", &grade);
-
-//     if (grade >= 50 )
-//     {
-//          printf("Pass\n");
-//          printf("Congrats!\n");
-//     }
-//     else
-//     {
-//          printf("Fail\n");
-//          printf("Good luck next time!\n");
-//     }
-     
-//     if (grade >= 90) printf("A\n");
-//     else if (grade >= 80) printf("B\n");
-//     else if (grade >= 70) printf("C\n");
-//     else if (grade >= 60) printf("D\n");
-//     else printf("Other\n");
-
-     int height = 10;
-     // printf("height: ");
-     // scanf("%d", &height);
-
-     int weight = 20;
-     // printf("weight :");
-     // scanf("%d", &weight);
-
-     if (height > 150 && weight > 50)
-     {
-          printf("Good to ride!\n");
-     }
-     else
-     {
-          printf("Not good to ride!\n");
-     }
-
-     if (! (height > 150))
-     {
-          printf("Not tall enough!\n");
-     }
-     else
-     {
-          printf("Tall enough!\n");
-     }
-     
-//     int i = 0;
-//     int number = 0;
-//     int total = 0;
-//     int totalNumbers = 0;
-//
-//     printf("How many numbers: ");
-//     scanf("%d", &totalNumbers);
-//
-//     while (i < totalNumbers)
-//     {
-//          printf("Enter number %d: ", i+1);
-//          scanf("%d", &number);
-//
-//          total = total + number;
-//          i = i + 1;
-//     }
-//     printf("total: %d\n", total);
-//     printf("average: %d", total/totalNumbers);
-
-//     int number = 0;
-//     int max = -1;
-//     while (number != -1)
-//     {
-//          printf("Enter a number: ");
-//          scanf("%d", &number);
-//
-//          if (number > max) max = number;
-//     }
-//
-//     printf("max: %d\n", max);
-     
-//     int i = 0;
-//     int number = 0;
-//     do
-//     {
-//          printf("Enter number (>0): ", i);
-//          scanf("%d", &number);
-//          if (number <= 0)
-//               printf("Number must be >0!\n");
-//     }    while (number <= 0);
-     
-     int i = 0;
-
-     for (i = 0; i < 10; i++)
-     {
-          printf("i: %d\n", i);
-     }
-     
-
-     double initial = 0, step = 0, stop = 0;
-
-//     do
-//     {
-//          printf("Initial (m): ");
-//          scanf("%lf", &initial);
-//          if (initial < 0) printf("Must be >=0\n");
-//     } while (initial < 0);
-//
-//     do
-//     {
-//          printf("Step (m): ");
-//          scanf("%lf", &step);
-//          if (step <= 0) printf("Must be >=0\n");
-//     } while (step <= 0);
-//
-//     do
-//     {
-//          printf("Stop (m): ");
-//          scanf("%lf", &stop);
-//          if (stop < 0) printf("Must be >=0\n");
-//     } while (stop < 0);
-     
-     
-//     for (double conv = initial; conv <= stop; conv += step)
-//     {
-//          printf("%f %f \n", conv, conv * 3.28084);
-//     }
-          
-     printf("\n");
-
-     printf("Meters Feet\n");
-     printf("********************\n");
-
-//     for (double conv = initial; conv <= stop; conv += step)
-//     {
-//         printf("%.2f %.2f\n", conv, conv * 3.28084);
-//         printf("%-5.2f %-5.2f\n", conv, conv * 3.28084);
-//
-//     }
-
-     int number = 3;
-     switch (number)
-     {
-          case 0:
-          printf("Case 0!\n");
-          break;
-
-          case 1:
-          printf("Case 1!\n");
-          break;
-
-          case 2:
-          printf("Case 2!\n");
-          break;
-
-          default:
-          printf("Default case!\n");
-     }
-
-     int grade[5] = {92, 85, 72, 73, 95};
-     
-     // we can't add an extra element in an array.
-     // the compilar would give just a warning for this.
-     grade[5] = 100;
-
-     printf("grade[2] = %d\n\n", grade[2]);
-
-     for (int i = 0; i <= 5; i++)
-     {
-          printf("grade[%d] = %d\n", i, grade[i]);
-     }
-     
-// adding the elements of an array.
-     int total = 0;
-     for (int i = 0; i <= 5; i++)
-     {
-          total += grade[i];
-
-         
-     }
-      printf("average %d\n", total / 5);
-
-     return 0;
+  return 0;
 }
 
+// swaps the value of what x is pointing to with the value of what y is 
+// pointing to, used to perform swaps of array elements in quicksort partition
+void swap(int *x, int *y)
+{
+  int temp = *x;
+  *x = *y;
+  *y = temp;
+}
 
+// applies quicksort algorthim to the array with the given length... strictly 
+// speaking this function isn't necessary because we could call 
+// quicksort_recursive directly, but this function makes the 'interface' 
+// prettier in that only the array and length need to be provided!
+void quicksort(int array[], int length)
+{
+  // our quicksort algorithm randomly selects the pivot, so we seed the random 
+  // number generator to ensure the randomization of our random numbers
+  srand(time(NULL));
+  
+  // calls the quicksort recursive algorithm with our array, and a starting 
+  // lower index bound of 0 and high index bound of the final element in the 
+  // array... i.e. apply quicksort to the entire length of the array
+  quicksort_recursion(array, 0, length - 1);
+}
+
+// applies the recursive divide and conquer portion of the quicksort algorithm
+// to the array... applying quicksort to the array between the low-high indexes
+void quicksort_recursion(int array[], int low, int high)
+{
+  // stop recursion when low >= high
+  if (low < high)
+  {
+    // partition the array by a pivot, and return the pivot element's index
+    int pivot_index = partition(array, low, high);
+
+    // apply quicksort to the left side subarray
+    quicksort_recursion(array, low, pivot_index - 1);
+
+    // apply quicksort to the right side subarray
+    quicksort_recursion(array, pivot_index + 1, high);
+  }
+}
+
+// partitions the array between low - high indexes by a pivot value and returns
+// the index of the pivot
+int partition(int array[], int low, int high)
+{
+  // randomly select a pivot value between low-high by randomly selecting an
+  // index in the range low - high... we do this as opposed to just selecting 
+  // the last element each time because it's technically possible that always 
+  // selecting the same pivot will have poor performance if the array happens 
+  // to contain values in a way that is suboptimal
+  int pivot_index = low + (rand() % (high - low));
+  
+  // swap the element at the pivot_index with the element at index high (i.e. 
+  // the last element in this portion of the array), doing so allows us to 
+  // apply the below partitioning algorithm
+  if (pivot_index != high) {
+    swap(&array[pivot_index], &array[high]);
+  }
+  
+  // the pivot value is now whatever is in the high index
+  int pivot_value = array[high];
+  
+  // the partioning algorithm will shift elements that are less than the pivot 
+  // value to the front portion of the low - high array indexes, with i keeping
+  // track of where the elements that are greater than the pivot value begin
+  int i = low; 
+  
+  // increment j from low up until but not including the pivot value at high
+  for (int j = low; j < high; j++)
+  {
+    // if the array value at j is less than the pivot value, perform a swap with
+    // the value at the array at index i... this effectively moves this "less 
+    // than the pivot values" to the front portion, and we increment i to 
+    // reflect where the values that are greater than the pivot now begin
+    if (array[j] <= pivot_value)
+    {
+      swap(&array[i], &array[j]);
+      i++;
+    }
+  }
+  
+  // we now know that the value at index i is greater than or equal to the pivot
+  // so we swap it with the pivot value to complete the partition 
+  swap(&array[i], &array[high]);
+  
+  // index i now contains the pivot value, so return this so that the 
+  // quicksort_recursion function knows where to split the array when applying 
+  // the algorithm to the resulting subarrays
+  return i;
+}

@@ -2,12 +2,17 @@ awk '{$1=""}1' # Eliminates 1st row in output.
 
 ldd $(which sshd) | awk '{$4=""}1' | grep -E '^libp[a-m]+'
 
+# To search the string in a particular column.
+ps aux | awk '$8 ~ "R"'
 
 # Prints the string if matches the input.
 echo manager | awk '/manager/ {print}'
 
 # To remove the column number two.
 nmcli con sh | awk '{ $2=""; print $0 }'
+
+# To remove the first column only.
+awk '{ $1=""; print }'
 
 # To remove specific number of columns.
 nmcli con sh | awk '{$2=$3=$4=""; print $0}'
@@ -57,6 +62,9 @@ awk 'BEGIN{FS=":"; OFS=":"} {print $1,$NF}' /etc/passwd
 
 # To print the last column only.
 nmcli con sh --active | sed '1d' | awk '{print $NF}'
+
+# To print a rnage of last columns.
+nmcli con show --active | sed '1d' | awk '{print $(NF-2), $(NF-1), $NF}'
 
 # To print the second row only.
 nmcli con sh | awk 'NR==2 {print}'

@@ -1,27 +1,27 @@
 #!/bin/bash
 
+# Required Packages: yum-utils, sysstat
+
 log_file=/home/pranshu/out_$(basename $0)_$(date +%d_%b).log
 
 # exec &>> ${log_file}
 
 print_header() {
-    echo -e "\n========================================================================================================================================="
+    echo -e "\n=============================================================================================================================================="
     echo  " 				$1 "
-    echo -e "========================================================================================================================================="
+    echo -e "==============================================================================================================================================\n"
 }
 
-print_header " Date and time when the script is running."
+print_header " Script Start Date and Time "
 date
 
-print_header " Hostname"
+print_header " Hostname "
 hostname
 
-print_header " Server IP Addresses."
-ip -4 -br addr show | grep -w UP
+print_header " Server IP Addresses "
+ip -4 -br addr show | cut -d '/' -f 1 | grep -w UP | awk '{print $1 "\t" $3}'| column -t -N NIC,IP
 
-print_header " Number of cores and CPU percentage"
-echo -e "Number of cores: $(nproc)"
-
+print_header " Total Cores CPU Percentage "
 cpu_usage() {
 first_reading=$(grep -w "^cpu" /proc/stat)
 sleep 1
@@ -44,15 +44,13 @@ total_non_idle=$((total_time - total_idle))
 
 cpu_usage=$(awk "BEGIN {printf \"%.2f\", ($total_non_idle / $total_time) * 100}")
 
-echo "CPU Percentage: $cpu_usage%"
+
+printf "Total Cores: %s, CPU Precentage: %s\n" "$(nproc)" "$cpu_usage%"
 }
 
 cpu_usage
 
-print_header " Memory usage."
-free -hw
-
-printf "\n%s" "Memory percentage: "
+print_header " Memory Swap Percentage "
 total=0
 for (( i=0; i<1; i++ ))
 do
@@ -61,63 +59,88 @@ do
     sleep 1
 done
 
-average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
-printf "%s\n" "$average%"
+mem_average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
 
-printf "%s" "Swap percentage: "
 total=0
 for (( i=0; i<1; i++ ))
 do
+	swap_size=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+	
+	if [ "$swap_size" -eq 0 ]; then
+		swap_average="Not Enabled"
+		break
+	else
+		swap_average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")%
+	fi
+	
     swap_usage=$(free | awk '/Swap/ {printf "%.2f\n", $3/$2 * 100.0}')
     total=$(awk "BEGIN {print $total + $swap_usage}")
     sleep 1
 done
 
-average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
-printf "%s\n" "$average%"
+printf "Memory Percentage: %s, Swap Percentage: %s\n" "$mem_average%" "$swap_average"
 
-print_header " Currently logged in users, uptime, and load average."
-w
+print_header " Server Uptime "
+uptime -p
 
-export PS_FORMAT="ruser,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser,stat,flags,stime,thcount,comm:25"
-print_header " Top CPU consuming processes."
-ps -e --sort=-pcpu | grep -v grep | head
+print_header " Current Logged-on Users "
+who -uH | column -t
 
-print_header " Top Memory consuming processes."
-ps -e --sort=-pmem | grep -v grep | head
+# Process flags.
+# 1 forked but didn't exec
+# 4 used super-user privileges
+# 5 both
+# 0 none
+export PS_FORMAT="ruser,pid,ppid,nice,wchan:25,pmem,pcpu,time:15,euser,state=STATE,flags=FLAGS,stime,thcount,comm:25"
+print_header " Top CPU Consuming Processes"
+ps -e --sort=-pcpu | grep -v grep | head -5
 
-print_header " Any zombie processes."
+print_header " Top Memory Consuming Processes "
+ps -e --sort=-pmem | grep -v grep | head -5
+
+print_header " Zombie Processes "
 ps -e | grep Z | grep -v ps
 
-print_header " Business specific processes."
-ps -e | head -1; ps -e | grep -v ps | grep -E 'ksmppd|bearerbox|sqlbox|gluster|mysqld'
+print_header " Business Specific Processes "
+ps -e | head -1; ps -e | grep -v ps | grep -wE 'ksmppd|bearerbox|sqlbox|gluster?d?f?s?d?|mysqld|redis-server|node|mongod|ora_smon_nexgol|screen'
 
-print_header " Number of open files."
-lsof -n | wc -l
+print_header " Current Open File Descriptors "
+total=0
+for pid in /proc/[0-9]*; do
+    if [ -d "$pid/fd" ]; then
+        count=$(ls -1 "$pid/fd" | wc -l)
+        total=$((total + count))
+    fi
+done
+echo "Hard Limit: $(ulimit -Hn), Current Usage: $total"
 
-print_header " Number of processes."
-ps -eLF | wc -l
+print_header " Current Processes/Threads Count "
+echo "Hard Limit: $(ulimit -Hu), Current Usage: $(ps -eLF | wc -l)"
 
-print_header " I/O utilization."
-vmstat -aw 2 5 | sed '3d'
+print_header " I/O Utilization "
+vmstat -t -w -S M 2 4 -y | sed '1,2d' | column -t -N Run,Block,Swap,FreeMem,BuffMem,CacheMem,SwpIn,SwpOut,BlkIn,BlkOut,Int,CtxSwtch,Usr,Sys,Idle,Wait,Steal,Date,Time
 
-print_header " Today failed logins."
-sudo lastb -wi | grep -vwE 'btmp|^$'
+print_header " Top Process Context Switching  "
+pidstat -w 1 2 | grep -w Average | grep -vE 'grep|tail|pidstat' |sed '1d' | sort -r -k 4n | tail -5 | awk '{ $1=""; print }' | column -t -N UID,PID,cswch/s,nvcswch/s,Command
 
-print_header " Mount points, inodes with their file system and total storage."
+print_header " Block Drive Utilization "
+sar -pd 1 4 | grep -w Average | awk '{ $1=""; print }' | column -t
+
+print_header " Today Failed Logins "
+sudo lastb -s today -wi | grep -vwE 'btmp|^$' | column -t -N User,TTY,From,Day,Mon,Date,TimeIn,_,TimeEnd,Duration
+
+print_header " File System Inodes Usage "
 export FIELD_LIST=source,fstype,itotal,iused,iavail,ipcent,size,used,avail,pcent,target
 df -h --output=$FIELD_LIST --sync --total | grep -vE 'tmpfs|nfs4|fuse.glusterfs'
 
-print_header " Failed units."
-systemctl list-units --state=failed --all --no-pager
-
-print_header " No. of established connection of processes."
+print_header " Established Connection Count By Processes "
 sudo ss -Hntup state established | cut -d '"' -f 2 |  sort | uniq -c | sort -nr | column -t -N EstabCount,Process
 
-print_header " Data packets statistics."
-for nic in $(nmcli con sh --active | sed '1d' | awk '{print $4}'); do
-	ip -stat addr show "$nic"
-done
+print_header " Data Packets Statistics "
+sar -n DEV 1 4 | grep -w Average | awk '{ $1=""; print }' | column -t
 
-print_header " Program-Crash-Report"
-journalctl -r -t systemd-coredump -S today | grep -w systemd-coredump
+print_header " Program Crash Report "
+journalctl -r -t systemd-coredump -S yesterday | grep -w systemd-coredump
+
+print_header " Out Of Memory Killed Procceses "
+journalctl -r -t kernel -S yesterday | grep 'Out of memory'

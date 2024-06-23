@@ -24,6 +24,9 @@ vm.swappiness = 10
 
 chrt -r -p 20 <pid>
 
+# To get the report of control groups
+systemd-cgtop
+
 # Decrease the timeslice allocated to each process (in nanoseconds)
 kernel.sched_min_granularity_ns = 10000000
 
@@ -60,9 +63,50 @@ kernel.numa_balancing = 1
 sysctl kernel.core_pattern
 
 # Analyze the core.
+# If a program crashes.
 find /var/lib/systemd/coredump/ -type f
 
 # To get the details of the core dump.
 journalctl -r -t systemd-coredump
 
 journalctl -r -t systemd-coredump | grep -w systemd-coredump | cat
+
+# Context switching means suspending execution of a process on the CPU and saving its state into the process control block.
+
+# It will go high, if there is high network traffic, or higher disk traffic.
+
+
+# Prints a single snapshot of the context switching.
+# thread group id, thread id, ctx swtch, non-vol ctx swtch
+pidstat -wt 1 4 | grep Average
+
+# Check which cores are being heaviliy used.
+mpstat -P ALL 1 4 | grep -w Average
+
+# Assign the free cores to the process which is causing high ctx swtch.
+taskset -c 0,1
+
+# Check which system call is causing high ctx swtch.
+# -c summary, -f follow-forks -p pid
+# Forks are the child processes.
+sudo timeout 5s strace -c -f -p 1879651
+
+
+# To monitor interface utilization.
+# Monitors the following.
+# Number of packets per second (received/transmitting)
+# Number of compressed packets (received/transmitting)
+# Number of packets in kilobytes per second (received/transmitting)
+# Number of packets received multicast per second.
+sar -n DEV 1 4 | grep -w Average
+
+
+mkdir -p /etc/tuned/custom-performance
+
+vim /etc/tuned/custom-performance
+
+[main]
+summary=This is a custom profile combining balanced and latency-performance for optimized performance.
+include=balanced,latency-performance
+
+tuned-adm profile custom-performance

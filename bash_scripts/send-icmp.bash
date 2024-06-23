@@ -88,7 +88,7 @@ echo -e "$log_entry"
 }
 
 check_hosts() {
-local source_host="$1"
+    local source_host="$1"
 
 	nc -zv -w "$waiting" "$source_host" "$port" &> /dev/null
 	

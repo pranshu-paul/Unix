@@ -1,0 +1,86 @@
+# Enable SSH on vmware
+# vCenter to have been deployed
+
+---
+- name: Deploy a VM on ESXi from scratch
+  hosts: esxi
+  gather_facts: no
+
+  tasks:
+    - name: Create a virtual machine on given ESXi hostname
+      community.vmware.vmware_guest:
+        hostname: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        folder: /vmfs/volumes/datastore1
+        name: test_vm_0001
+        state: poweredon
+        guest_id: centos64Guest
+        esxi_hostname: esxi
+        disk:
+          - size_gb: 10
+            type: thin
+            datastore: datastore1
+        hardware:
+          memory_mb: 2048
+          num_cpus: 4
+          scsi: paravirtual
+        networks:
+          - name: VM Network
+            mac: aa:bb:dd:aa:00:14
+            ip: 10.10.10.100
+            netmask: 255.255.255.0
+            device_type: vmxnet3
+			
+		validate_certs: false
+        wait_for_ip_address: true
+        wait_for_ip_address_timeout: 600
+      delegate_to: localhost
+      register: deploy_vm
+
+
+
+######
+
+
+ansible 
+
+---
+- hosts: localhost 
+  gather_facts: false
+  connection: local 
+  vars:
+    vcenter_server: "sr4-vc01.ppc2.local"
+    vcenter_user: "administrator@ppc2.local"
+    vcenter_pass: "P@ssw0rd"
+    datacenter_name: "Datacenter"
+    cluster_name: "Cluster01"
+  tasks:
+  - name: Clone the template
+    vmware_guest:
+      hostname: "{{ vcenter_server }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: False
+      name: zabbix_testing05 
+      template: zabbixserver_template 
+      datacenter: "{{ datacenter_name }}"
+      folder: '/{{ datacenter_name }}/vm/Zabbix Cluster'
+      cluster: "{{ cluster_name }}"
+      datastore: "vsanDatastore"
+      networks:
+      - name: VM Network
+        ip: 10.1.1.22
+        netmask: 255.255.255.0
+        gateway: 10.1.1.2
+        type: static
+        dns_servers: 10.1.1.2
+      customization:
+        hostname: "web02"
+        dns_servers:
+        - 10.1.1.2
+        - 1.1.1.1
+      state: poweredon
+      wait_for_ip_address: yes
+    delegate_to: localhost
+    

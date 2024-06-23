@@ -65,9 +65,6 @@ pidstat -w -p <pid>
 # detailed CPU usage summary for a command.
 /usr/bin/time -v ls
 
-# Setting processor affinity for a running process or launching a process with specified affinity.
-taskset
-
 # The below directives set the Out Of Memory behavior in the systemd unit files.
 OOMScoreAdjust=
 
@@ -190,6 +187,7 @@ fs.aio-max-nr = 1048576
 
 # Purpose: Configures ptrace scope:
 # Usage: Set to 1 to restrict ptrace to child processes only for security purposes, enhancing system security.
+# This parameter order precendence matters.
 kernel.yama.ptrace_scope = 1
 
 # Purpose: Enables Address Space Layout Randomization (ASLR) for security:

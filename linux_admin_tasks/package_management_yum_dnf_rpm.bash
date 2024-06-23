@@ -78,8 +78,20 @@ dnf provides <command_name>
 
 dnf history
 
+# Use the history command to get the history_id
+dnf history info <history_id>
+
 # To apply critical updates only.
 dnf upgrade --sec-severity=Critical
+
+# To list the CVEs
+dnf updateinfo info --sec-severity=Critical
+
+# To mitigate CVEs
+dnf check-update --cve CVE-2024-2961
+
+# To review the bug changelogs
+dnf check-update --cve CVE-2024-2961 --changelogs
 
 # To download a package and its dependencies in the current folder.
 dnf download <package_name> --resolve

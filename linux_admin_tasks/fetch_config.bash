@@ -10,7 +10,7 @@ print_header() {
 
 log_file=/tmp/out_$(basename $0)_$(date +%d_%b).log
 
-exec &>> ${log_file}
+# exec &>> ${log_file}
 
 # Date and time when the script is running.
 print_header "Date and time when the script is running."

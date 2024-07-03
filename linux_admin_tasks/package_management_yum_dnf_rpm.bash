@@ -95,6 +95,7 @@ dnf check-update --cve CVE-2024-2961 --changelogs
 
 # To download a package and its dependencies in the current folder.
 dnf download <package_name> --resolve
+dnf download <package_name> --resolve --downloaddir /var/www/repos/ol-88/np-custom/Packages
 
 # Extracting a package.
 rpm2cpio <package_name> | cpio -idmv

@@ -425,3 +425,13 @@ ps aux | awk '{if (NR>1) print "cpu_usage{command=\""$11"\", pid=\""$2"\"}"}'
 # Grant permission to the user (for resources like ec2, lambda)
 # Create an access key for the user of Grafana
 
+# Set email config in grafana.ini
+# Restart the grafana
+# Ansible also allows for email integration
+
+# Alerting in Grafana
+# Create contact points
+
+
+# Granfana uses sqlite to store suer credentials and all the data
+# Copy the grafana.db to backup: /var/lib/grafana

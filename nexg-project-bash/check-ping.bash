@@ -1,9 +1,8 @@
 #!/bin/bash
 
-source ./functions
-source ./constants
+source /home/pranshu/scripts/functions
+source /home/pranshu/scripts/constants
 
-# SSH connection details
 user=pranshu
 waiting=2
 port=22
@@ -14,23 +13,23 @@ declare -a source_hosts=(
 )
 
 declare -a target_hosts=(
+"172.19.8.158"
+"172.19.8.161"
 "172.19.8.166"
 "172.19.8.167"
 )
 
-# ICMP parameters
 size=4
 count=1
 timeout=3
 interval=1
 
-# Global directives
 available_hosts=/tmp/$(basename $0)_icmp_available_hosts_$$
 log_dir=/home/$(whoami)/scripts/logs
 log_file="${log_dir}/$(basename $0)_$(date +%d_%b_%H%M%S).log"
 service_stat_loc=/home/$(whoami)/scripts/locks
 
-#exec &>> "$log_file"
+exec &> >(tee -a "$log_file")
 
 mkdir -pv "$(dirname $log_file)"
 
@@ -124,17 +123,24 @@ exit_code="$?"
 return "$?"
 }
 
+check_icmp_hosts() {
+local host="$1"
+local -n target="$2"
+
+for trgt in "${target[@]}"; do
+	send_icmp "$host" "$trgt" &
+done
+
+wait
+}
+
 check_icmp() {
 local -n source="$1"
-local -n target="$2"
-local -a pids=( )
-local -a exit_codes=( )
+local -n int_target="$2"
 local i=0
 
     for source_host in "${source[@]}"; do
-        for target_host in "${target[@]}"; do
-                send_icmp "$source_host" "$target_host" &
-        done
+        check_icmp_hosts "$source_host" int_target &
     done
 
 wait
@@ -149,8 +155,6 @@ process_hosts source_hosts target_hosts
 process_hosts target_hosts source_hosts
 
 get_execution_time
-
-find "${log_dir}" -name "$(basename $0)_*.log" -mtime +2 -type f -ls -delete
 }
 
 main

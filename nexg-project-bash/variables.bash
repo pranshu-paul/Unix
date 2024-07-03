@@ -12,7 +12,7 @@ declare -a bear_sql=(
 "172.19.8.167"
 )
 
-declare -A srv01=( 
+declare -A srv01=(
 ["ksmppd"]=2777
 )
 
@@ -24,11 +24,26 @@ declare -A srv02=(
 ["bearerbox"]=13001
 )
 
-declare -A srv03=( 
+declare -A srv03=(
 ["sqlbox"]=13002
 )
 
-estab_count_limit=100
+declare -a redis=(
+"172.19.8.158"
+)
 
+declare -A srv04=(
+["redis-server"]=6370
+)
+
+declare -a mysql=(
+"172.19.8.161"
+)
+
+declare -A srv05=(
+["mysqld"]=3306
+)
+
+estab_count_limit=50
 log_dir=/home/pranshu/scripts/logs
 service_stat_loc=/home/pranshu/scripts/locks

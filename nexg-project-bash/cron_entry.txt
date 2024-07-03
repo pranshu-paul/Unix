@@ -1,0 +1,4 @@
+*/10 * * * * /home/pranshu/scripts/check-ping
+*/5 * * * * /home/pranshu/scripts/check-service
+* * * * * /home/pranshu/scripts/sms-count
+@daily find /home/pranshu/scripts/logs -maxdepth 1 -name "*.log" -mtime +1 -type f -ls -delete

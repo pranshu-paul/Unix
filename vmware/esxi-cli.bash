@@ -15,6 +15,8 @@ esxcli storage filesystem list
 
 vim-cmd vmsvc/createdummyvm clivm /vmfs/volumes/datastore1
 
+df -h
+
 # ESXi top
 esxtop
 
@@ -61,6 +63,7 @@ esxcli hardware memory get
 # Print the CPU info.
 esxcli hardware cpu global get
 
+esxcli network vm list
 
 # Print the users list.
 esxcli system account list

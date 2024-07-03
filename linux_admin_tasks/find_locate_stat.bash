@@ -112,3 +112,9 @@ find /usr -type f -newer start_date ! -newer end_date -exec ls -l {} \;
  
 # Remove temporary files
 rm start_date end_date
+
+
+# To truncate a file in AIX
+find <path> -name reports.log -size +1610612736c -type f -ls
+
+find <path> -name reports.log -size +1610612736c -type f -ls -exec sh -c 'echo -n "" > "{}"' \;

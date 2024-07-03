@@ -33,7 +33,7 @@ func handler(ctx context.Context, val *data) (string, error) {
 		return fmt.Sprintln("Could not load the configuration."), err
 	}
 
-	// Pass the struct as an argument and return a pointer to an ec2 client
+	// Pass the struct as an argument and return a pointer to the ec2 client
 	ec2_client := ec2.NewFromConfig(cfg)
 	input := &ec2.DescribeInstancesInput{InstanceIds: val.InstanceId}
 

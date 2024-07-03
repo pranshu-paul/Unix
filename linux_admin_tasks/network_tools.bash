@@ -41,7 +41,9 @@ ipcalc 172.16.0.0/16 -S 20
 tcpdump -i eth0 ip
 
 # ICMP
-ping
+ping -n google.com
+
+# Use Ctrl-'\' to send the break signals like in Ctrl-Break in windows
 
 # My traceroute
 mtr

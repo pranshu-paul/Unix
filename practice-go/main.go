@@ -1,59 +1,73 @@
-// Quick Sort
-
 package main
 
-import "fmt"
+// Descriptions: Sends EC2 instance public IPs to slack channels
+// Date: 26-Jun-2024
+// State: Working
 
-func QuickSorter(elements []int, below int, upper int) {
-	if below < upper {
-		var part int
-		part = divideParts(elements, below, upper)
-		QuickSorter(elements, below, part-1)
-		QuickSorter(elements, part+1, upper)
-	}
+import (
+	"context"
+	"fmt"
+	"sync"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/slack-go/slack"
+)
+
+type data struct {
+	InstanceId []string `json:"instanceId"`
+	ChannelIDs []string `json:"channelIds"`
+	Token      string   `json:"token"`
 }
 
-func divideParts(elements []int, below int, upper int) int {
-	var center int
-	center = elements[upper]
-	var i int
-	i = below
-	var j int
-	for j = below; j < upper; j++ {
-		if elements[j] <= center {
-			swap(&elements[i], &elements[j])
-			i += 1
+func handler(ctx context.Context, val *data) (string, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	ec2_client := ec2.NewFromConfig(cfg)
+	input := &ec2.DescribeInstancesInput{InstanceIds: val.InstanceId}
+
+	result, _ := ec2_client.DescribeInstances(ctx, input)
+
+	var ip []string
+	for _, reservation := range result.Reservations {
+		for _, instance := range reservation.Instances {
+			ip = append(ip, *instance.PublicIpAddress)
 		}
 	}
 
-	swap(&elements[i], &elements[upper])
+	client := slack.New(val.Token)
 
-	return i
-}
+	message := fmt.Sprintf("osTicket instance public IP: %s", ip)
 
-func swap(element1 *int, element2 *int) {
-	var val int
-	val = *element1
-	*element1 = *element2
-	*element2 = val
+	var wg sync.WaitGroup
+	wg.Add(len(val.ChannelIDs))
+
+	for _, channelID := range val.ChannelIDs {
+		go func(channelID string) {
+			defer wg.Done()
+
+			_, _, err := client.PostMessage(
+				channelID,
+				slack.MsgOptionText(message, false),
+			)
+
+			if err != nil {
+				fmt.Printf("Failed to sent on channel %s: %v", channelID, err)
+				return
+			}
+
+			fmt.Printf("Sent to channel %s\n", channelID)
+		}(channelID)
+	}
+
+	wg.Wait()
+	return fmt.Sprintf("Sent public ip: %s to the channels: %s", ip, val.ChannelIDs), nil
 }
 
 func main() {
-	var num int
-
-	fmt.Print("Enter Number of Elements: ")
-	fmt.Scan(&num)
-
-	var array = make([]int, num)
-
-	var i int
-
-	for i = 0; i < num; i++ {
-		fmt.Print("array[", i, "]: ")
-		fmt.Scan(&array[i])
-	}
-
-	fmt.Println("Elements: ", array, "\n")
-	QuickSorter(array, 0, num-1)
-	fmt.Print("Sorted Elements: ", array, "\n")
+	lambda.Start(handler)
 }

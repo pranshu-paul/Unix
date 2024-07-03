@@ -65,9 +65,11 @@ nmcli con mod ens3 +ipv4.dns-options "attempts:1 timeout:1"
 /etc/resolv.conf
 nameserver 9.9.9.9
 nameserver 208.67.222.222
+nameserver 1.1.1.1
+nameserver 1.0.0.1
+options timeout:1 attempts:2
 # Qaud 9: 9.9.9.9
 # Cisco: 208.67.222.222
-options timeout:1 attempts:2
 # To generate a UUID.
 uuidgen
 

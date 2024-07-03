@@ -7,6 +7,14 @@ ls -l
 
 ls -ltr --time-style=full-iso
 
+# US style
+export TIME_STYLE='+%b %d, %Y %H:%M:%S'
+ls -ltr --time-style='+%b %d, %Y %H:%M:%S'
+
+# Indian style
+export TIME_STYLE='+%d-%b-%Y %H:%M:%S'
+ls -ltr --time-style='+%d-%b-%Y %H:%M:%S'
+
 # Dereference the symbolic link and prints the physical path.
 ls -lL
 
@@ -177,6 +185,9 @@ chattr +i <file/directory>
 
 # To truncae a file.
 truncate --size 0 <file>
+
+# Another example to truncate a file
+find <path> -name reports.log -size +1610612736c -type f -ls -exec sh -c 'echo -n "" > "{}"' \;
 
 # To create version controlled backups.
 # Values available for the variable "VERSION_CONTROL".

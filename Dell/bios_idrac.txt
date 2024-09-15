@@ -1,0 +1,32 @@
+# To query current applied BIOS settings
+Get-CimInstance -Namespace root\dcim\sysman\biosattributes -ClassName EnumerationAttribute | Select-Object -Property DisplayName,AttributeName,CurrentValue,DefaultValue,PossibleValue
+
+# Use cctk to chnage BIOS settings in windows or linux based systems.
+cd 'C:\Program Files (x86)\Dell\Command Configure\X86_64'
+
+# Client Configuration Toolkit
+cctk --RestoreBIOSSettings=FactoryDefault
+
+
+
+
+# Open Manage Ansible modules automate
+Configuration of components
+Deployment of operating Systems
+Update Firmware from repository
+
+
+# A server configuration profiles contains the following
+BIOS
+iDRAC
+Lifecycle Controller
+Network
+Storage
+
+
+# Download the openmanage ansible modules for iDRAC
+ansible-galaxy collection install dellemc.openmanage
+
+# To upgrade the collection
+ansible-galaxy collection install dellemc.openmanage --upgrade
+

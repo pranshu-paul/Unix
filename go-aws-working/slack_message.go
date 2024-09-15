@@ -1,4 +1,4 @@
-package main
+	package main
 
 // Descriptions: Sends EC2 instance public IPs to slack channels
 // Date: 26-Jun-2024

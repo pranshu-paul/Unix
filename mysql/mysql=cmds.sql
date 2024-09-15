@@ -19,7 +19,8 @@ use <db_name>;
 create user 'user'@'localhost' identifued by 'password123';
 
 -- A public user.
-create user 'user'@'%' identifued by 'password123';
+-- innodb_force_recovery=0 should be set to zero
+create user 'user'@'%' identified by 'password123';
 
 alter user 'user'@'localhost' identified by 'password456';
 
@@ -33,7 +34,7 @@ drop user 'user'@'localhost'
 grant all privileges on <database>.* to 'user'@'%';
 
 -- Granting privileges on all databases.
-grant all privileges on *.* to 'user'@'%';
+grant all privileges on *.* to 'root'@'%';
 
 -- Grant specific privilege on a specific table in a database.
 grant select, insert, delete on employee.department to 'user'@'%';

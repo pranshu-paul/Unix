@@ -67,5 +67,6 @@ show tables;
 
 
 # To restore the hr.sql
+# When restoring from actual backup
 create database hr;
 mysql -u root –p hr < hr.sql

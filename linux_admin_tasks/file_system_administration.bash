@@ -1,5 +1,67 @@
 # File system administration
 
+# To check a file system's integrity during cloning
+find . -type  f -exec md5sum {} \; | awk '{print $1}' | md5sum
+
+# Cloning a disk at the block level
+dd if=/dev/mapper/vg01-u01 of=/dev/mapper/vg01-u02 bs=32M status=progress
+
+# Repair the file system by removing its logs
+xfs_repair -L /dev/mapper/vg01-u02
+
+# Generate a new UUID
+xfs_admin -U generate /dev/mapper/vg01-u02
+
+# Verify 
+blkid /dev/mapper/vg01-u02
+
+mount /dev/mapper/vg01-u02 /u02
+
+# To copy an exting xfs file system to another mount point
+xfsdump -b 32768 -J - /u01 | xfsrestore -b 32768 -J - /u02
+
+# To check (dry-run) file system
+xfs_repair -n /dev/mapper/vg01-u02
+
+# Steps to clone two mount points
+lvremove /dev/vg01/u01
+
+lvrename /dev/vg01/u02 u01
+
+# Print the UUID
+blkid
+
+# Update the UUID
+vim /etc/fstab
+
+# If the there is any problem if anything goes wrong.
+xfs_repair -L /dev/mapper/vg01-u01
+
+# Refresh the systemd configuration
+# If not done, old UUID will still be used.
+systemctl dameon-reload
+
+# Mount it
+mount -v /dev/mapper/vg01-u01
+
+
+# To append a file to another using dd
+dd if=input_file of=existing_file conv=notrunc oflag=append
+
+# TO change case of the files
+dd if=input_file of=output_file conv=lcase
+dd if=input_file of=output_file conv=ucase
+
+# Minimum file system mount point overview
+/boot 1G
+/boot/efi 600M
+/home 5G
+/var 10G
+/tmp 10G
+/ 20G
+swap 12G
+
+
 # Print the current working directory.
 
 # Long listing of the current directory.
@@ -225,6 +287,12 @@ mount -o uid=<uid>,gid=<gid> path/to/device_file path/to/target_director
 
 # To print the PIDs of the processes on the mount point when unable to unmount.
 fuser -mu /mnt
+
+# To remount the /dev/shm
+mount -o remount,rw,inode64  tmpfs /dev/shm
+
+# Verify the change
+mount | grep /dev/shm
 
 # Kill the process with associated with the mount point.
 fuser -ck /mnt

@@ -1,0 +1,57 @@
+#version=OL8
+# Use graphical install
+graphical
+
+repo --name="AppStream" --baseurl=file:///run/install/sources/mount-0000-cdrom/AppStream
+
+%packages
+@^server-product-environment
+kexec-tools
+
+%end
+
+# Keyboard layouts
+keyboard --xlayouts='us'
+# System language
+lang en_US.UTF-8
+
+# Network information
+network  --bootproto=static --device=ens34 --gateway=172.19.8.140 --ip=172.19.8.182 --netmask=255.255.255.0 --noipv6 --activate
+network  --hostname=npksmpptest02
+
+# Use CDROM installation media
+cdrom
+
+# Run the Setup Agent on first boot
+firstboot --enable
+
+ignoredisk --only-use=sda
+# Partition clearing information
+clearpart --none --initlabel
+# Disk partitioning information
+part /boot --fstype="xfs" --ondisk=sda --size=1024
+part pv.336 --fstype="lvmpv" --ondisk=sda --size=64520
+part /boot/efi --fstype="efi" --ondisk=sda --size=1024 --fsoptions="umask=0077,shortname=winnt"
+volgroup vg00 --pesize=4096 pv.336
+logvol /tmp --fstype="xfs" --size=10240 --name=tmp --vgname=vg00
+logvol /var --fstype="xfs" --size=10240 --name=var --vgname=vg00
+logvol / --fstype="xfs" --size=25600 --name=root --vgname=vg00
+logvol /home --fstype="xfs" --size=10240 --name=home --vgname=vg00
+logvol swap --fstype="swap" --size=8192 --name=swap --vgname=vg00
+
+# System timezone
+timezone Asia/Kolkata --isUtc --ntpservers=172.19.8.225
+
+# Root password
+rootpw --iscrypted $6$a7IdckZWiTRtX.UP$zVMMjKpnda8OzNBLiP59ffbq2MLXlzBO00W3rBJ30GwIQYp/VUOFnhmOV9cvZPehaSjmRGrd8aqyfg9goiedZ.
+user --groups=wheel --name=pranshu --password=$6$mnfo0b88sDOgFXgP$gKv0otpjKvofXD84RS9u8gjZHmzO6Xe4ZvtlU2.pG0tO58AG5WFy/MU7Dg0RBmJCqdYxz37a/6TjeJTjWdBja1 --iscrypted
+
+%addon com_redhat_kdump --enable --reserve-mb='auto'
+
+%end
+
+%anaconda
+pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
+pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+%end

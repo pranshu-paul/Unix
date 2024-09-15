@@ -8,6 +8,15 @@
 # To list available networks can be made in /16 network.
 ipcalc 172.16.0.0/16 -S 20
 
+# To generate QR code of the current network
+nmcli dev wifi show-password
+
+# 
+ss -Hntup state established | awk -F : '{print $1 " " $2}' | awk '{print $4 " <----- " $6}' | sort -n -k 1 | uniq -c | column -t -N EstabCount,LocalIP,_,RemoteIP
+
+# To create a new connection when a new device is connected
+nmcli con add type ethernet con-name ens37 ifname ens37 ipv4.method manual ipv4.addresses 172.16.1.3/24 ipv6.method disabled connection.autoconnect yes ipv4.never-default yes
+
 # To fetch the MAC address of the IP
 ip neigh show 192.168.1.11
 
@@ -62,6 +71,9 @@ ip link show enp0s9 | grep link | awk '{print $2}'
 # To add DNS servers with options
 nmcli con mod ens3 +ipv4.dns "8.8.8.8 4.2.2.2"
 nmcli con mod ens3 +ipv4.dns-options "attempts:1 timeout:1"
+
+# Using a third party name server can change the source IP of your DNS query
+
 /etc/resolv.conf
 nameserver 9.9.9.9
 nameserver 208.67.222.222

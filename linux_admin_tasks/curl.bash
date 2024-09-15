@@ -56,3 +56,11 @@ curl "https://postman-echo.com/get?param1=value1&param2=value2"
 curl -w "%{http_code}" -X GET https://postman-echo.com/get
 
 curl -X POST --header 'Content-Type: application/form-data'  https://postman-echo.com/post -d "My first POST request."
+
+
+# To pass arguments of a URL as a get request in the curl command
+curl -L -G \
+-o rhel-9.4-x86_64-dvd.iso \
+--data-urlencode "user=794c66651ad3cfa1ea8521b0fe4e86cc" \
+--data-urlencode "_auth_=1720297465_56ff033d26e52376fea259daffd24d87" \
+https://access.cdn.redhat.com/content/origin/files/sha256/39/398561d7b66f1a4bf23664f4aa8f2cfbb3641aa2f01a320068e86bd1fc0e9076/rhel-9.4-x86_64-dvd.iso

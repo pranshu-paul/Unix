@@ -74,6 +74,12 @@ esxcli network firewall get
 # Print the uplinks available.
 esxcli network vswitch standard list
 
+# To ping the entire TCP/Stack
+vmkping -D
+
+# Ping a vmkernel
+vmkping 192.168.1.13
+
 # To get the current software profile and license
 esxcli software profile get
 

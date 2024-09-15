@@ -15,3 +15,6 @@ subscription-manager register --auto-attach --force
 
 # To check subscription id.
 subscription-manager identity
+
+# To registser the system
+rhc connect --username paulpranshu@gmail.com

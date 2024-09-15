@@ -1,4 +1,4 @@
-# Storage Administration
+ # Storage Administration
 
 # Synchronizes all pending I/O operations.
 sync
@@ -27,6 +27,36 @@ stat -c '%n %t:%T' /dev/sda1 /dev/sda2 /dev/sda3
 # For the devices name starting with "sd"
 dmesg | grep -e SCSI | grep sd
 journalctl -k | grep SCSI | grep sd
+
+# To split a volume group and create a new volume group from the underlying physical volume
+# This will a volume group and keep the extent size to new volume group
+vgsplit vg01 vg02 /dev/sdc1
+
+# To create a cole of OS
+# Copy the OS disk
+dd if=/dev/sda of=/dev/sde bs=32M conv=noerror,sync status=progress
+
+# COpy the swap disk or other disk
+dd if=/dev/sdc of=/dev/sdf bs=32M conv=noerror,sync status=progress
+
+###########################################################################################
+# To extend too partition on LVM
+# Add storage
+# Create a parition
+fdisk /dev/sda
+
+partprobe -s
+
+pvcreate /dev/sda4
+
+vgextend <existing_volume_group>
+
+lvextend --size +5G <root_volume_group>
+
+xfs_growfs /
+
+###########################################################################################
+
 
 # Lists the block drives with their file systems.
 lsblk -f
@@ -68,6 +98,7 @@ mount -av
 # "<name>.mount" name must be equal to "Where" of the unit file.
 
 systemctl edit mnt.mount --full --force
+env EDITOR=vim systemctl edit mnt.mount --full --force
 
 # Or
 
@@ -227,6 +258,7 @@ lvdisplay
 # To extend a logical volume. [-L|--size]
 lvextend --size +1G /dev/<vg_group_name>/<logical_volume>
 lvextend --size +900M /dev/vg-00/my_vol
+lvresize --resizefs --size +15GB /dev/VG00/var
 
 # Extend the existing XFS file system.
 xfs_growfs /mnt
@@ -245,6 +277,8 @@ lvrename /dev/<vg_group_name>/<logical_volume_old_name> /dev/<vg_group_name/<log
 # To get UUID.
 blkid
 
+# To increate the swap size
+lvextend --size +12G  /dev/ol_oel8/swap
 
 ###########################
 # Creating a SWAP partition.

@@ -30,6 +30,9 @@ sftp <user_name>@<ip_address>
 # To connect a remote system for data transfer with different port.
 sftp -P <port> <user_name>@<ip_address>
 
+# Sftp through a jump host
+sftp -o "ProxyJump pranshu@152.67.29.35:2169" -P 2224 root@127.0.0.1
+
 # To login into a specific path.
 sftp <user_name>@<ip_address>:/path/to/directory
 

@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Check the highest SMS count of the day
+# On DB node: sar -pd | grep app01 | sort -n -k 11 | tail -1
 # grep -r 'Sent SMS Count' | sort -n -k 13 | tail -2
+# Process level: pidstat -d -p 3593049 1 # Required root prvileges
+
 source /home/pranshu/scripts/functions
 
 declare -a hosts=(

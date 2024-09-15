@@ -1,4 +1,5 @@
 # Creating a basic SMTP server for sending and recieving emails.
+# Use Oauth for modern authentication methods
 
 # Port 25 must be unblocked.
 # Attachments are usually sent in base64.

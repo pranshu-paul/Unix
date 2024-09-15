@@ -62,7 +62,7 @@ done
 mem_average=$(awk "BEGIN {printf \"%.2f\", $total / 5}")
 
 total=0
-for (( i=0; i<1; i++ ))
+for (( i=0; i<5; i++ ))
 do
 	swap_size=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
 	

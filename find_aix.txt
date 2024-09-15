@@ -1,0 +1,419 @@
+
+find Command
+
+Purpose
+
+       Finds files with a matching expression.
+
+Syntax
+
+       find [-H | -L] Path ... [Expression]
+
+Description
+
+       The find command recursively searches the directory tree for each specified Path parameter, seeking files that match a Boolean expression. The
+       Boolean expression is written by using the terms that are provided in the following text. When the find command is recursively descending directory
+       structures, it does not descend into directories that are symbolically linked into the current hierarchy. The output from the find command depends
+       on the terms that are specified by the Expression parameter.
+
+       The find command does not support the 4.3 BSD fast-find syntax.
+
+Flags
+
+       Item
+            Description
+       -H
+            Causes the file information and file type that are evaluated for each symbolic link that is encountered on the command line to be those of the
+            file that is referenced by the link, and not the link itself. If the referenced file does not exist, the file information and type are for the
+            link itself. File information for all symbolic links not on the command line is that of the link itself.
+       -L
+            Causes the file information and file type that are evaluated for each symbolic link to be those of the file that is referenced by the link, and
+            not the link itself.
+
+Expression Terms
+
+       These Boolean expressions and variables describe the search boundaries of the find command as defined in the Path and Expression parameters.
+
+       Note: In the following definitions, the n variable specifies a decimal integer that can be expressed as +n (more than n), -n (less than n), or n
+       (exactly n) and the Number variable specifies a decimal integer that can be expressed as +Number (more than Number), -Number (less than Number), or
+       Number (Number-1 to Number).
+       Item
+            Description
+       \(Expression\)
+            Evaluates to the value True if the expression in parentheses is true.
+       -amin n
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 60 seconds (with any remainder discarded),
+                   is n.
+              -n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 60 seconds (with any remainder discarded),
+                   is less than n.
+              +n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 60 seconds (with any remainder discarded),
+                   is greater than n (in case of UNIX03, greater than n+1).
+            For example, -amin 2 is true if the file is accessed within 1 to 2 minutes.
+
+            Note: Files that are accessed after the find command start time are not taken into account. However, when the find command is used within the
+            unary NOT operator for non-UNIX03 behavior, the files that are modified after the command start time are displayed until the value of n.
+       -atime n
+
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is n.
+              -n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is less than n.
+              +n
+                   Evaluates as True if the file access time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is greater than n (in case of UNIX03, greater than n+1).
+            Note: The definition of -atime is changed to comply with the Single UNIX Specification, Version 3. The previous behavior of -atime evaluated as
+            True if the file was accessed in n-1 to n multiples of 24 hours. By default, find -atime works like it did before UNIX03. The UNIX03 behavior
+            can be obtained by setting the environment variables XPG_SUS_ENV to ON and XPG_UNIX98 to OFF.
+
+            The previous behavior for this option can be obtained by setting the XPG_UNIX98 variable to ON.
+
+            Files that are accessed after the find command start time is not taken into account. However, when the find command is used within the unary
+            NOT operator for non-UNIX03 behavior, the files that are modified after the command start time are displayed until the value of n.
+       -cmin n
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 60 seconds (with any
+                   remainder discarded), is n.
+              -n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 60 seconds (with any
+                   remainder discarded), is less than n.
+              +n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 60 seconds (with any
+                   remainder discarded), is greater than n (in case of UNIX03, greater than n+1).
+            Note: Files with i-nodes that are modified after the find command start time are not taken into account. However, when the find command is used
+            within the unary NOT operator for non-UNIX03 behavior, files with i-nodes modified after the command start time are displayed until the value
+            of n.
+       -cpio Device
+            Writes the current file to the specified device in the cpio command format.
+       -ctime n
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 86400 seconds (with any
+                   remainder discarded), is n.
+              -n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 86400 seconds (with any
+                   remainder discarded), is less than n.
+              +n
+                   Evaluates as True if the file i-node modification time subtracted from the initialization time, divided by 86400 seconds (with any
+                   remainder discarded), is greater than n (in case of UNIX03, greater than n+1).
+            Note: The definition of -ctime is changed to comply with the Single UNIX Specification, Version 3. The previous behavior of -ctime evaluated as
+            True if the file was accessed in n-1 to n multiples of 24 hours. By default, find -ctime works like it did before UNIX03. The UNIX03 behavior
+            can be obtained by setting the environment variables XPG_SUS_ENV to ON and XPG_UNIX98 to OFF.
+
+            The previous behavior for this option can be obtained by setting the XPG_UNIX98 variable to ON.
+
+            Files with i-nodes modified after the find command start time is not taken into account. However, when the find command is used within the
+            unary NOT operator for non-UNIX03 behavior, files with i-nodes modified after the command start time is displayed until the value of n.
+       -depth
+            Always evaluates to the value True. Causes the descent of the directory hierarchy to be done so that all entries in a directory are affected
+            before the directory itself is affected. It can be useful when the find command is used with the cpio command to transfer files that are
+            contained in directories without write permission.
+       -ea
+
+            Evaluates to the value True if file has either access control information (ACL) or Extended attributes (EA) set.
+       -exec Command
+            Evaluates to the value True if the specified command runs and returns a 0 value as exit status. The end of the specified command must be
+            punctuated by a semicolon in quotation marks, an escaped semicolon, or a plus sign. An argument that contains the two characters {} (braces)
+            must be followed by a plus sign that punctuates the end of the specified command. A command parameter {} (braces) is replaced by the current
+            path name.
+       -follow
+            Causes symbolic and hard links to be followed.
+       -fstype Type
+            Evaluates to the value True if the file system to which the file belongs is of the specified type. The Type variable has a value of jfs
+            (journaled file system), nfs (network file system), jfs2 (enhanced journaled file system), procfs (proc file system), or namefs (name file
+            system).
+       -group Group
+            Evaluates to the value True if the file belongs to the specified group. If the value of the Group variable is numeric and does not appear in
+            the /etc/group file, it is interpreted as a group ID.
+       -inum n
+            Evaluates to the value True if file has an i-node matching the value of the n variable.
+       -links n
+            Evaluates to the value True if the file has the specified number of links. See the ln command for a description of links.
+       -iregex regular_expression
+            Evaluates to the value True if the entire path name of the file matches the regular expression. This option is similar to the -regex option,
+            except that the match is case-insensitive.
+       -long
+            Prints all available characters of each user/group name instead of truncating to the first 8 when used in combination with -ls.
+       -ls
+            Always evaluates to the value True. Causes the current path name to be printed together with its associated statistics. These statistics
+            include the following values:
+              *    I-node number
+              *    Size in KB (1024 bytes)
+              *    Protection mode
+              *    Number of hard links
+              *    User
+              *    Group
+              *    Size in bytes
+              *    Modification time
+            If the file is a special file, the size field contains the major and minor device numbers. If the file is a symbolic link, the path name of the
+            linked-to file is printed preceded by the -> (hyphen, greater than) symbols. Formatting is similar to that of the ls -filds command, however
+            formatting is done internally without running the ls command. Therefore, differences in output with the ls command might exist, such as with
+            the protection mode.
+       -mmin n
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 60 seconds (with any remainder
+                   discarded), is n.
+              -n
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 60 seconds (with any remainder
+                   discarded), is less than n.
+              +n
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 60 seconds (with any remainder
+                   discarded), is greater than n (in case of UNIX03, greater than n+1).
+            Note: Files that are modified after the find command start time are not taken into account. However, when the find command is used within the
+            unary NOT operator for non-UNIX03 behavior, the files that are modified after the command start time are displayed until the value of n.
+       -mtime n
+            The value of n can be one of the following values:
+              n
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is n. 86400 seconds is 24 hours.
+              -n
+
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is less than n.
+              +n
+                   Evaluates as True if the file modification time subtracted from the initialization time, divided by 86400 seconds (with any remainder
+                   discarded), is greater than n (in case of UNIX03, greater than n+1).
+            Note: The definition of -mtime is changed to comply with the Single UNIX Specification, Version 3. The previous behavior of -mtime evaluated as
+            True if the file is modified in n-1 to n multiples of 24 hours. By default, find -mtime works like it did before UNIX03. The UNIX03 behavior
+            can be obtained by setting the environment variables XPG_SUS_ENV to ON and XPG_UNIX98 to OFF.
+
+            The previous behavior for this option can be obtained by setting the XPG_UNIX98 variable to ON.
+
+            Files that are modified after the find command start time are not taken into account. However, when the find command is used within the unary
+            NOT operator for non-UNIX03 behavior, the files modified after the command start time are displayed until the value of n.
+       -name File
+            Evaluates to the value True if the value of the File variable matches the file name. The typical shell file name generation characters (see the
+            sh command) can be used. The pattern must be enclosed in either quotation marks or the escape characters. The escape character is used when the
+            find command is used from the shell. A backslash (\) is used as an escape character within the pattern. You can use wildcard (pattern-matching)
+            characters, provided they are in quotation marks. For more information about using wildcard characters, see Pattern matching with wildcards and
+            metacharacters in Operating system and device management.
+
+            In an expression such as [a-z], the hyphen means through according to the current collating sequence. A collating sequence might define
+            equivalence classes for use in character ranges. For more information about collating sequences and equivalence classes, see "National Language
+            Support Overview" in the National Language Support Guide and Reference.
+       -newer  File
+            Evaluates to the value True if the current file is modified more recently than the file indicated by the File variable.
+       -nogroup
+            Evaluates to the value True if the file belongs to a group not in the /etc/group database.
+       -nouser
+            Evaluates to the value True if the file belongs to a user not in the /etc/passwd database.
+       -ok Command
+            The same as the -exec expression, except that the find command verifies whether it must start the specified command. An affirmative response
+            starts the command. The end of the specified command must be punctuated by a semicolon that is enclosed in quotation marks or the \;
+            (backslash-escape semicolon).
+       -perm [-] OctalNumber
+            Evaluates to the value True if the permission code of the file exactly matches the OctalNumber parameter. For details about file permissions,
+            refer to the chmod command. If the optional - (hyphen) is present, this expression evaluates to the value true if at least these permissions
+            are set. The OctalNumber parameter can be up to 9 octal digits.
+
+            Note: For files that are a part of TCB environment, additional security bits are added to the permission of the files. These files have the
+            S_ITCB bit set and the security bit set is defined as 0x010000000. Therefore, the octal permissions value of a TCB enabled file must include
+            the bit setting of 100000000 along with its other permission bits.
+
+            Example: To list a file, which is a part of the TCB environment, find -perm 100000600 -print. It lists the names of the files that have only
+            owner-read and owner-write permission and are a part of the TCB environment. See the chmod command for an explanation of permission codes.
+       -perm [-] Mode
+            The mode argument is used to represent file mode bits. It is identical in format to the <symbolicmode> operand described in chmod, and is
+            interpreted as follows:
+
+            Initially, a template is assumed with all file mode bits cleared. Op (-) symbols have the following function:
+              +
+                   Sets the appropriate mode bits in the template
+              -
+                   Clears the appropriate bits
+              =
+                   Sets the appropriate mode bits, without regard to the contents of the process' file mode creation mask
+            The op symbol - cannot be the first character of mode. It avoids ambiguity with the optional leading hyphen. Because the initial mode is all
+            bits off, there are no symbolic modes that must use - as the first character.
+
+            If the hyphen is omitted, the primary evaluates as True when the file permission bits exactly match the value of the resulting template.
+
+            Otherwise, if mode is prefixed by a hyphen, the primary evaluates as True if at least all bits in the resulting template are set in the file
+            permission bits.
+
+            The Mode parameter is identical to the chmod command syntax. This expression evaluates to the value True if the file has exactly these
+            permissions. If the optional - (hyphen) is present, this expression evaluates to the value True if at least these permissions are set.
+       -print
+            Always evaluates to the value True. Displays the current path name. The find command assumes a -print expression, unless the -exec, - ls, or
+            -ok expressions are present.
+       -prune
+            Always evaluates to the value True. Stops the descent of the current path name if it is a directory. If the -depth flag is specified, the
+            -prune flag is ignored.
+       -size n
+            Evaluates to the value True if the file is the specified n of blocks long (512 bytes per block). The file size is rounded up to the nearest
+            block for comparison.
+       -regex regular_expression
+            Evaluates to the value True if the entire path name of the file matches the regular expression. This option does not search for the regular
+            expression but matches the regular expression with the complete path name of the file. For example, to match a file named ./test, you can use
+            the regular expression .*test.* or .*t.*t, but not t.*t.
+       -regextype Type
+            Always evaluates to the value True. This option specifies the type of regular expression syntax for the -regex and -iregex options. It also
+            affects regular expressions that occur later in the command line.
+
+            The Type variable can have one of the following values:
+              Basic
+                   For basic regular expression syntax.
+              Extended
+                   For extended regular expression syntax.
+            Note: If the -regextype option is not used, the regular expressions are interpreted as basic.
+       -size nc
+            Evaluates to the value True if the file is exactly the specified n of bytes long. Adding c to the end of the n variable indicates that the size
+            of the file is measured in individual bytes not blocks.
+       -type Type
+            Evaluates to the value True if the Type variable specifies one of the following values:
+              b
+                   Block special file
+              c
+                   Character special file
+              d
+                   Directory
+              f
+                   Plain file
+              l
+                   Symbolic link
+              p
+                   FIFO (a named pipe)
+              s
+                   Socket
+       -user User
+            Evaluates to the value True if the file belongs to the specified user. If the value of the User variable is numeric and does not appear as a
+            login name in the /etc/passwd file, it is interpreted as a user ID.
+       -xdev
+            Always evaluates to the value True. Prevents the find command from traversing a file system different from the one specified by the Path
+            parameter.
+
+       These expressions can be combined by using the following operators in the order of decreasing precedence:
+       1    ( Expression ) - A parenthetic group of expressions and operators (parentheses are special to the shell and require the backslash-escape
+            sequence).
+       2    ! Expression - The negation of an expression ('!' is the unary NOT operator).
+
+       3    Expression [ -a ] Expression - Concatenation of expressions (the AND operation is implied by the juxtaposition of two primaries or might be
+            explicitly stated as -a).
+       4    Expression -o Expression - Alternation of primaries; -o is the OR operator. The second expression is not evaluated if the first expression is
+            true.
+
+            Note: When you use the find and cpio commands together, you must use the -follow option and the -L option with the cpio command. Not using
+            these two options together produces undesirable results. If expression is not present, -print as used in the default expression. For example,
+            if the specified expression does not contain any of the primaries -exec, -ok, or -print, the expression is replaced by (given_expression)
+            -print. The -user, -group, and -newer primaries each evaluate their respective arguments only once. Using a command that is specified by -exec
+            or -ok does not affect subsequent primaries on the same file.
+
+Exit Status
+
+       This command returns the following exit values:
+       Item
+            Description
+       0
+            All Path parameters were traversed successfully.
+       >0
+            An error occurred.
+
+Examples
+       1    To list all files in the file system with a specified base file name, type:
+
+            find /  -name .profile -print
+            This command searches the entire file system and writes the complete path names of all files named .profile. The / (slash) instructs the find
+            command to search the root directory and all of its subdirectories. In order not to waste time, it is best to limit the search by specifying
+            the directories where you think the files might be.
+       2    To list files that have a specific permission code in the current directory tree, type:
+
+            find . -perm 0600  -print
+            This command lists the names of the files that have only owner-read and owner-write permission. The . (dot) instructs the find command to
+            search the current directory and its subdirectories. See the chmod command for an explanation of permission codes.
+       3    To search several directories for files with certain permission codes, type:
+
+            find manual clients proposals -perm -0600  -print
+            This command lists the names of the files that have owner-read and owner-write permissions and possibly other permissions. The manual, clients,
+            and proposals directories and their subdirectories are searched. In the previous example, -perm 0600 selects only files with permission codes
+            that match 0600 exactly. In this example, -perm -0600 selects files with permission codes that allow the accesses that are indicated by 0600
+            and other accesses above the 0600 level. It also matches the permission codes 0622 and 0744.
+       4    To list all files in the current directory that are changed during the current 24-hour period, type:
+
+            find .  -ctime 1  -print
+       5    To search for regular files with multiple links, type:
+
+            find .  -type f  -links +1  -print
+            This command lists the names of the ordinary files (-type f) that have more than one link (-links +1).
+
+            Note: Every directory has at least two links: the entry in its parent directory and its own . (dot) entry. The ln command explains multiple
+            file links.
+       6    To find all accessible files whose path name contains find, type:
+
+            find .  -name '*find*' -print
+       7    To remove all files named a.out or *.o that are not accessed for a week and that are not mounted by using nfs, type:
+
+            find / \( -name a.out -o -name '*.o' \) -atime +7 ! -fstype nfs -exec rm {} \;
+
+            Note: The number that is used within the -atime expression is +7. It is the correct entry if you want the command to act on files that are not
+            accessed for more than a week (seven 24-hour periods).
+
+       8    To print the path names of all files in or below the current directory, except the directories named SCCS or files in the SCCS directories,
+            type:
+
+            find .  -name SCCS  -prune -o -print
+            To print the path names of all files in or below the current directory, including the names of SCCS directories, type:
+
+            find . -print -name SCCS -prune
+       9    To search for all files that are exactly 414 bytes long, type:
+
+            find . -size 414c -print
+       10   To find and remove every file in your home directory with the .c suffix, type:
+
+            find /u/arnold -name "*.c" -exec rm {} \;
+            Every time the find command identifies a file with the .c suffix, the rm command deletes that file. The rm command is the only parameter that
+            is specified for the -exec expression. The {} (braces) represent the current path name.
+       11   In this example, dirlink is a symbolic link to the directory dir. To list the files in dir by referring to the symbolic link dirlink on the
+            command line, type:
+
+            find -H dirlink -print
+       12   In this example, dirlink is a symbolic link to the directory dir. To list the files in dirlink, traversing the file hierarchy under dir
+            including any symbolic links, type:
+
+            find -L dirlink -print
+       13   To determine whether the file dir1 referred by the symbolic link dirlink is newer than dir2, type:
+
+            find -H dirlink -newer dir2
+
+            Note: Because the -H flag is used, time data is collected not from dirlink but instead from dir1, which is found by traversing the symbolic
+            link.
+       14   To produce a listing of files in the current directory in ls format with expanded user and group name, type:
+
+            find . -ls -long
+       15   To list the files with ACL/EA set in current directory, type:
+
+            find . -ea
+       16   To list the files that are modified within 60 minutes, type:
+
+            find . -mmin -60
+       17   To find all path names in the /home directory that contain a pattern afile in the path name, type the following command:
+
+            find /home -regextype basic -regex ".*afile.*"
+       18   To find all path names in the /home directory that contain a pattern afile or cap in the path name, type the following command:
+
+            find /home -regextype extended -regex ".*afile.*|.*cap.*"
+       19   To find all path names in the /home directory that contain a pattern afile, AFILE, cap, or CAp in the path name, type the following command:
+
+            find /home -regextype extended -iregex ".*afile.*|.*cap.*"
+
+Files
+
+       Item
+            Description
+       /usr/bin/find
+            Contains the find command.
+       /bin/find
+            Symbolic link to the find command.
+       /etc/group
+            Contains a list of all known groups.
+
+       /etc/passwd
+            Contains a list of all known users.
+

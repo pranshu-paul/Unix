@@ -10,10 +10,16 @@ nmcli connection modify <connection_name> +ipv4.routes "0.0.0.0/0 10.0.2.2 100"
 # Both are same.
 
 ip route add <destination>/<cidr> via <gateway> dev <device_that_can_reach_gateway> src <source_ip_on_the_device> metric <metric>
+ip route add 10.0.2.12 from 10.0.3.13 via 192.168.1.3
+ip route add <target_ip> from <source_nic_ip> via <pingable_ip_of_the_other_machine>
 
 ip route add default via 10.0.0.43 src 10.0.0.108 dev ens3 proto static metric 50
 ip route add default via 172.19.8.140 src 172.19.8.0 dev ens3 metric 103
 ip route add 0.0.0.0/0 via 10.0.0.43 src 10.0.0.108 dev ens3 metric 50
+
+# To add between two nodes
+ip route add <target_network>/<cidr> via <pingable_ip> dev ens36
+ip route add 172.16.2.0/25 via 172.16.1.3 dev ens36
 
 # To delete the default route.
 ip route del default

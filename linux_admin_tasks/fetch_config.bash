@@ -26,7 +26,7 @@ ip -4 -br addr show | cut -d '/' -f 1 | grep -w UP | awk '{print $1 "\t" $3}'| c
 
 # Number of CPU(s), Socket(s), and Core(s) per socket.
 print_header "Number of CPU(s), Socket(s), and Core(s) per socket."
-lscpu | grep -E '^CPU\(s\)|Socket|Core\(s\)'
+lscpu | grep -wE '^CPU\(s\)|Socket\(s\)|Core\(s\)|Thread\(s\)'
 
 # Total and free memory available.
 print_header "Free memory available."
@@ -44,6 +44,7 @@ last reboot -n 5
 print_header "Last failed logins"
 sudo lastb -n 10
 
+print_header "Failed Daemons"
 systemctl list-units --state=failed --all --no-pager
 
 # Hosts table.
@@ -105,6 +106,10 @@ done
 print_header "File system with inodes."
 export FIELD_LIST=source,fstype,itotal,iused,iavail,ipcent,size,used,avail,pcent,file,target
 df -h --output=$FIELD_LIST --total
+
+# Any NFS exports
+print_header " NFS Exports "
+cat /etc/exports
 
 # Print the physical volumes.
 print_header "Physical volumes"

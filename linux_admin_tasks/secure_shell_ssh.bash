@@ -4,7 +4,8 @@
 # /etc/ssh/sshd_config, /etc/ssh/sshrc, ~/.ssh/rc, ~/.hushlogin, /etc/motd, ~/.authorized_keys
 
 # TO CREATE AUTHORIZED_KEYS FILE.
-mkdir -v ~/.ssh; chmod -v 700 ~/.ssh; touch ~/.ssh/authorized_keys; chmod -v 600 ~/.ssh/authorized_keys
+mkdir -pv ~/.ssh; chmod -v 700 ~/.ssh; touch ~/.ssh/authorized_keys; chmod -v 600 ~/.ssh/authorized_keys
+install -dv ~/.ssh -m 700; touch ~/.ssh/authorized_keys; chmod -v 600 ~/.ssh/authorized_keys
 
 # TO CHECK LOGS OF SSHD.
 journalctl -f -t sshd
@@ -126,6 +127,8 @@ ssh -o ProxyCommand="ncat --proxy-type socks5 --proxy 127.0.0.1:1080 %h %p" <use
 
 # To jump from a host when the other host is not available publicly.
 ssh -J paul@168.138.114.133:2169 pranshu@10.0.0.108 -p 2169
+
+sftp -o "ProxyJump pranshu@152.67.29.35:2169" -P 2224 root@127.0.0.1
 
 ################# Sample /etc/ssh/sshd_config hardening ################
 mkdir /etc/ssh/sshd_config.d

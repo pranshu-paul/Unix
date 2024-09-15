@@ -21,6 +21,13 @@ export TZ=UTC
 
 unset TZ
 
+# Format: yyyymmdd
+target_date=20230201
+
+formatted_date=$(date -d "$target_date" +"%Y_%m_%d")
+
+echo "$formatted_date"
+
 # To get the date of a file.
 date +%d%m%Y -r <file_name>
 
@@ -74,6 +81,7 @@ chronyc tracking
 # And do not add the "allow" line in the client.
 # 0.in.pool.ntp.org :Indian NTP server
 # 139.59.15.185 Digital Ocean India NTP server
+# ntp.nic.in timeserver
 server 192.168.100.6
 
 # To check the connected clients.

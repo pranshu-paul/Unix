@@ -1,5 +1,7 @@
 Creating a DNS server.
 
+# Use PowerDNS for a modern DNS server.
+
 # We can add multiple server entries in the zone files.
 
 # Download the packages.

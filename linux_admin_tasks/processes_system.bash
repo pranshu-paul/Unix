@@ -27,6 +27,9 @@ sudo dmidecode -t processor | head -30
 
 dmidecode -t bios
 
+# Prints the command line arguments during the boot
+cat /proc/cmdline
+
 # To get a summary about the inter process.
 ipcs --human -u
 

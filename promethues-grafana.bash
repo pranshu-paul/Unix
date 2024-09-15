@@ -44,7 +44,7 @@ scrape_configs:
 	
 "
 
-# Libraries
+# Copy the libraries Libraries
 cp -pvr console_libraries/ /etc/prometheus/console_libraries
 cp -pvr consoles/ /etc/prometheus/consoles
 
@@ -161,7 +161,7 @@ tar -zxpvf node_exporter-0.18.1.linux-amd64.tar.gz && cd node_exporter-0.18.1.li
 # Copy the binary
 install -v -m 755 -o node_exporter -g node_exporter node_exporter /usr/local/bin
 
-# Create systemd unit file
+# Create a systemd unit file
 vi /etc/systemd/system/node_exporter.service
 
 : "

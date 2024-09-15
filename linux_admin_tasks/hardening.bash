@@ -38,9 +38,9 @@ echo "kernel.core_uses_pid = 1"
 # Disable IPv6.
 # default: disable the new interfaces.
 # all: disable all the interfaces.
-echo "net.ipv6.conf.all.disable_ipv6 = 1"
-echo "net.ipv6.conf.default.disable_ipv6 = 1"
-echo "net.ipv6.conf.lo.disable_ipv6 = 1"
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
 
 # Disable IP forwarding.
 echo "net.ipv4.ip_forward = 0"

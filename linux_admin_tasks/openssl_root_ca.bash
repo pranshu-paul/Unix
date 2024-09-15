@@ -29,7 +29,7 @@ openssl req -new -sha256 -subj "/CN=paulpranshu.ddns.net" -key server-key.pem -o
 
 # Generate a self-signed certifcate.
 # "subjectAltName=DNS:paulpranshu.xyz,IP:144.24.111.213"
-openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem -extfile <(printf "subjectAltName=IP:192.168.1.12") -CAcreateserial
+openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem -extfile <(printf "subjectAltName=IP:192.168.1.13") -CAcreateserial
 
 # Verify the certifcate.
 openssl verify -CAfile root-ca-cert.pem -verbose server.pem

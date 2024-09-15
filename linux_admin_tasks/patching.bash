@@ -1,3 +1,27 @@
+# Live Patching rhel 
+
+dnf install kpatch
+
+# Start and enable the kpatch service
+systemctl enable --now kpatch.service
+
+
+
+# Update the kernel and its dependencies
+dnf update kernel
+
+
+# Install the kpatch kernel module
+dnf install kpatch-patch-5_14_0-427_13_1.x86_64
+
+# Verify the update the patch
+kpatch list
+
+
+# Verify the version.
+cat /etc/system-release
+
+
 # Linux patching CVE common vulnerabilities and exposures
 
 # Prevents from cyber attacks and emerging threats

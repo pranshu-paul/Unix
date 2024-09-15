@@ -9,7 +9,9 @@ bzip2 -d com.oracle.elsa-ol8.xml.bz2
 
 oscap oval eval –-results /tmp/result.xml --report /tmp/result-report.html /root/com.oracle.elsa-ol8.xml
 
+oscap-ssh joesec@machine1 22 oval eval --report remote-vulnerability.html rhel-8.oval.xml
 
+oscap oval eval --report vulnerability.html rhel-8.oval.xml
 #####
 
 # To conduct a incorrect and unsecure settings on the server

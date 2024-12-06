@@ -48,3 +48,6 @@ git reset --hard HEAD~1
 
 # To check the git log
 git log
+
+# To delete a branch
+git branch -d <branch_name>

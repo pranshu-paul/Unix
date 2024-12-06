@@ -144,3 +144,9 @@ journalctl -r -t systemd-coredump -S yesterday | grep -w systemd-coredump
 
 print_header " Out Of Memory Killed Procceses "
 journalctl -r -t kernel -S yesterday | grep 'Out of memory'
+
+print_header " Exceptions "
+journalctl -r -k -o short -n 15 --no-pager
+
+print_header " Exceptions DMESG"
+dmesg --decode -e | grep -E ':warn|:crit|:err|segfault'

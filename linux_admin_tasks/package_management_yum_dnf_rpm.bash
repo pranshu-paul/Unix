@@ -76,6 +76,9 @@ dnf grouplist <package_name>
 
 dnf provides <command_name>
 
+# To list the contents inside a rpm
+dnf repoquery -l openvpn-auth-ldap
+
 dnf history
 
 # Use the history command to get the history_id
@@ -88,7 +91,10 @@ dnf upgrade --sec-severity=Critical
 dnf updateinfo info --sec-severity=Critical
 
 # To mitigate CVEs
-dnf check-update --cve CVE-2024-2961
+dnf check-update --cve CVE-2024-38538
+
+# TO apply by the edvisior ID ELSA
+dnf check-update --advisory ELSA-2024-5101
 
 # To review the bug changelogs
 dnf check-update --cve CVE-2024-2961 --changelogs

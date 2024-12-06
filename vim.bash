@@ -58,3 +58,22 @@ set bg=dark
 
 # To unhighlight.
 noh
+
+# Set file format to unix.
+# This command converts the file from windows to unix.
+:set ff=unix
+:wq
+
+
+# To check a file's format.
+:set ff?
+
+# To remove carriage returns.
+sed -i 's/\r$//' filename
+
+
+# This command converts the Windows carriage return line feed file format to Unix line feed only.
+dos2unix
+
+# Truncate a log file.
+/dev/null >| my_logfile.log

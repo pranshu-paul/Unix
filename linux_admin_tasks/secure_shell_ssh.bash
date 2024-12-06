@@ -182,6 +182,25 @@ Host *
 	Ciphers aes256-ctr
 	PasswordAuthentication no
 
+
+Host 159.89.174.206
+        HostName 159.89.174.206
+        User root
+        ForwardAgent yes
+
+Host 192.168.1.94
+        HostName 192.168.1.94
+        User oracle
+
+Host *
+        StrictHostKeyChecking no
+        ServerAliveInterval 300
+        ServerAliveCountMax 2
+
+Host 172.19.8.151
+        Port 22
+        Ciphers aes256-gcm@openssh.com	
+
 ##########################################################################################################
 ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys

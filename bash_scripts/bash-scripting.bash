@@ -145,6 +145,8 @@ cat < my_pipe
 cat <(ls -l)
 nl <(ping -c4 google.com)
 
+# Here - is same as stdout
+pdftotext file.pdf - | grep "search_term"
 
 #####
 
@@ -268,6 +270,23 @@ select variable in option1 option2 ... optionN; do
     esac
 done
 
+# Open a file descriptor.
+exec 3> /tmp/src_hosts
+
+# Close a file descriptor.
+exec 3>&-
+
+# Open again for capturing data.
+exec 3< /tmp/src_hosts
+
+# Pass the data to make an array.
+readarray -t src_hosts <&3
+
+# Lists the current open file descriptors.
+ls -la /proc/$$/fd
+
+# To empty a file descriptor.
+: > /proc/self/fd/3
 
 # Define a function
 # A function can also be difned like "function <function_name> () { <command> }
@@ -345,3 +364,130 @@ main
 # ~/.bashrc The individual per-interactive-shell startup file
 # ~/.bash_logout The individual login shell cleanup file, executed when a login shell exits
 # ~/.inputrc Individual readline initialization file (Maps keys with a command for a user)
+
+# Green
+echo -e "\e[38mgreen\e[0m"
+
+# Blue
+echo -e "\e[34mblue\e[0m"
+
+# Red
+echo -e "\e[31mred\e[0m"
+
+# Other options with echo
+echo -e "\e[5mThis is blinking text\e[0m"
+
+echo -e "\e[1mThis is bold text\e[0m"
+
+echo -e "\e[7mThis is inverse video text\e[0m"
+
+echo -e "\e[1m\e[4mThis is bold and underlined text\e[0m"
+
+echo -e "\e[4mThis is underlined text\e[0m"
+
+echo -e "\e[9mThis is strikethrough text\e[0m"
+
+
+#####
+
+# Executes the commands and shell characters inside a variable
+eval
+
+pipe='|'
+
+eval ps -ef $pipe wc -l
+
+nc=netcat
+
+eval $nc
+
+#####
+
+# To add directories in a stack
+pushd <path>
+pushd $PWD
+pushd $OLDPWD
+
+# To remove directories from the stack.
+popd
+popd <dir>
+
+# To list the directory index.
+dirs -v
+
+# To change to a particular directory by its index.
+cd ~<index_num>
+
+#####
+#!/bin/bash
+declare -A matrix
+num_rows=4
+num_columns=5
+
+for ((i=1;i<=num_rows;i++)) do
+    for ((j=1;j<=num_columns;j++)) do
+        matrix[$i,$j]=$RANDOM
+    done
+done
+
+f1="%$((${#num_rows}+1))s"
+f2=" %9s"
+
+printf "$f1" ''
+for ((i=1;i<=num_rows;i++)) do
+    printf "$f2" $i
+done
+echo
+
+for ((j=1;j<=num_columns;j++)) do
+    printf "$f1" $j
+    for ((i=1;i<=num_rows;i++)) do
+        printf "$f2" ${matrix[$i,$j]}
+    done
+    echo
+done
+
+#####
+
+# Recursive sum
+sum() {
+    if (( $1 == 1 )); then
+        echo 1
+        return
+    fi
+    local minusOne=$(( $1 - 1 ))
+    echo $(( $1 + $(sum $minusOne) ))
+}
+
+# Fork bomb
+:(){ :|:& };:
+
+# To prevent a fork bomb
+ulimit -u 30
+
+# To set a user level hard limit.
+/etc/security/limits.d/pranshu.conf
+pranshu hard nproc 30
+
+# Factorial
+factorial() {
+	
+	if [ $1 -gt 1 ]; then
+		echo $(( $1 * $(factorial $(( $1 -1 ))) ))
+	else
+		echo 1
+	fi
+	
+}
+
+divide () {
+  local x=$1
+  local y=$2
+  local value=${3:-2}  # Use default value 2 if $3 is empty
+
+  local precision="$((20 - value))"
+
+  local output="$(bc -l <<< $x/$y)"
+
+  echo "$x/$y = ${output::-$precision}"
+}

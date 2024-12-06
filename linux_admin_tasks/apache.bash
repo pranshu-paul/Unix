@@ -14,12 +14,12 @@ sed -n '45p' /etc/httpd/conf/httpd.conf
 openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout server.key -out server.crt -subj "/CN=*.example.com"
 
 # Move the files created earlier in their respective directories.
-mv httpd.crt /etc/pki/tls/certs/
-mv httpd.key /etc/pki/tls/private/
+mv server.crt /etc/pki/tls/certs
+mv server.key /etc/pki/tls/private
 
 # Change the SElinux context for the below files.
-restorecon -Rrv /etc/pki/tls/certs/httpd.crt
-restorecon -Rrv /etc/pki/tls/private/httpd.key
+restorecon -Rrv /etc/pki/tls/certs/server.crt
+restorecon -Rrv /etc/pki/tls/private/server.key
 
 echo "$(hostname -I | awk '{print $1}') niteshkumar.org" >> /etc/hosts
 
@@ -41,8 +41,8 @@ Listen 443
 		CustomLog /var/log/httpd/niteshkumar_access.log combined
 		ErrorLog /var/log/httpd/niteshkumar_error.log
 		SSLEngine on
-		SSLCertificateFile /etc/pki/tls/certs/httpd.crt
-		SSLCertificateKeyFile /etc/pki/tls/private/httpd.key
+		SSLCertificateFile /etc/pki/tls/certs/server.crt
+		SSLCertificateKeyFile /etc/pki/tls/private/server.key
 	<Directory /var/www/niteshkumar.org>
 			Options Indexes FollowSymLinks
 			Allowoverride none

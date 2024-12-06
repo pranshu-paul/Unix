@@ -8,9 +8,9 @@ print_header() {
     echo -e "==============================================================================================================================================\n"
 }
 
-log_file=/tmp/out_$(basename $0)_$(date +%d_%b).log
+log_file=/tmp/out_$(basename $0)_$(hostname)_$(date +%d_%b).log
 
-# exec &>> ${log_file}
+exec &>> ${log_file}
 
 # Date and time when the script is running.
 print_header "Date and time when the script is running."
@@ -236,13 +236,11 @@ print_header "Any third party softwares installed."
 ls /opt
 
 # Check if the system needs restarting
-print_header " Reboot Required "
-if rpm --quiet -q yum-utils; then
-	needs-restarting -r
-fi
+print_header " Packages Reboot Required "
+dnf needs-restarting -r
 
-print_header " Services Require Restart "
-if rpm --quiet -q yum-utils; then
-	sudo needs-restarting -s
-fi
+print_header " Exceptions "
+journalctl -r -k -o short -n 15 --no-pager
 
+print_header " DMESG "
+dmesg --decode -e | grep -E ':warn|:crit|:err|segfault'

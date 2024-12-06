@@ -1,19 +1,15 @@
 # BASH divide functions.
 
 divide () {
-local x=$1
-local y=$2
-local value=$3
+  local x=$1
+  local y=$2
+  local value=${3:-2}  # Use default value 2 if $3 is empty
 
-if [[ -z "$value" ]]; then
-	local value=2
-fi
+  local precision="$((20 - value))"
 
-local precision="$((20-$value))"
+  local output="$(bc -l <<< $x/$y)"
 
-local output="$(bc -l <<< $x/$y)"
-
-echo $x/$y = "${output::-$precision}"
+  echo "$x/$y = ${output::-$precision}"
 }
 
 

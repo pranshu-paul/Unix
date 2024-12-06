@@ -15,7 +15,7 @@
 grep TMOUT /etc/profile /etc/bashrc /etc/profile.d/*
 
 # Set the session timeout.
-echo 'readonly TMOUT=3600; export TMOUT' > /etc/profile.d/tmout.sh
+echo 'readonly TMOUT=600; export TMOUT' > /etc/profile.d/tmout.sh
 
 # Set a local terminal warning before the users login.
 echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue
@@ -43,20 +43,20 @@ net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
 
 # Disable IP forwarding.
-echo "net.ipv4.ip_forward = 0"
+net.ipv4.ip_forward = 0
 
 # Disable packet forwards.
-echo "net.ipv4.conf.all.send_redirects = 0"
+net.ipv4.conf.all.send_redirects = 0
 
 # Disable multicast forwarding.
-echo "net.ipv4.conf.all.mc_forwarding = 0"
+net.ipv4.conf.all.mc_forwarding = 0
 
 # Enable ignoring broadcasts request.
-echo "net.ipv4.icmp_echo_ignore_broadcasts = 1"
+net.ipv4.icmp_echo_ignore_broadcasts = 1
 
 # Avoid SYN floods at the kernel level.
 # Avoid Denial-of-Service if the system not getting ACKs.
-echo "net.ipv4.tcp_syncookies = 1"
+net.ipv4.tcp_syncookies = 1
 
 # Enables reverse path filtering
 # Drops packets with source addresses that should not have been able to be received on the interface they were received on.
@@ -222,7 +222,7 @@ grep -vE '^#|^$' /etc/security/pwhistory.conf
 # maxsequence = 3
 cat > /etc/security/pwquality.conf.d/pwquality.conf << EOF
 enforce_for_root
-minlen = 9
+minlen = 12
 dcredit = -1
 ucredit = -1
 lcredit = -1
@@ -312,13 +312,14 @@ blacklist squashfs
 
 cat > /etc/security/faillock.conf << EOF
 deny=4
-unlock_time=60
+unlock_time=600
 even_deny_root
 EOF
 
 # Use pam_faillock to protect from brute force.
 authselect select sssd with-faillock with-pwhistory without-nullok
-
+faillock --user <user>
+faillock --user <user> --reset
 # Audit.
 grep -vE '^#|^$' /etc/security/faillock.conf
 
@@ -357,7 +358,7 @@ readonly HISTSIZE=2000
 readonly HISTFILESIZE=3000
 readonly HISTTIMEFORMAT="%Y-%m-%d %T "
 readonly PROMPT_COMMAND='history -a'
-readonly HISTFILE="/var/log/bash_history/$(who am i | awk '{print $1}')_as_$(whoami)_history"
+readonly HISTFILE="/var/log/bash_history/$(logname)_as_$(whoami)_history"
 export HISTFILE HISTSIZE HISTFILESIZE PROMPT_COMMAND
 
 sudo mkdir /var/log/bash_history

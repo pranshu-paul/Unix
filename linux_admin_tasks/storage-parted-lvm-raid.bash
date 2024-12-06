@@ -265,7 +265,7 @@ xfs_growfs /mnt
 
 # To resize a logical volume. [-L|--size]
 # Resize the file system first (xfs_growfs)
-lvresize --size -1G /dev/<vg_group_name>/<logical_volume>
+lvresize --resizefs --size +1G /dev/<vg_group_name>/<logical_volume>
 
 # To remove a logical volume.
 # First unmount the file system.

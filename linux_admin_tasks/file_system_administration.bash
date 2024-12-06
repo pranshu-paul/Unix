@@ -44,6 +44,7 @@ systemctl dameon-reload
 # Mount it
 mount -v /dev/mapper/vg01-u01
 
+sudo edquota --user username		 # Sets limits on soft and hard links and inodes on a user.
 
 # To append a file to another using dd
 dd if=input_file of=existing_file conv=notrunc oflag=append

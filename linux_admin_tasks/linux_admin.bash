@@ -1,6 +1,9 @@
 # Adminstration Commands Summary #
 
-# =================================================================================== Specfic of el7 and el8 ============================================================ #
+# =================================================================================== GNU Linux ============================================================ #
+
+pwd         # Prints the working directory.
+pwd -P      # Prints the physical path
 
 ls -ltrSh		# -- Sorts by the size of the files in ascending order.
 du -csh *		# -- Shows the total of all the files and folders in the current directory.
@@ -8,22 +11,6 @@ du -h		# -- Shows the list of size of all the files and folders.
 ls -ld */		# Lists the directories in the current directory.
 
 ls -l ?????.txt		# -- To search for a file with a five-character name.
-
-# The below command takes backups.
-# Values available for the variable "VERSION_CONTROL".
-# This variable also works with cp, mv as well.
-# none, off       never make backups (even if --backup is given)
-# numbered, t     make numbered backups
-# existing, nil   numbered if numbered backups exist, simple otherwise
-# simple, never   always make simple backups
-export VERSION_CONTROL=numbered
-install -b -v -D -m 644 <file> <destination>
-
-install -v -owner postgres <file_1> <file_2> <destination>
-
-# Taking backups with the "VERSION_CONTROL" variable exported.
-# Standard options with cp: -r --recursive, -p (preserve) 
-cp -v --backup <file/directory> <destination>
 
 stat / | grep 'Birth:' | awk '{print $2}'		# Shows the operating system's installation date.
 file <file_name>		# -- Shows the file type for a file.
@@ -43,6 +30,22 @@ ln -rs <file> <softlink>
 # To create a soft link.
 ln <file> <softlink>
 cp -pvr <directory_name> $OLDPWD		# -- Copies the directory to the previous working directory.
+
+# The below command takes backups.
+# Values available for the variable "VERSION_CONTROL".
+# This variable also works with cp, mv as well.
+# none, off       never make backups (even if --backup is given)
+# numbered, t     make numbered backups
+# existing, nil   numbered if numbered backups exist, simple otherwise
+# simple, never   always make simple backups
+export VERSION_CONTROL=numbered
+install -b -v -D -m 644 <file> <destination>
+
+install -v -owner postgres <file_1> <file_2> <destination>
+
+# Taking backups with the "VERSION_CONTROL" variable exported.
+# Standard options with cp: -r --recursive, -p (preserve) 
+cp -v --backup <file/directory> <destination>
 
 export -p | grep -v 'declare -x LS_COLORS'		# -- To print all the set environment variables.
 unset -v <variable_name>		# -- To unset a variable.
@@ -75,11 +78,9 @@ df -h --total		# -- Shows the system's total storage capacity.
 df -hT $PWD		# -- Shows the file system of the mounted drives and the current directory.
 df --output -h		# -- Shows a verbose output of the mount points.
 
-echo "---"  > /sys/class/scsi_host/host0/scan
+echo "---"  > /sys/class/scsi_host/host0/scan        # Rescan the HBA
 
 df -h --total | sed -n '1p;$p'		# Prints only the first and last line.
-
-sudo edquota --user username		 # Sets
 
 find . -name <name> -type <T> -print		# -- Type could be "d" directory, "f" file, "l" sym link, and "b" block device.
 find . -user oracle -exec rm -fvr {} \;
@@ -88,16 +89,24 @@ find . -type f -exec file {} \;
 
 find /u01 -size +5M -print		# To find files by their size; M -- for megabyte, G -- for gigabyte, K -- for kilobyte
 
-tar -cvzf <compress_name>.tar.gz ./<file_name>
-tar -tvf | head -1 
-tar -xvzf <compress_name>.tar.gz <path>
 unzip <path_to_the_zip>.zip -d <output_directory>		# To output the zip to a specific directory.
 unzip -l <path_to_the_zip>.zip		# To list the zip file contents.
+
+# -z (gzip), -a (xz), -j (bz2)
+# -C to change to a specifc directory during extracting or creating
+tar -czf archive.tar.gz /path/to/directory # Create a .tar.gz Archive (gzip compression)
+tar -tf archive.tar.gz # List contents of an archive
+tar -xzf archive.tar.gz path/to/file # Extract a specific file from an archive
 
 which <command>		# For any command. If the command is in /usr/sbin, then that command requires the root privileges.
 which <alias> 
 which <function>
 type -a <command/bash_builtin>
+
+# Set ACL on file system. X is for executable if the file is a directory.
+setfacl -m u:pranshu:rwX /app01
+setfacl -R -m u:pranshu:rwX /app01
+setfacl -m d:pranshu:rwX /app01             # Doesn't work if the process is owned by root
 
 # ======================================================================================== NETWORKING ====================================================================== #
 hostname -f		# -- Shows the fully qualified domain name of the hostname.
@@ -108,7 +117,7 @@ hostname -I		# -- Shows the system's IP addresses.
 hostname -i 	# -- Shows which IP address is linked with the hostname.
 hostname -d 	# -- Shows the domain name of the system.
 
-nmcli con mod ens34 +ipv4.address 192.168.1.100/24 +ipv4.gateway 192.168.1.1 + ipv4.dns 192.168.1.1		# To assing a static IP address
+nmcli con mod ens34 +ipv4.address 192.168.1.100/24 +ipv4.gateway 192.168.1.1 +ipv4.dns 192.168.1.1		# To assing a static IP address
 nmcli con up ens34		# Apply the changes without restarting the interface.
 
 dmesg | grep eth		# -- Lists the connected NICs.
@@ -134,7 +143,24 @@ curl -L <the_url> --output <any_file_name>		# -- To download a file. -L is for r
 
 curl cheat.sh/<any_linux_or_unix_command>		# -- To get the structure of commands for the syntax.
 
-fuser -n tcp <port> -k		# To kill a TCP port.
+# Working with rest APIs
+curl -L -s -X GET \
+    --data-urlencode "username=$username" \
+    --data-urlencode "password=$password" \
+    --data-urlencode "from=$from" \
+    --data-urlencode "to=$to" \
+    --data-urlencode "indiaDltContentTemplateId=$indiaDltContentTemplateId" \
+    --data-urlencode "indiaDltPrincipalEntityId=$indiaDltPrincipalEntityId" \
+    --data-urlencode "text=$message" \
+    "$api_url"
+
+# JSON can be provided using @data.json
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"key1":"value1", "key2":"value2"}' \
+    https://api.example.com/endpoint    
+
+fuser -n tcp <port> -k		# To kill a TCP port. It can also kill file system related processes.
 
 # DNS lookups.
 host <domain_name>		# Package = bind-utils
@@ -143,6 +169,7 @@ host <domain_name> <dns_server>
 host -t txt google.com
 
 ssh <user_name>@<ip_address> [-p <port>]
+ssh -i /sysbackup/sms-host -o StrictHostKeyChecking=no -o ConnectTimeout="$waiting" -q -T -l "$user" "$source_host" -p "$port" "<command>"
 # For the ports up to 1024 requires root priviledges. So, use a port above 1024 in place of <any_random_port>.
 ssh <user_name>@<remote_ip_address> -L <any_random_port>:<remote_loopback_address>:<target_port>		# -- Local port forwarding.
 ssh-copy-id <user_name>@<ip_address>		# To setup password less authentication.
@@ -159,27 +186,17 @@ postsuper -d ALL		# To clear the mailq.
 
 # ================================================================================ SYSTEM AND PROCESS MANAGEMENT ===================================================================== #
 dmidecode		# Prints.. what the BIOS detected.
-
 grep -c ^processor /proc/cpuinfo		# Lists number of cores available.
-
 cat /etc/system-release		# Prints the OS version and release.
-
 w		# -- Shows how many users are logged in. Can also use to check at which display port VNC is running.
-
 whoami		# -- Shows the current user logged in.
 last reboot | head -1		# -- Shows last reboot time.
 free -h		# -- Shows the information about the memory. /proc/meminfo
-
 hostnamectl set-hostname <hostname>.<domain>.<tld>		# Sets the new hostname
-
 uptime		# -- Shows the system's uptime with load average.
 uptime -p		# -- Shows the brief output of the uptime command.
-
-ps -eo pid,ppid,cmd,pmem,pcpu,user,time,euser,stat,flags,wchan --sort=-pcpu | grep -v grep | head		# -- Top 15 processes eating cpu.
+ps -eo pid,ppid,cmd,pmem,pcpu,user,time,euser,stat,flags,wchan,ruser --sort=-pcpu | grep -v grep | head		# -- Top 15 processes eating cpu.
 ps -f <pid> <ppid> ...
- ps -eo pid,ppid,pmem,pcpu,user,time,euser,ruser,comm --sort=-pcpu
-ps -eo pid,ppid,cmd,pmem,pcpu,user,time,euser,stat,flags,ruser,wchan | grep pranshu
-ps -eo pid,ppid,pmem,pcpu,user,time,euser,ruser,comm
 
 renice -n <nice_value> -p <pid>		# To change a process priority.
 
@@ -198,6 +215,9 @@ kill -SIGCONT <pid>
 
 watch -d -n 3 'ps -f 2180 9714'		# -- For process monitoring.
 
+bg %<n>         # Sends the job in the background
+disown %<n>     # Disowns the jobs from the shell
+
 # In systemd based systems every thing is a unit file: daemon, nic, filesystem, user. Files like: /etc/hosts, /etc/fstab, /etc/resolv.conf
 systemctl enable --now <service_name>.service		# For the new services, it starts and enables in a single command.
 systemctl disable --now <service_name>.service		# For the services
@@ -212,6 +232,9 @@ systemctl <option> <service_name>.service
 # Create a user.
 useradd -r -m -d /home/pranshu -s /bin/bash -c 'Support User' -u 201 -g system -G adm -e 2025-01-01 pranshu
 
+# To delete a user from a group.
+gpasswd -d pranshu wheel
+
 # -- Getting help in Linux. -- #
 man -k <any_command_keyword>
 whatis <command>
@@ -225,9 +248,11 @@ chage -l <user> # Change the user's password expiry information.
 
 cat /etc/passwd | grep -E /bin/'b?a?sh'
 
-echo 'vm.overcommit_memory = 2' /etc/sysctl.d/10-custom.conf		# To modify kernel parameters.
+echo 'vm.overcommit_memory = 2' >> /etc/sysctl.d/10-custom.conf		# To modify kernel parameters.
 
 sysctl -w vm.overcommit_memory=2
+
+sysctl --system # To apply all the kernel parameters from the different files.
 
 # =============================================================================== OPENSSL AND MANAGING CERTIFICATES ================================================================ #
 # To see the details about the certificate request.
@@ -243,9 +268,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout <certificate>.key -o
 # -v --verbose: Can be used with cp, mv, rm, and most of the commands.
 # -h --human-readable: Can be used with df, ls, free, du, ps 
 
-# Always use the directory with ".d" extension to add any custom configuration.
-# Or use the "include" directive in the main file pointing to the custom configuration.
-# For eg. include <path_with_file_name>.conf OR include <path>*.conf
+openssl req -new -newkey rsa:2048 -nodes -keyout amyntas.key -out amyntas.csr        # First create a CSR
+openssl x509 -req -in amyntas.csr -signkey amyntas.key -out amyntas.crt -days 365       # Then create a cert from the request
 
 # =================================================================================== Managing Packages ================================================================================ #
 # Use "yum" instead of "dnf" in RHEL 7.
@@ -254,16 +278,34 @@ openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout <certificate>.key -o
 dnf -y <option> <package_name>
 dnf -y install <url>.rpm
 
+ldd ./<binary>      # Lists required libraries
+
+# Download and install or compile the library (shared object)
+# make an entry of the library path in /etc/ld.so.conf.d
+ldconfig        # Updates the linker cache
+
 # Check which package installed the package.
 rpm -qf <path\to_file\to_directory.>
 
-dnf provides <command_name> # Searches which package is required for the command or library.
+dnf provides <command_name/library_name> # Searches which package is required for the command or library.
+
+# To install a tarball
+./configure --prefix=/usr/local     # Generate the make file as per the system
+make && make install        # Compile, assmeble, and link the binary then install in the directory as mentioned above in --prefix
+
+# =================================================================================== Miscellaneous ================================================================================ #
+
+# Always use the directory with ".d" extension to add any custom configuration.
+# Or use the "include" directive in the main file pointing to the custom configuration.
+# For eg. include <path_with_file_name>.conf OR include <path>*.conf
 
 # Important variables. $PATH, $LD_LIBRARY_PATH
 (echo $SSH_CLIENT; echo $VERSION_CONTROL; echo $BASHPID)		# Run commands in a sub shell.
-printenv SSH_CLINET
+printenv SSH_CLIENT
 
 # To run multiple commands as a single unit.
 { echo $VERSION_CONTROL; echo $SSH_CLIENT; }
 
 sos report		# Takes a system config snapshot for troubleshooting.
+
+# Configuration and file names Precedence Matter

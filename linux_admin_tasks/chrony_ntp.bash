@@ -28,6 +28,17 @@ formatted_date=$(date -d "$target_date" +"%Y_%m_%d")
 
 echo "$formatted_date"
 
+#!/bin/bash
+
+UPTIME_EPOCH=$(date -d "$(who -b | awk '{print $3 " " $4}')" +%s)
+LAST_EPOCH=$(dmesg --decode | tail -n 1 | awk '{print $3}' | tr "[]" " ")
+FINAL_EPOCH=$(echo "$UPTIME_EPOCH + $LAST_EPOCH" | bc)
+
+date -d @$FINAL_EPOCH
+
+# To get the boot epch
+date -d "$(who -b | awk '{print $3 " " $4}')" +%s
+
 # To get the date of a file.
 date +%d%m%Y -r <file_name>
 

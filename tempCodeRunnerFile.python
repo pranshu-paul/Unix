@@ -1,4 +1,0 @@
-a="   Cisco Switch   "
-
-print(a.replace(" ", ""))
-

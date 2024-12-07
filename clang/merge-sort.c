@@ -63,4 +63,4 @@ void merge(int *a, int s1, int *b, int s2) {
 	}
 	
 	free(temp_arr);
-}	
+}

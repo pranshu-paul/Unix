@@ -12,10 +12,8 @@ dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker
 # Start and enable Docker.
 systemctl enable --now docker
 
-
+# Prints the docker version
 docker --version
-
-docker version
 
 # Directory of docker.
 /var/lib/docker
@@ -45,7 +43,6 @@ mysql -u root -p
 # Run the below command.
 mysql -h 0.0.0.0 -P 3306 -u root -p
 
-
 # To create a docker network.
 docker network create mysql_network
 
@@ -57,24 +54,33 @@ docker network connect mysql_network mysql_container_1
 
 
 #############################
+# List docker images.
 docker images
 
+# Search for the official images only.
 docker search --filter is-official=true <image_name>
 
+# Pull an image of a specific version.
 docker pull <image_name>:<version_name>
 
+# Create an image.
 docker create <image_name>
 
+# List all the running containers
 docker ps -as
 
+# Start a container.
 docker run <image_name>
 
+# Run a command in the container.
 docker run <image_name> <command>
 
+# Bootstrap a container
 docker run -it <image_name> <command>
 
 docker run -it --name <new_container_name> <image_name> <command>
 
+# Execute a command in a container.
 docker exec -it <image_name> <command>
 
 docker attach
@@ -83,6 +89,7 @@ docker detach
 
 docker inspect jq
 
+# Remove a docker container.
 docker rm <contianer_name>
 
 docker rm $(docker ps -a -q -l -f status=exited)
@@ -91,8 +98,8 @@ docker ps -a -q -l -f status = running
 
 docker ps -a -f name=python1
 
-
 # Binding a local directory to a container.
+# Persistance volume creation
 docker run -it -v <local_directory>:<container_path> <image> <command>
 
 # -w container working directory.
@@ -107,6 +114,7 @@ curl $(docker inspect $(docker ps -q -l) | jq -r .[0].NetworkSettings.IPAdress)
 docker run -d --publish 5000 -v <local_directory>:<container_path> -w <container_path> <command> <argument>
 
 # Docker file syntax.
+<< EOF
 FROM <image_name>
 
 COPY <local_directory> <container_path>
@@ -137,15 +145,17 @@ ENTRYPOINT [ "<name>" ]
 HEALTHCHECK --interval=5s --timeout=3s CMD curl -f http://localhost:5000 || nc -zv localhost 5000 || exit 1
 
 CMD [ "<name>" ]
-
+EOF
 
 
 # To pause a container.
 docker pause $(docker ps -l -q)
 docker kill $(docker ps -l -q)
 
+# Archive a container
 docker save -o <backup_name>.tar <contianer_name>
 
+# Load a container from the archive.
 docker load -i dev.tar
 
 docker export --output="test.tar" $(docker ps -l -q)

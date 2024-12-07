@@ -1,7 +1,0 @@
----
-- name: facts_printone
-  hosts: all
-  tasks:
-  - name: Print a fact
-    ansible.builtin.debug:
-      var: "{{ ansible_facts['architecture'] }}"

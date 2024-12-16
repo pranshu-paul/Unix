@@ -47,6 +47,9 @@ P -- pastes upwards
 # To change the all occurances.
 %s/<string>/<string_replaced>/g
 
+# To save the name
+:file <file_name>
+:saveas <file_name>
 
 # "Escape" and "colon" commands.
 # To set and unset number lines.

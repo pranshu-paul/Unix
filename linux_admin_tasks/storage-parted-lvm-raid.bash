@@ -1,5 +1,8 @@
  # Storage Administration
 
+# List the config backups.
+ls /etc/lvm/backup /etc/lvm/archive
+
 # Synchronizes all pending I/O operations.
 sync
 

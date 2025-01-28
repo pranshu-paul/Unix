@@ -1,5 +1,5 @@
 # Creating a basic SMTP server for sending and recieving emails.
-# Use Oauth for modern authentication methods
+# Use OAuth for modern authentication methods
 
 # Port 25 must be unblocked.
 # Attachments are usually sent in base64.
@@ -31,7 +31,7 @@ _dmarc	3600	 IN 	TXT	"v=DMARC1;p=quarantine"
 # Add an entry in /etc/hosts file.
 
 # Install Postfix and Mailx mail client.
-dnf -y install postfix mailx
+dnf -y install postfix s-nail
 
 # To check postfix mail version.
 postconf mail_version
@@ -77,6 +77,8 @@ postconf mailbox_size_limit
 # For TLS httpd is required and certbot(Let's Encrypt)
 # Use openssl to generate a certificate and key.
 # Or, we could generate a Let's Encrypt certificate from punchsalad.com
+
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /etc/pki/tls/certs/postfix.crt -out /etc/pki/tls/private/postfix.key -subj "/CN=crypinst.org"
 
 postconf -e "smtpd_tls_cert_file = /etc/pki/tls/certs/postfix.crt"
 postconf smtpd_tls_cert_file

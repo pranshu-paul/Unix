@@ -12,6 +12,11 @@ log_file=/tmp/out_$(basename $0)_$(hostname)_$(date +%d_%b).log
 
 exec &>> ${log_file}
 
+if [ $EUID != 0 ]; then
+	echo "Please run with root or sudo privileges."
+	exit 1
+fi
+
 # Date and time when the script is running.
 print_header "Date and time when the script is running."
 date
@@ -111,17 +116,23 @@ df -h --output=$FIELD_LIST --total
 print_header " NFS Exports "
 cat /etc/exports
 
+print_header " NFS Clients "
+ss -nt | grep :2049 | awk '{print $5}' | grep -v :2049 | cut -d : -f 1
+
+print_header " NFS Servers "
+ss -nt | grep :2049 | awk '{print $5}' | grep :2049 | cut -d : -f 1
+
 # Print the physical volumes.
 print_header "Physical volumes"
-sudo pvdisplay
+pvdisplay
 
 # Print the volume groups.
 print_header "Volumes groups and physical volumes in a group."
-sudo vgdisplay
+vgdisplay
 
 # Print the logical volumes
 print_header "Logical volumes on a volume group."
-sudo lvdisplay
+lvdisplay
 
 # /etc/fstab
 print_header "Current File system table."
@@ -167,7 +178,7 @@ print_header "Current sudoers directives."
 grep -vE '^#|^$' /etc/sudoers
 
 print_header "Current sudoers directives in the /etc/sudoers.d directory."
- grep -rvE '^#|^$' /etc/sudoers.d
+grep -rvE '^#|^$' /etc/sudoers.d
 
 # ulmits
 print_header "Applied OS limits."
@@ -241,6 +252,15 @@ dnf needs-restarting -r
 
 print_header " Exceptions "
 journalctl -r -k -o short -n 15 --no-pager
+
+print_header " Cryptographic Entropy "
+cat /proc/sys/kernel/random/entropy_avail
+
+print_header " GRUB ENV Variables "
+grub2-editenv list
+
+print_header " Hardware Errors "
+journalctl -p 3 -xb
 
 print_header " DMESG "
 dmesg --decode -e | grep -E ':warn|:crit|:err|segfault'

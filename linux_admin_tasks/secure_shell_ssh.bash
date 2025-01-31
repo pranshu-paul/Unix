@@ -39,7 +39,7 @@ sed -n '15p' /etc/ssh/sshd_config
 # Use "aureport" command if some one is brute forcing.
 
 **********************************************************************
-*                      Authorized Access Only                        *
+*                     Authorized Access Only                         *
 *            All activities are logged and monitored.                *
 *               Unauthorized access is not allowed.                  *
 **********************************************************************
@@ -169,6 +169,15 @@ AllowUsers *@<ip_address> *@<ip_address> *@<ip_address>
 
 # Restrict to a specific users from a IP.
 AllowUsers <user_name>@<ip_address>
+
+# Avoid the users from invoking a shell.
+Match User *,!admin
+        ForceCommand /bin/echo 'This bastion does not support interactive commands.'
+		
+AllowAgentForwarding no
+AllowStreamLocalForwarding no
+X11Forwarding no
+
 ##############################################################################
 
 # ssh client options
@@ -199,7 +208,11 @@ Host *
 
 Host 172.19.8.151
         Port 22
-        Ciphers aes256-gcm@openssh.com	
+        Ciphers aes256-gcm@openssh.com
+	
+# Create a proxy jump in the ssh client file.	
+Host *
+  ProxyJump bastion.example.com		
 
 ##########################################################################################################
 ~/.ssh/authorized_keys

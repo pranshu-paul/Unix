@@ -46,3 +46,20 @@ tcpdump portrange 21-25
 
 # To capture broadcast
 tcpdump -i ens34 -nvn 'broadcast'
+
+# Fetch ASCII text from the pcap.
+tcpdump -nnr ncat.pcap -A
+
+# Can also use strings.
+strings ncat.pcap
+
+# To read the pcap file using wireshark.
+tshark -r ncat.pcap
+
+tcpdump -i ens33 'ip[6:2] & 0x1fff != 0'
+
+
+# From a particular src and dst and vice versa.
+# Fetch only TCP flags SYN & ACK on the port 2777.
+# And, avoid PUSH and PUSH ACK flags.
+tcpdump -nn -i any '((src host 172.19.8.174 and dst host 172.19.8.181) or (src host 172.19.8.181 and dst host 172.19.8.174)) and tcp[tcpflags] & (tcp-syn|tcp-ack) != 0 and port 2777 and not tcp[tcpflags] & tcp-push != 0'

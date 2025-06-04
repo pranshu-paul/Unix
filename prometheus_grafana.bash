@@ -10,10 +10,10 @@ install -v -d -m 755 -o prometheus /etc/prometheus/{consoles,console_libraries}
 install -v -d -m 755 -o prometheus /var/lib/prometheus
 
 # Download the tar ball of prometheus
-curl -LO https://github.com/prometheus/prometheus/releases/download/v2.53.0-rc.1/prometheus-2.53.0-rc.1.linux-amd64.tar.gz
+curl -LO https://github.com/prometheus/prometheus/releases/download/v3.3.1/prometheus-3.3.1.linux-amd64.tar.gz
 
 # Extract the TAR
-tar -zxpvf prometheus-2.53.0-rc.1.linux-amd64.tar.gz && cd prometheus-2.53.0-rc.1.linux-amd64
+tar -zxpf prometheus-3.3.1.linux-amd64.tar.gz && cd prometheus-3.3.1.linux-amd64
 
 # Copy the below files respectively.
 
@@ -40,7 +40,7 @@ scrape_configs:
   - job_name: "linux servers"
     scrape_interval: 5s	
     static_configs:
-      - targets: ["10.122.0.2:9100"]
+      - targets: ["10.0.1.7:9100", "10.0.1.3:9100"]
 	
 "
 
@@ -61,11 +61,7 @@ After=network-online.target
 User=prometheus
 Group=prometheus
 Type=simple
-ExecStart=/usr/local/bin/prometheus \
-    --config.file /etc/prometheus/prometheus.yml \
-    --storage.tsdb.path /var/lib/prometheus/ \
-    --web.console.templates=/etc/prometheus/consoles \
-    --web.console.libraries=/etc/prometheus/console_libraries
+ExecStart=/usr/local/bin/prometheus --config.file /etc/prometheus/prometheus.yml --storage.tsdb.path /var/lib/prometheus 
 
 [Install]
 WantedBy=multi-user.target
@@ -83,11 +79,11 @@ systemctl status prometheus
 # Grafana default port: 3000
 
 # Download grafana
-wget https://dl.grafana.com/oss/release/grafana-11.0.0.linux-amd64.tar.gz
-tar -zxvf grafana-11.0.0.linux-amd64.tar.gz
+wget https://dl.grafana.com/oss/release/grafana-11.6.1.linux-amd64.tar.gz
+tar -zxvf grafana-11.6.1.linux-amd64.tar.gz
 
 # RPM
-dnf install -y https://dl.grafana.com/oss/release/grafana-11.0.0-1.x86_64.rpm
+dnf install -y https://dl.grafana.com/oss/release/grafana-11.6.1-1.x86_64.rpm
 
 # Start the Grafana service
 systemctl daemon-reload
@@ -111,6 +107,19 @@ cp -v Linux_mascot_tux.png  /usr/share/grafana/public/img/fav32.png
 cp -v Linux_mascot_tux.png  /usr/share/grafana/public/img/apple-touch-icon.png
 
 cp -v tux.svg  /usr/share/grafana/public/img/grafana_icon.svg
+
+# Adding TLS to grafana.
+cd /etc/grafana
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout grafana.key -out grafana.crt -subj "/CN=*.example.local"
+
+# Under the server section in grafana.ini, add the following or uncomment.
+protocol = https
+cert_file = /etc/grafana/grafana.crt
+cert_key = /etc/grafana/grafana.key
+
+# Change the welcome message.
+# Change welcome to grafana to your company.
+grep -ril "Welcome to Grafana" /usr/share/grafana/public/build/ | head -n 1
 
 # Add a data source to prometheus.
 Navigation Menu --> Add new connection --> Prometheus --> prometheus server URL -- Save
@@ -435,3 +444,164 @@ ps aux | awk '{if (NR>1) print "cpu_usage{command=\""$11"\", pid=\""$2"\"}"}'
 
 # Granfana uses sqlite to store suer credentials and all the data
 # Copy the grafana.db to backup: /var/lib/grafana
+
+
+# Configuring mysql exporter.
+curl -L https://github.com/prometheus/mysqld_exporter/releases/download/v0.17.2/mysqld_exporter-0.17.2.linux-amd64.tar.gz | tar xzf -
+
+# Navigate to the directory.
+cd mysqld_exporter-0.17.2.linux-amd64
+
+# Install the binary.
+install -v -m 755 mysqld_exporter -o mysql -g mysql /usr/local/bin
+
+# Create a MySQL exporter database user.
+CREATE USER 'exporter'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'localhost';
+FLUSH PRIVILEGES;
+
+# Create a mysql password file.
+cat > /opt/mysqld_exporter-0.17.2.linux-amd64/.my.cnf << EOF
+[client]
+user=exporter
+password=your_secure_password
+EOF
+
+# Create a systemd unit file.
+vim /etc/systemd/system/mysqld_exporter.service
+
+:'
+[Unit]
+Description=Prometheus MySQL Exporter
+After=network.target
+
+[Service]
+User=mysql
+Group=mysql
+Type=simple
+ExecStart=/usr/local/bin/mysqld_exporter --config.my-cnf=/opt/mysqld_exporter-0.17.2.linux-amd64/.my.cnf
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+'
+
+# Reload the systemd daemon.
+systemctl daemon-reload
+
+# Enable and start the exporter.
+systemctl enable --now mysqld_exporter
+
+# Metrics
+CPU
+Memory (RAM)
+Disk Usage with inodes and file descriptor file system usage
+Disk I/O
+Network Traffic bandwidth and packet errors
+Swap Usage
+Uptime
+
+
+# Creating Dashboards
+
+# Create variables is common for all the dashboards.
+
+# CPU Dashboard
+
+# PromQL CPU
+100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle", instance="$node"}[$__rate_interval])))
+
+# Grafana Config.
+
+Visualization: Gauge
+
+Title: CPU Busy
+Description: Overall CPU busy percentage (averaged across all cores)
+Calculations: Last *
+Fields: Numeric Fields
+
+Gauge:
+Show threshold markers: true
+
+Standard options
+Percent (0-100)
+Min 0
+Max 100
+Decimals 1
+
+Thresholds
+Red: 95
+Orange: 85
+Green: Base
+
+
+# Memory Dashboard
+
+# PromQL Memory
+(1 - (node_memory_MemAvailable_bytes{instance="$node", job="$job"} / node_memory_MemTotal_bytes{instance="$node", job="$job"})) * 100
+
+# Options
+Legend: Verbose
+Type: Instant
+
+# Grafana Config.
+
+Visualization: Gauge
+
+Title: RAM Used
+Description: Real RAM usage excluding cache and reclaimable memory
+Calculations: Last *
+Fields: Numeric Fields
+
+Gauge:
+Show threshold markers: true
+
+Standard options
+Percent (0-100)
+Min 0
+Max 100
+Decimals 1
+
+Thresholds
+Red: 95
+Orange: 85
+Green: Base
+
+
+# File System Dashboard
+
+# PromQL Memory
+node_filesystem_size_bytes{instance="$node",job="$job",device!~'rootfs|tmpfs'} - node_filesystem_avail_bytes{instance="$node",job="$job",device!~'rootfs|tmpfs'}
+
+# Options
+Legend: {{mountpoint}}
+Type: Range
+
+# Grafana Config.
+
+Visualization: Time Series
+
+Title: Filesystem Used
+Description: Disk usage (used = total - available) per mountpoint
+
+Legend
+Mode: Table
+Values: Min Mean Max Last
+
+Graph Styles
+Fill opacity: 20
+Show points: Auto
+Point size: 5
+
+Standard options
+bytes(IEC)
+Min 0
+
+Thresholds
+Red: 95
+Orange: 85
+Green: Base
+
+

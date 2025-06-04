@@ -43,7 +43,13 @@ tcpdump -i eth0 ip
 # ICMP
 ping -n google.com
 
-# Use Ctrl-'\' to send the break signals like in Ctrl-Break in windows
+# To send a 1500 byte ping.
+ping -M do -c 4 -s 1472 172.19.8.191
+
+# To send a 9000 byte ping.
+ping -M do -c 4 -s 8972 172.19.8.191
+
+# Use Ctrl + '\' to send the SIGQUIT like in Ctrl + Break in windows
 
 # My traceroute
 mtr

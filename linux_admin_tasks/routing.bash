@@ -59,3 +59,32 @@ ip route get 8.8.8.8 from 192.168.1.19 dev ens33
 
 # To flush the all routes temporarily.
 ip route flush
+
+# Creating a NAT instance and a gateway router.
+
+# Router VM with two networks.
+192.168.10.0/24
+10.0.1.0/28
+
+# Router IP address.
+192.168.10.3
+10.0.1.3
+
+# Enable IP forwarding.
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Enable IP masquerading.
+firewall-cmd --add-masquerade
+firewall-cmd --runtime-to-permanent
+
+# On the VMs accessing the gateway.
+
+# On the VM with 10.0.1.0/28 network only.
+ip route add 192.168.10.0/24 via 10.0.1.3
+
+# On the VM with 192.168.10.0/24 network only.
+ip route add 10.0.1.0/28 via 192.168.10.3
+
+# To use the router as a NAT instance.
+ip route add default via 10.0.1.3
+ip route add default via 192.168.10.3

@@ -14,36 +14,39 @@ openssl version -d
 openssl rand -base64 12
 
 
-#The below steps works properly.
-# Password: windows
-Rwwt#756
+## The below steps works properly. ##
 
 # Create a password protected private key, to be used to create the Root Certificate.
 # Create a self-signed root certificate.
+# For testing password must be: root@123
 openssl genpkey -algorithm RSA -aes256 -out root-ca-key.pem -pkeyopt rsa_keygen_bits:4096
 openssl req -new -x509 -sha256 -days 3650 -key root-ca-key.pem -out root-ca-cert.pem -subj "/CN=Pranshu Root CA"
 
-# Generate a csr
+# Generate a csr.
 openssl genpkey -algorithm RSA -out server-key.pem
-openssl req -new -sha256 -subj "/CN=paulpranshu.ddns.net" -key server-key.pem -out server.csr
+openssl req -new -sha256 -subj "/CN=esxi01" -key server-key.pem -out server.csr
 
 # Generate a self-signed certifcate.
 # "subjectAltName=DNS:paulpranshu.xyz,IP:144.24.111.213"
-openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem -extfile <(printf "subjectAltName=IP:192.168.1.13") -CAcreateserial
+openssl x509 -req -sha256 -days 365 -in server.csr -CA root-ca-cert.pem -CAkey root-ca-key.pem -out server.pem -extfile <(printf "subjectAltName=IP:10.0.1.8") -CAcreateserial
 
 # Verify the certifcate.
 openssl verify -CAfile root-ca-cert.pem -verbose server.pem
+
+# List the root CA cert.
+ls -l root-ca-cert.pem
 
 # Update the local public key infrastructure.
 cp -v root-ca-cert.pem /etc/pki/ca-trust/source/anchors/root-ca-cert.pem
 update-ca-trust
 
 # Import the root certifcate in windows as well.
-# Import-Certificate -FilePath "C:\root-ca-cert.pem" -CertStoreLocation Cert:\LocalMachine\Root
+# Import-Certificate -FilePath "root-ca-cert.pem" -CertStoreLocation Cert:\LocalMachine\Root
 
+##																	##
 
 # To verify.
-openssl s_client -connect 103.240.91.92:443
+openssl s_client -connect 10.0.1.8:443
 
 # Copy the root certifcate to the OS PKI.
 update-ca-trust enable
@@ -129,6 +132,7 @@ openssl rsa -in private.pem -pubout -out public.pem
 
 # Create a password protected private key, to be used to create the Root Certificate.
 # Create a self-signed root certificate.
+# subj "/C=IN/ST=Delhi/L=Delhi/O=Paul IT Labs/OU=Home Labs/CN=Paul Root CA"
 openssl genpkey -algorithm RSA -aes256 -out root-ca-key.pem -pkeyopt rsa_keygen_bits:4096
 openssl req -new -x509 -sha256 -days 3650 -key root-ca-key.pem -out root-ca-cert.pem -subj "/CN=Root CA"
 
@@ -161,3 +165,74 @@ cat intermediate-crt.pem server.pem > bundle.pem
 # To create a bundle root certificate.
 cat root-ca-cert.pem intermediate-crt.pem > root-bundle.pem
 
+
+# Signing Java JAR files.
+# Required JDK devel package.
+
+# Install Open JDK Devel Package.
+dnf -yq install java-1.8.0-openjdk-devel
+
+# Download a sample JAR file.
+curl -O https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar
+
+# Verify whether the JAR is signed.
+jarsigner -verify commons-lang3-3.12.0.jar
+
+# Create Java keystore with a password.
+keytool -genkeypair -alias mykey -keyalg RSA -keysize 2048 -validity 365 -keystore mykeystore.jks
+
+# Sign the JAR file.
+jarsigner -keystore mykeystore.jks commons-lang3-3.12.0.jar mykey
+
+# Verify the signature.
+jarsigner -verify commons-lang3-3.12.0.jar
+
+
+## Another approach for the same.
+
+# Create a Root CA
+openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+  -keyout rootCA.key -out rootCA.crt \
+  -subj "/C=IN/ST=Delhi/L=Delhi/O=Paul IT Labs/OU=Home Labs/CN=Paul Root CA"
+  
+# Generate Key Pair and Keystore
+keytool -genkeypair -alias jar-signer \
+  -keyalg RSA -keysize 2048 -keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts \
+  -dname "CN=Pranshu, OU=Home Labs, O=Paul IT Labs, L=Delhi, ST=Delhi, C=IN" \
+  -validity 365
+
+# Generate a Certificate Signing Request
+keytool -certreq -alias jar-signer \
+  -keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts \
+  -file jar-signer.csr
+  
+# Sign the CSR Using the Root CA
+openssl x509 -req -in jar-signer.csr -CA rootCA.crt -CAkey rootCA.key \
+  -CAcreateserial -out jar-signer.crt -days 365 -sha256
+  
+# Import Root CA into the Keystore (as Trusted Certificate) in the default root CA.
+# For the below command the default passowrd: changeit
+keytool -import -trustcacerts -alias rootca   \
+-file rootCA.crt   \
+-keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts
+
+# Import the Signed Certificate into the Default Keystore
+# Default password: changeit
+keytool -import -alias jar-signer \
+  -file jar-signer.crt \
+  -keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts
+  
+# Sign the JAR File and use a Public TSA
+jarsigner -keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts \
+-tsa http://timestamp.digicert.com ../commons-lang3-3.12.0.jar jar-signer
+
+# Verify
+jarsigner -verify -keystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts  \
+-certs ../commons-lang3-3.12.0.jar
+
+
+# Import Java keystore in pkcs12 format.
+keytool -importkeystore \
+  -srckeystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts \
+  -destkeystore /etc/java/java-1.8.0-openjdk/java-1.8.0-openjdk-1.8.0.402.b06-2.el8.x86_64/lib/security/cacerts \
+  -deststoretype pkcs12

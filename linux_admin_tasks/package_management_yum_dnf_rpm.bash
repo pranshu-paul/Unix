@@ -103,12 +103,15 @@ dnf check-update --cve CVE-2024-2961 --changelogs
 dnf download <package_name> --resolve
 dnf download <package_name> --resolve --downloaddir /var/www/repos/ol-88/np-custom/Packages
 
-# Extracting a package.
-rpm2cpio <package_name> | cpio -idmv
+# Extracting a rpm package.
+rpm2cpio <package_name>.rpm | cpio -idmv
 
 # To get the dependencies list of a package.
 # We could also use an HTTP link of the package.
 dnf deplist <package_name> | grep provider | awk '{print $2}' | grep -v '.src' | sed -E 's/(-[0-9]+).*//' | sort | uniq
+
+# List a package dependencies with it's repoid.
+dnf repoquery --requires systemd --resolve --qf "%{name} %{repoid}"
 
 # To avoid the librepo warnings in CEntOS
 dnf install python3-librepo -y

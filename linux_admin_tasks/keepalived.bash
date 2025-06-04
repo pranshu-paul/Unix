@@ -10,10 +10,11 @@ keepalived --version
 # Master node
 global_defs {
     notification_email {
-        admin@example.com
+        envisior.support@nexgplatforms.com
     }
-    notification_email_from keepalived@node1.example.com
-    smtp_server localhost
+    notification_email_from alerts@nexgplatforms.com
+    smtp_server 172.19.8.114 587
+	smtp_port 587
     smtp_connect_timeout 30
     enable_script_security
     script_user mysql
@@ -25,23 +26,23 @@ vrrp_script chk_mysqld {
 }
 vrrp_instance VI_1 {
     state MASTER
-    interface ens36
+    interface ens33
     virtual_router_id 51
 
-        unicast_src_ip 172.16.1.5
+        unicast_src_ip 172.19.8.197
         unicast_peer {
-             172.16.1.10
+             172.19.8.198
         }
 
     priority 150
     advert_int 1
     authentication {
         auth_type PASS
-        auth_pass 1234
+        auth_pass 5aa95619				# Password can only be of 8 characters.
     }
 # CIDR should also be provided to avoid any inconsistencies in the network
     virtual_ipaddress {
-        192.168.1.100/24 dev ens33
+        172.19.8.90/24 dev ens33
     }
     track_script {
         chk_mysqld
@@ -52,10 +53,10 @@ vrrp_instance VI_1 {
 # ================================================ #
 global_defs {
     notification_email {
-        admin@example.com
+        envisior.support@nexgplatforms.com
     }
-    notification_email_from keepalived@node1.example.com
-    smtp_server localhost
+    notification_email_from alerts@nexgplatforms.com
+    smtp_server 172.19.8.114 587
     smtp_connect_timeout 30
     enable_script_security
     script_user mysql
@@ -67,23 +68,23 @@ vrrp_script chk_mysqld {
 }
 vrrp_instance VI_1 {
     state BACKUP
-    interface ens36
+    interface ens33
     virtual_router_id 51
 
-        unicast_src_ip 172.16.1.10
+        unicast_src_ip 172.19.8.198
         unicast_peer {
-                172.16.1.5
+                172.19.8.197
         }
 
     priority 110
     advert_int 1
     authentication {
         auth_type PASS
-        auth_pass 1234
+        auth_pass 5aa95619
     }
 # CIDR should also be provided to avoid any inconsistencies in the network
     virtual_ipaddress {
-        192.168.1.100/24 dev ens33
+        172.19.8.90/24 dev ens33
     }
     track_script {
         chk_mysqld
@@ -96,11 +97,14 @@ keepalived -t
 # Start Keepalived
 systemctl enable --now keepalived
 
-Command:
-tcpdump -i ens36 -n -vvv -s0 -l 'ip proto 112'
+# Command:
+tcpdump -i ens33 -n -vvv -s0 -l 'ip proto 112'
+
+# For any errors.
+journalctl -r -t Keepalived_vrrp
 
 Description:
-The command captures VRRP (Virtual Router Redundancy Protocol) packets on the ens36 network interface.
+The command captures VRRP (Virtual Router Redundancy Protocol) packets on the ens33 network interface.
 This helps in monitoring the VRRP advertisements sent between routers to ensure high availability of routing paths.
 
 Table of Data:

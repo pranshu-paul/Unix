@@ -1,6 +1,6 @@
 # Hardening and system auditing
 
-# Ensure the below paths exist on a speretae partition or LVM.
+# Ensure the below paths exist on a separate partition or LVM.
 # With noexec, nosuid, and nodev.
 # noexec not on /home and /var
 /dev/shm           
@@ -10,6 +10,9 @@
 /var/log           
 /var/log/audit     
 /tmp      
+/opt
+/usr
+/srv
 
 # Audit
 grep TMOUT /etc/profile /etc/bashrc /etc/profile.d/*
@@ -129,8 +132,8 @@ grep ^PASS_MAX_DAYS  /etc/login.defs
 cat /etc/shadow | cut -d : -f 1,5 | grep [0-9]
 
 
-PASS_MIN_DAYS   0
-chage --mindays 7 <user>
+PASS_MAX_DAYS   90
+chage --maxdays 90 <user>
 
 # Audit PASS_MIN_DAYS
 grep ^PASS_MIN_DAYS  /etc/login.defs
@@ -158,7 +161,6 @@ grep -i '^processizemax=[0-9][bkmgtpe]*' /etc/systemd/coredump.conf
 # Harden the SSH service /etc/ssh/sshd_config
 # Directory /etc/ssh/sshd_config.d can be used to enforce the rules instead of editing the main sshd_config
 AllowGroups root,wheel
-Protocol 2
 Port 2169
 DenyUsers appadm
 HostbasedAuthentication no
@@ -166,7 +168,6 @@ PermitRootLogin no # Or PermitRootLogin prohibit-password # Password must be del
 LoginGraceTime 60
 PermitUserEnvironment no
 PermitEmptyPasswords no
-Ciphers aes128-ctr,aes192-ctr,aes256-ctr
 MaxAuthTries 4
 IgnoreRhosts yes
 Banner /etc/issue.net
@@ -183,8 +184,6 @@ MaxStartups 10:30:60
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
-KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
-MACs -hmac-md5,hmac-md5-96,hmac-ripemd160,hmac-sha1-96,umac-64@openssh.com,hmac-md5-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,umac-64-etm@openssh.com
 
 cp -v sshd_config{,.bak}
 
@@ -222,7 +221,7 @@ grep -vE '^#|^$' /etc/security/pwhistory.conf
 # maxsequence = 3
 cat > /etc/security/pwquality.conf.d/pwquality.conf << EOF
 enforce_for_root
-minlen = 12
+minlen = 9
 dcredit = -1
 ucredit = -1
 lcredit = -1
@@ -342,7 +341,7 @@ sudo sed -i '$d' /etc/sudoers
 echo "Defaults requiretty" >> /etc/sudoers
 
 # Change the default PATH when the sudo command is run.
-Defaults secure_path = /sbin:/usr/bin
+Defaults secure_path = /usr/sbin:/usr/bin
 
 # Not allow to run executables in the current directory.
 echo "Defaults ignore_dot" >> /etc/sudoers
@@ -413,9 +412,82 @@ update-crypto-policies --show
 # Secure the SSH CBC
 update-crypto-policies --set DEFAULT:NO-SHA1:NO-SSHCBC:NO-WEAKMAC
 
+# Due to exceptions made, firewall is disabled.
+# We are enabling setting the firewall's default target to ACCEPT all the traffic.
+firewall-cmd --permanent --set-target=ACCEPT
+
+# Add the below firewall-cmd rich rule to drop server's time set through ICMP replies.
+# Drop the ICMP timestamp requests type (13), and the outgoing ICMP timestamp replies type (14).
+firewall-cmd --permanent --add-rich-rule='rule icmp-type name="timestamp-request" drop'
+firewall-cmd --permanent --add-rich-rule='rule icmp-type name="timestamp-reply" drop'
+
+# Reload the firewall after all the configuration changes made.
+firewall-cmd --reload
+
+# Verify the changes made.
+nping --icmp --icmp-type 13 192.168.227.128
+nping --icmp --icmp-type 14 192.168.227.128
+
+
+# Disable Avahi daemon.
+systemctl disable --now avahi-daemon
+
+# Mask the service
+systemctl mask avahi-daemon
+
+
+# Verify the whether the mDNS avahi daemon is disabled.
+# Reply filtered means the service is not running on the server.
+nmap --script=dns-service-discovery -p 5353 192.168.227.128
+
+# Verify whether the cbc ciphers are disabled.
+ssh -o Ciphers=aes128-cbc localhost
+ssh -oCiphers=aes128-cbc,aes256-cbc 127.0.0.1
+
+# Create a directory if doesn't exist.
+mkdir /etc/crypto-policies/policies/modules
+
+vi /etc/crypto-policies/policies/modules/DISABLE-CBC.pmod
+# Disable CBC ciphers
+cipher@SSH = -AES-128-CBC -AES-256-CBC
+
+# Disable ChaCha20-Poly1305 cipher
+cipher@SSH = -CHACHA20-POLY1305
+
+# Disable Encrypt-then-MAC (ETM) algorithms
+ssh_etm = 0
+
+# Disable SSH Weak Key Exchange Algorithms Enabled
+# Remove diffie-hellman-group-exchange-sha1 from both the files.
+vi /etc/crypto-policies/back-ends/openssh.config
+vi /etc/crypto-policies/back-ends/opensshserver.config
+
+# Verify the changes,
+grep -i diffie-hellman-group-exchange-sha1 /etc/crypto-policies/back-ends/openssh.config
+grep -i diffie-hellman-group-exchange-sha1 /etc/crypto-policies/back-ends/opensshserver.config
+
+# Try to connect. It should NOT work.
+ssh -o KexAlgorithms=diffie-hellman-group-exchange-sha1 127.0.0.1
+
+# Restart the sshd daemon. Reloading it won't work.
+systemctl restart sshd
+
+# Disable SSH Terrapin Prefix Truncation Weakness
+# Disable ChaCha20-Poly1305 cipher
+vi /etc/crypto-policies/policies/modules/DISABLE-CBC.pmod
+cipher@SSH = -CHACHA20-POLY1305
+
+# Verify CVE-2023-48795
+ssh -o Ciphers=chacha20-poly1305@openssh.com localhost
+
+# Apply the changes made to the crypto policies.
+update-crypto-policies --set DEFAULT:DISABLE-CBC
+
 # Enable the fips mode.
+# FIPS mode is not recommened.
 fips-mode-setup --enable
 
+# Check the fips mode
 fips-mode-setup --check
 
 # Secure modes available: DEFAULT, FIPS, FUTURE
@@ -435,7 +507,7 @@ grub2-setpassword
 # Run the vulnerability test.
 
 # Install the OpenSCAP scanner.
-dnf -y install openscap-scanner
+dnf -y install httpd openscap-scanner scap-security-guide
 
 wget -O - https://www.redhat.com/security/data/oval/v2/RHEL8/rhel-8.oval.xml.bz2 | bzip2 --decompress > rhel-8.oval.xml
 
@@ -443,3 +515,10 @@ oscap oval eval --report vulnerability.html rhel-8.oval.xml
 
 # Scanning a remote system for vulnerabilities.
 oscap-ssh joesec@machine1 22 oval eval --report remote-vulnerability.html rhel-8.oval.xml
+
+# Fetching configurational failed vulnerabilities.
+# Another profiles: xccdf_org.ssgproject.content_profile_stig
+oscap xccdf eval --fetch-remote-resources --profile xccdf_org.ssgproject.content_profile_pci-dss --results /tmp/scan-xccdf-results.xml /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
+
+# Generate an HTML report.
+oscap xccdf generate report /tmp/scan-xccdf-results.xml > /var/www/html/index.html

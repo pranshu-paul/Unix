@@ -28,6 +28,10 @@ _dmarc	3600	 IN 	TXT	"v=DMARC1;p=quarantine"
 
 # Add DKIM (Domain Key Identified Mail) record (see openssl).
 
+# For dnsmasq
+mx-host=example.com,mail.example.com,10
+host-record=mail.example.com,192.168.1.100
+
 # Add an entry in /etc/hosts file.
 
 # Install Postfix and Mailx mail client.

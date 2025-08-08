@@ -261,7 +261,6 @@ lvdisplay
 # To extend a logical volume. [-L|--size]
 lvextend --size +1G /dev/<vg_group_name>/<logical_volume>
 lvextend --size +900M /dev/vg-00/my_vol
-lvresize --resizefs --size +300GB /u02
 
 # Extend the existing XFS file system.
 xfs_growfs /mnt

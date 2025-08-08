@@ -7,7 +7,7 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
 EOF
 
-yum clean all
+yum clean metadata
 
 yum -y install mongodb-org
 

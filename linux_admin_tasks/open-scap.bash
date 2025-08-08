@@ -33,13 +33,14 @@ ls /usr/share/xml/scap/ssg/content
 oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
 
 # Start the evaluation.
-oscap xccdf eval --fetch-remote-resources --profile xccdf_org.ssgproject.content_profile_ism_o --results /tmp/scan-xccdf-results.xml /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
+oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_cis --results /tmp/scan-xccdf-results.xml /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
 
 # Generate an HTML report
 oscap xccdf generate report /tmp/scan-xccdf-results.xml > /var/www/html/index.html
 
+systemctl start httpd
 
-oscap xccdf generate fix --fix-type ansible --output remediation_playbook.yml --result-id "" /tmp/scan-xccdf-results.xml
+oscap xccdf generate fix --fix-type bash --output fix.sh --result-id "" /tmp/scan-xccdf-results.xml
 
 
 ansible-galaxy collection install community.general

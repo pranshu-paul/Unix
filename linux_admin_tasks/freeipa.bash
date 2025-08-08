@@ -19,16 +19,19 @@ dnf -y module install idm:DL1/{server,dns}
 
 # IPv6 on loopback is required
 
+# Ensure the umask set to 0022
+umask 022
+
 # Configure the IPA server.
 ipa-server-install \
---hostname srv.paulpranshu.org \
---realm paulpranshu.org \
+--hostname srv06.db.local \
+--realm db.local \
 --ds-password admin@123 \
 --admin-password admin@123 \
 --unattended \
 --setup-dns \
---forwarder 67.207.67.3 \
---forwarder 67.207.67.2 \
+--forwarder 1.1.1.1 \
+--forwarder 1.0.0.1 \
 --no-reverse
 
 # To check the version installed.

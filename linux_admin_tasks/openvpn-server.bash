@@ -5,7 +5,7 @@ timedatectl set-timezone Asia/Kolkata
 subscription-manager register
 
 # Install essential utilities: bash-completion, vim, and firewalld for firewall management.
-dnf -y install bash-completion vim firewalld
+dnf -y install bash-completion vim
 
 # Update the system with minimal security updates.
 dnf -y update-minimal --security
@@ -33,9 +33,12 @@ dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarc
 /usr/bin/crb enable
 
 # Install OpenVPN and Easy-RSA.
-# OpenVPN manages VPN sessions and encrypted traffic (affects **data plane**, **forwarding plane**, and **control plane** for traffic encryption and session management).
-# Easy-RSA is used to generate cryptographic keys and certificates (affects **control plane**, managing secure sessions).
-dnf -y install openvpn easy-rsa
+# Easy-RSA is used to generate cryptographic keys and certificates
+dnf -y install openvpn easy-rsa bc
+
+# Check whether openvpn supports dynamic loading of shared objects.
+# If not, MFA won't work.
+openvpn --version | grep enable_pam_dlopen
 
 # Create a directory for Easy-RSA configuration files.
 mkdir -p /ca
@@ -46,33 +49,27 @@ cp -rv /usr/share/easy-rsa/3/* /ca
 
 # Initialize the Public Key Infrastructure (PKI).
 # This step creates the directory structure needed for managing certificates and keys.
-# Affects the **control plane**, preparing the environment for managing secure communication sessions.
 env -C /ca /ca/easyrsa init-pki
 
 # Build the Certificate Authority (CA), which signs the server and client certificates.
 # The CA is the trusted authority that ensures certificates are valid.
-# Affects the **control plane**, as it manages the identity and trust in secure SSL/TLS sessions.
 # Password: root@678
 env -C /ca /ca/easyrsa build-ca
 
 # Generate a private key and certificate request for the server.
 # The server's private key and certificate are used to authenticate the server to clients.
-# Affects the **control plane**, creating the server's cryptographic identity for secure communication.
 env -C /ca /ca/easyrsa gen-req server nopass
 
 # Sign the server certificate request with the CA.
 # This ensures that the server's identity is validated by the CA, enabling trust between clients and the server.
-# Affects the **control plane**, enabling secure session establishment.
 env -C /ca /ca/easyrsa sign-req server server
 
 # Generate Diffie-Hellman (DH) parameters for secure key exchange.
 # DH ensures that keys exchanged between the server and client are securely negotiated.
-# Affects the **control plane**, enabling secure encryption key exchange.
 env -C /ca /ca/easyrsa gen-dh
 
 # Generate a private key and certificate request for the client.
 # Each client connecting to the VPN requires its own key and certificate for authentication.
-# Affects the **control plane**, ensuring each client has a unique cryptographic identity.
 env -C /ca /ca/easyrsa gen-req <client_cert_name> nopass
 env -C /ca /ca/easyrsa gen-req client nopass
 
@@ -84,94 +81,108 @@ env -C /ca /ca/easyrsa sign-req client client
 
 # Generate a static key for TLS authentication.
 # TLS authentication adds an additional layer of security to prevent unauthorized connections.
-# Affects the **control plane**, as TLS is used to secure session establishment.
 openvpn --genkey secret /etc/openvpn/ta.key
 
 # Copy the necessary certificates and keys to the OpenVPN configuration directory.
 # These files are essential for the server to authenticate itself and encrypt the traffic between clients and the server.
-# Affects both the **data plane** (for secure traffic flow) and the **control plane** (for managing cryptographic identities).
 env -C /ca cp -v pki/ca.crt pki/issued/server.crt pki/private/server.key pki/dh.pem /etc/openvpn
 
+# Create a directory for openpvn 
+mkdir -p /u01/openvpn
+
+# Chnage ownership and set SELinux var_log label.
+chown openvpn:openvpn /u01/openvpn
+semanage fcontext -a -t openvpn_var_log_t '/u01/openvpn'
+restorecon -Rrv openvpn
+
 # Open the OpenVPN server configuration file for editing.
-vim /etc/openvpn/server.conf
+vim /etc/openvpn/server/server.conf
 
 # Example OpenVPN Server Configuration
 
-port 1194                         # OpenVPN listens on port 1194 (affects **data plane** and **forwarding plane**, managing traffic flow).
+port 1194                         # OpenVPN listens on port 1194
 proto udp4                         # Use UDP as the transport protocol (Layer 4, Transport Layer).
-dev tun                            # Use a TUN device (Layer 3, Network Layer) to route IP packets through the VPN (affects **data plane** and **forwarding plane**).
-tls-server                         # Enable TLS to secure connections (Layer 5, Session Layer; affects **control plane** by managing session security).
-ca /etc/openvpn/ca.crt             # Path to the Certificate Authority (CA) certificate (affects **control plane**, managing secure authentication).
-cert /etc/openvpn/server.crt       # Path to the server's signed certificate (affects **control plane**, ensuring the server's identity).
-key /etc/openvpn/server.key        # Path to the server's private key (affects **control plane**, securing data encryption and authentication).
-dh /etc/openvpn/dh.pem             # Path to the Diffie-Hellman parameters (affects **control plane**, securing the key exchange process).
-tls-crypt /etc/openvpn/ta.key      # Path to the TLS key for added security (affects **control plane**, preventing unauthorized session establishment).
-auth SHA256                        # Use SHA256 for HMAC authentication (affects **control plane**, ensuring data integrity).
-tun-mtu 1500                       # Set the MTU size for the TUN interface (Layer 3, Network Layer; affects **data plane**).
-topology subnet                    # Use subnet topology (Layer 3, Network Layer; affects **data plane** by assigning unique IPs to clients).
-server 10.0.7.0 255.255.255.0      # Define the internal VPN network (Layer 3, Network Layer; affects **data plane**).
-keepalive 10 120                   # Ping clients every 10 seconds and disconnect after 120 seconds (Layer 5, Session Layer; affects **control plane** for session management).
-push "redirect-gateway def1"       # Redirect all client traffic through the VPN (Layer 3, Network Layer; affects **data plane** and **forwarding plane**).
-push "dhcp-option DNS 8.8.8.8"     # Push Google DNS to clients (Layer 3, Network Layer; affects **data plane** for DNS queries).
+dev tun                            # Use a TUN device (Layer 3, Network Layer) to route IP packets through the VPN
+tls-server                         # Enable TLS to secure connections (Layer 5, Session Layer;
+ca /etc/openvpn/ca.crt             # Path to the Certificate Authority (CA) certificate
+cert /etc/openvpn/server.crt       # Path to the server's signed certificate
+key /etc/openvpn/server.key        # Path to the server's private key 
+dh /etc/openvpn/dh.pem             # Path to the Diffie-Hellman parameters
+tls-crypt /etc/openvpn/ta.key      # Path to the TLS key for added security
+auth SHA256                        # Use SHA256 for HMAC authentication
+tun-mtu 1500                       # Set the MTU size for the TUN interface (Layer 3, Network Layer)
+topology subnet                    # Use subnet topology (Layer 3, Network Layer)
+server 10.0.7.0 255.255.255.0      # Define the internal VPN network (Layer 3, Network Layer)
+keepalive 10 120                   # Ping clients every 10 seconds and disconnect after 120 seconds (Layer 5, Session Layer)
+push "redirect-gateway def1"       # Redirect all client traffic through the VPN (Layer 3, Network Layer)
+push "dhcp-option DNS 8.8.8.8"     # Push Google DNS to clients (Layer 3, Network Layer)
 push "dhcp-option DNS 8.8.4.4"
 data-ciphers AES-256-GCM:AES-128-GCM
-data-ciphers-fallback AES-256-CBC                 # Use AES-256 encryption (Layer 5, Session Layer; affects **control plane** for data encryption).
-status openvpn-status.log          # Output VPN server status (affects **control plane** for monitoring sessions).
-verb 3                             # Set verbosity level for logging (affects **control plane** for troubleshooting).
+data-ciphers-fallback AES-256-CBC                 # Use AES-256 encryption (Layer 5, Session Layer)
+status /u01/openvpn/openvpn-status.log          # Output VPN server status
+verb 3                             # Set verbosity level for logging
 
 # Enable IP forwarding on the server to allow traffic between VPN clients and the external network.
 # This ensures that traffic can flow between VPN clients and external resources (Layer 3, Network Layer).
 vim /etc/sysctl.conf
-net.ipv4.ip_forward=1              # Enable IPv4 forwarding (Layer 3, Network Layer; affects **forwarding plane** and **data plane**).
-net.ipv6.conf.all.forwarding=1     # Enable IPv6 forwarding (Layer 3, Network Layer; affects **forwarding plane** and **data plane**).
+net.ipv4.ip_forward=1              # Enable IPv4 forwarding (Layer 3, Network Layer)
+net.ipv6.conf.all.forwarding=1     # Enable IPv6 forwarding (Layer 3, Network Layer)
 
 # Apply the IP forwarding settings.
 sysctl --system
 
 # Open the firewall for OpenVPN traffic on port 1194 (UDP).
 # This allows clients to connect to the VPN server on the specified port.
-# Affects **data plane** and **forwarding plane** by allowing VPN traffic.
-firewall-cmd --add-port=49152/udp
+firewall-cmd --add-port=1194/udp
 
 # Enable IP masquerading (NAT) to allow VPN clients to access the internet.
 # IP masquerading allows internal client traffic to be translated to the server's public IP for internet access.
-# Affects **forwarding plane**, **data plane**, and **control plane**, as it routes and manages outgoing traffic.
 firewall-cmd --add-masquerade
 
 # Make firewall rules persistent across reboots.
 firewall-cmd --runtime-to-permanent
 
-vim /etc/systemd/system/openvpn.service
-[Unit]
-Description=OpenVPN Community Server
-After=network.target auditd.service
-
-[Service]
-Type=forking
-ExecStart=/usr/sbin/openvpn /etc/openvpn/server.conf
-ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-
-#####
-systemctl daemon-reload
-
-systemctl enable --now openvpn
+# Enable and start the daemon.
+systemctl enable openvpn@server.service
+systemctl start openvpn-server@server.service
 
 # Start the OpenVPN server using the configuration file.
 # This will begin listening for client connections and route traffic securely through the VPN.
-# Affects **data plane** (for encrypted traffic), **forwarding plane** (for traffic routing), and **control plane** (for session management and authentication).
-nohup openvpn /etc/openvpn/server.conf &
+nohup openvpn /etc/openvpn/server/server.conf &
 
-# Client side
+# Setting up log rotation.
+
+vim /etc/logrotate.d/openvpn
+
+/u01/openvpn/*.log {
+    weekly
+    missingok
+    rotate 4
+    compress
+    delaycompress
+    notifempty
+    create 640 openvpn openvpn
+    sharedscripts
+
+    postrotate
+        systemctl reload openvpn-server@server.service > /dev/null 2>&1 || true
+    endscript
+}
+
+# Test the configuration
+logrotate --force /etc/logrotate.d/openvpn
+
+# Use client side.
+tail -f /var/log/secure
+
+### Client side ###
+vim client.opvn
+
 
 client
 dev tun
 proto udp4
-remote 142.93.215.48 1195
+remote 139.59.87.104 1194
 resolv-retry infinite
 nobind
 persist-key
@@ -185,78 +196,78 @@ tls-client
 
 <ca>
 -----BEGIN CERTIFICATE-----
-MIIDPzCCAiegAwIBAgIUK5pAUFukfFYFeuvbTq49uTsA5T8wDQYJKoZIhvcNAQEL
-BQAwEjEQMA4GA1UEAwwHanVwaXRlcjAeFw0yNDEwMDUwOTM5NDZaFw0zNDEwMDMw
-OTM5NDZaMBIxEDAOBgNVBAMMB2p1cGl0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IB
-DwAwggEKAoIBAQD1iO5kmL24pcfifWKgqxlH6ZVIlBMi2t1WyJ6QisgvawYS5ipz
-W2GkycJB3MqehmTHHYhNhV6e/3PbGplyNn8G/4oPcAKz3SBreeIIKyIjc8Cr/WqM
-4bGdScFuKRUc3UZLPxfopjmVUCxShOWJlZv4UA8bWoGPh6RnTaoQv/IedNUeaA5X
-Jr+tNwVyyMwetJu8EMsrgeftgD5xCxsio0jll6aI0jZJD6Et84WG6dUUggLaZbeZ
-1iM9gG7p4CEA2o/qQbGGgMZxN+baJQBGd1463InO4l4ih53aUQvF+Gh9e0b1h3FM
-yc9xdQWhwWoqFr42/yZIdgLulrAaBa5Nvb7zAgMBAAGjgYwwgYkwDAYDVR0TBAUw
-AwEB/zAdBgNVHQ4EFgQUbgVN74Vv6GLoMWlR1IFXtVcnMqgwTQYDVR0jBEYwRIAU
-bgVN74Vv6GLoMWlR1IFXtVcnMqihFqQUMBIxEDAOBgNVBAMMB2p1cGl0ZXKCFCua
-QFBbpHxWBXrr206uPbk7AOU/MAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOC
-AQEAeyv7R6eJ/kJP7JKbZqY3V8gaU3R1MSEuHl0e+ZFlmLlaFF2Wh/E6bNjvY99w
-/vWQyU+r4kydTjaT4uxHaG1nMybJ2UhCRUlGnRiFBD8nslC5HtpLGGotoDLKrDE1
-+/9WuE3+9oBh3DjrNrHqbjHZsA8KFt2MyHKHbNrOKi8LdTeGWM8P1Z6RKiY6vM8c
-MYhCq5QA6arY+58t5w1QSuxHIKM+yhlqlHalmbPDF3YBD/p5XDpxV7rZfzFZMhY9
-qmFGQ9/+Kkh2o5H1kThDSTKQyvnORd+bkv9e/o7LbsgPKAuXxYBC5r1yG/cFuzJl
-9rfp9pE0qQLA7Q2ZREMrjcII4Q==
+MIIDPzCCAiegAwIBAgIUbvSXSFSeb9MJFutHwKuT6310+dcwDQYJKoZIhvcNAQEL
+BQAwEjEQMA4GA1UEAwwHb3BlbnZwbjAeFw0yNTA3MDgwNzMyMTZaFw0zNTA3MDYw
+NzMyMTZaMBIxEDAOBgNVBAMMB29wZW52cG4wggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCrsMXwr0lNRAjnFJcjd2DHnAK2Xsb2A6oLLxkBBOaoQ1djO8xE
+NZk+bzrnOdGHIWMXzYgZoz8H1f7H2+MsPBVL33gJ4+sgRdZe6qCS4te/+xgv+jGG
+VYlupHOVhmorT0mAHhG9beLYWcH8tGDGYH4nzZIOG3/R6PQRcKHMwyhe0+qV6qWp
+T6Aon9MG7JGVaB2XtjhOM6KXnsvr/pTGIQdSLhnnBgC06MZ2g+atEAo2SvNHDic/
+FAwetK+jA2G/YyFrrZ+sOZh8tdsGL6+8meuo/GthjH/oh3zn+YOfcNsP1hW2iS0x
+EO8dwcStq9xmJLJ2uwlZsvirYGVXBRYknOMrAgMBAAGjgYwwgYkwDAYDVR0TBAUw
+AwEB/zAdBgNVHQ4EFgQUXcFoNzeBVGKtq7ZnA29CiJtNg0MwTQYDVR0jBEYwRIAU
+XcFoNzeBVGKtq7ZnA29CiJtNg0OhFqQUMBIxEDAOBgNVBAMMB29wZW52cG6CFG70
+l0hUnm/TCRbrR8Crk+t9dPnXMAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOC
+AQEAoaMrw8syejg1KkvOSOlca2jnraQ+vVghz/fVaHXgVbAx2793A4AviVmcXV7B
+VPtHkO/WqSuvRBjbTlWuieha1EdgsUjdZGItB0r8qnKr0FpQ/DPhbPqEEfYEVYYE
+EQY41WUNcad5yZw3Q2Bm8aQIxfrwufJ81bwdmay1q8boMw6pyqNdAyeu1Tnjk3vV
+LCaRGmYQB0xx4J1EiEvth6gmkkLJf1bsAcNpV4fOiLyAkdf7LwWLsxNMoJabuX9P
+S3ptGZ7P/1o0jIyz4UdzFPR2vwJLTHr1i0roO6NNG5HzFUrb+rVHWeQbn0aHCj7y
+ZiNd0hFG1VZZ3KoDvzukNjMKPw==
 -----END CERTIFICATE-----
 </ca>
 
 <cert>
 -----BEGIN CERTIFICATE-----
-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
+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
 -----END CERTIFICATE-----
 </cert>
 
 <key>
 -----BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCX/QyRDCyIvE8V
-33NDSv2H1gebO8jp2hvSf2kXt8kUFfcNVZuKLfCDc1ES/Nkfd53l/o4wpy5L/dPq
-xEWbSZi8JAhAofSX4vzctKupchYE7dVZ93CCbAfwmD/ymWHNguYb9FpzHfCjaOSi
-BB4l3iD6dVJCslyOHciRE3BWIiCgsaLQTq0nK7gAyU2P3cqjdyeoqfEucEKnvfGo
-K7e3rWaETe/RdSlOtNRbUxu6xhoau0uB3imJ6P/xGUELl3YE4cjkX03aJkgUsRC/
-CLcZfWqKmKBvUMNfySbj4+TCCs2Z2ui5QuAYBGW9v0ewNU3ia7c0n0nPm5OUuG4o
-Vm+Ik1z7AgMBAAECggEARgOt/EttYHfOvra2tDMhY6e2zU3XGdL9qhRDZ0eke3o6
-2ourIRZUi1ld6a9MnfBObpq7CbKZ4yvEqYtMvWJD17eJjayNrkJEVa9svJvvhMnC
-1LTlwU7ewXiBTNJXeYJpWktQN2N9bOlvGStob+1Jp9bP1CWx+U3DDQG1aBhEi4FT
-Og1PR2OFQJ2FYGizEf/picxGZeEj6m9yZrP5DVlJw27Cqx0lMbU55aFiT8dZ/RNQ
-kFqZ+ixCvkpCB2NR57tz4jHevxq92ndz2J1iyaClVa5S5F5cb8q8damgZyNaWVfT
-awf/rTYgIuw6PCaPI3y3lrQe3kiijjHvrBGmxzmzAQKBgQDLj20gwVSm8gvwiUOT
-bBSzAWHT2Zo1VbYeMXgVdYfwePyzxCxsXfsJ4fDb4dafhhMolutcjmk9J0b96ZKO
-qWGyF/9JyGthLoPDUjlQF2aX4YmPinJLnKQ8XrR6+29hsQD2qMvy3i++EUBuH5W9
-HdJnfA36P/ePQ0BgGGz9zhWgOwKBgQC/JIVHXiJCL/kpa1tRdp4Jl5Q531z/o04D
-Z/6uPMRx2WKD5HKkSpKEQWyhA5uZritexRGLh7MBBjAUAZCNYS/osGlNNM5hSKpO
-dX/0DLo3mV/a486R9omrPevy3jMTV6lifzalI4frfCiV05JcOlB2V5SAtKIPN0vx
-7Txm2aQqQQKBgEvMuMI9u5v+/dswAe3fjUWq+ha9LOM3a32KxkCXZ2twYgk+v5wK
-0vQ3Ik1+p0D32CKBMFti3GVdPt5GH8Dn6e07amC7NOEXRRFyiMz+KcHcxjChSTZG
-uhGQ4nv5LNyf4M/4wxlJC1YnbmqTcFrfw/2tADdzomfCjzI5ZjyMhRkJAoGAQjY2
-bOhw2ZigqPZlZay/RfdaA0oafvtk1M07bcPjEMUK2UFTbRHf+yxmosgLKIsqvuNp
-FnplSZ+JHAUGu9LEs8gYUgRO0WhIhnExZ6rY/tWEXOC499r9CXKjvze1XafqJxKG
-LWJHfQ0/SddGReh1YuknqgXodXjkN+PEHqSZt4ECgYEAwvcTUKPiRGw5MNZcaqSi
-hBTCGwa8Ix0/zNnh6n9OPOUvMfvZ4+yQGp+oT/DW6DuDGnzmMVvX7LRVfPJUOQYQ
-ZEljFLnICTZiO3Yjc2kniJOMD6gKKT0naVpJE5U0CiQFiH1OwNBk2z9PnY8RC58+
-093z6lpLv7CGLKyA4pLfuqg=
+MIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCG+OBQ/Ina699g
++4FfkV8rJC5ktNV9gNDqdeLxapL1KeIRK6uJiDSd1VPtxO+fhWAdMo+6eMlBAOLQ
+Yl68Ell6VVQQvV+ukCArLbY2Zf9748Lb9o6AaxG8OX7TyeTe4rHjQbyZoQb34ht5
+OZF6KH6mFgAutQKDsokhVEBnxn1elzrcQguEERnOQU0JbNQHHehD+01rTMBCz8qe
+P0HQbC5K4xYl5IVefUlBrts7OneziBIb5FVeeEcVm3oLf8jcRiPjhC/ZN3XoIeHw
+hyv5L1E8VZDfSck9c8Otl1K3w7J/CwDPORGkW68vl/1+fK1Pqw4cco3q/p3enkDb
+zHD8aBfzAgMBAAECgf8kgRLU1ISlEpQCaer1Ku5hmBIxEiU9zFw6q9hTvAVYYbJh
+O58pSic6DvJCmWJmbTJUmt5EnOBLd3f5FOsEO9nfC34SjwzwQdn3in3V73cRYCbZ
+oB6hR3iQrLMOS6TX4EdIhOB9b4mv4syv/LErG+EMqOagrxcjk4dquS3vFAkdc2Tf
+MxOQlVf0Sd/CuH8Bjm+rbfLoAyl95wCtJiPPT2MQw4HQG91EMJTl2Kxj7MhJFOom
+vUqaYn0eHcHjGl73Re2noBzsmkSnLu/wYl95c5aTG0oheEwXverylPe7hKoXT6y4
+X9FzOW56embc5teyU718Ch8Itd309fk8SYmLXmECgYEAuWmS1iakDKwM1HNSoYer
+e68Gxu5Wft4tEtOILdbTCVSJQZwQgKYBzIubQKsWhRmTM9uw8LMcIX/uxxIXdbYo
+q/2R7r7Q1oX+1COkkH7EyHqttnfQI1avZauOpCEF4eURTQV9flg5QLKNR8k6vm3K
+jtXfUvqIr226m4NV9QKu7nsCgYEAultcpgnR7IKkBwSV5xhuJdkPpDv2AKxojHPh
+1lQEWGS3JBncm0c/e4HJew1mY+oKfRTCTnODEfHPJFks6qm4RO3vPU9kU5wnYr1v
+XPgSch+SK7/eiTwwyPjKqvYiHQzcSPnLMP9jfEOgR9B7XQAPpw8Maa1MN66e4phK
+bXTJ/ukCgYAWjcUSz7h84iDdZvnSNFKjxPKqGCvlWtlYxOp3yP360JGxrW5Ed+0Y
+GJNWFnmyzx2c3Uh0vxTY7lr5VDYOV44y/bFWvVdiAQKyg3NtMD53tJSU8ZYb9lt3
+nprHVE0G4XptSBGv4MN2H0IYTV4b8/cD0PhNe7RMwqhEaoF2QFFPKQKBgQCovEir
+XoDhMXjrkc9ZK9mwE1YCUvhvq6wOYG6/7drxXmAlI/WH838biWyxKnTnSuasUruM
+5TJscRIpy0TMRVg/sWDJlrU0r1NKKFRJTaUGCGgFjPkmMYXKstpu6eYBf7+FpAfD
+GbsurNzXqYHJt2B01z9aADvevxHGAjaB3Rl44QKBgCHruaiOBrK6DtercnyJ1uNg
+P/AMvFoMmkU1HOGOttWkyschI5eL2Br3gKzFzQZ1EqJxND0anbjmp3B7oT1OnSeM
+MCodV9NSdT7fcBu52wZYSRCAs3kh1P5ncjsDMBk3qzw7S5GV64WI0+hQbz3KjDAn
+BwMTednTrJBbM0qT51pa
 -----END PRIVATE KEY-----
 </key>
 
@@ -265,22 +276,22 @@ ZEljFLnICTZiO3Yjc2kniJOMD6gKKT0naVpJE5U0CiQFiH1OwNBk2z9PnY8RC58+
 # 2048 bit OpenVPN static key
 #
 -----BEGIN OpenVPN Static key V1-----
-3b3f2fcc76e4f132b3d94d31727848d4
-2a3069959b4121dc20b324bf034d7759
-e8d319ff4fe5fb53957851b1f7db801b
-6d99180a83d737863ef24ab77142ef95
-a7f025ed5816ecc91cff673dcb7f565b
-a46b451e1bf8f1d7bb9621765a95a6f5
-fd8e7bc5643ceae1031d524dd7ebdb84
-d9f4859a04fe56a67be96e40850a6c90
-9c26c8077a4fbc23f7d99b38ac2cf9f1
-c828964286f92ccbe1e73691dedb723e
-8ad29ba26584c48453b0ea434f5c8fb3
-4787a7bd64aecaad465356eb102fa7b8
-a4ba53456ed633eb8c6afdccccd8f2bb
-dbc4e5455cbade9e771248c654a1de94
-bb2bf4e495a06fd94badb252d367521e
-afa0f7a77adc827b8842c6050ba46585
+ee53022e7a26fda037e46f06080ba02d
+ebf34ab65ed62249e8c544df3dcf269a
+97b5b3b9654b1cb2788b03a742f24d94
+726497beb341de214ce04331778abb79
+32fb265a69138aabbc4fad73b3f90a56
+81f14653133adc966efce17096971a26
+49d2dbaa4f07866722451843b2faacf8
+19f9a79e3f15bd8eb193789d1687f90b
+7832394c1e085d1e1f3b76488e20e8db
+4725fdd9e7298ce4df9408e75884b64e
+fb825113f5fbe8cee337bc0b2af5e813
+786548aa96b819ee52ec06da28f34f8e
+097a454c151adaba65b8db6b974220d4
+a89ff00e91182df148e18d0ea6cc7786
+7e4f38646f4510211a4428be98fe3b33
+81c8f70790eb1150d6f601d85b28a8be
 -----END OpenVPN Static key V1-----
 </tls-crypt>
 

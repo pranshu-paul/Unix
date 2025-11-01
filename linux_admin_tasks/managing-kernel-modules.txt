@@ -1,0 +1,88 @@
+MANAGING KERNEL MODULES
+***********************
+root permissions reuired.
+kmod should be installed.
+/lib/modules/$(uname -r)/kernel/ -- This directory has all kernel modules.
+Do not append .ko.xz extension anywhere.
+
+lsmod -- To list kernel modules.
+cat /proc/modules -- To list kernel modules more verbose output.
+modinfo MODULE_NAME -- To check a module's info.
+modprobe MODULE_NAME -- To load kernel module.
+lsmod | grep MODULE_NAME -- To verify whether module is loaded or not.
+modprobe -r MODULE_NAME -- To unload a kernele module.
+echo MODULE_NAME > /etc/modules-load.d/MODULE_NAME.conf -- To load kernel modules at the type of boot.
+
+vim /etc/modprobe.d/blacklist.conf -- Create this file to blacklist modules prevent from loading while booting.
+# Blacklists <KERNEL_MODULE_1>		-- Sample configuration file.
+blacklist <MODULE_NAME_1>
+install <MODULE_NAME_1> /bin/false
+
+cp /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).bak.$(date +%m-%d-%H%M%S).img -- To create backup of current initramfs.
+
+dracut -f -v -- To generate a new initramfs.
+systemctl reboot -- After generating initramfs.
+
+dracut -f -v /boot/initramfs-<TARGET_VERSION>.img <CORRESPONDING_TARGET_KERNEL_VERSION> -- To create image for specific kernel.
+
+
+
+
+
+
+
+#########################################################################################################
+Signing kernel modules with secure boot on.
+Packages required -- openssl, kernel-devel, perl, mokutil, keyutils
+
+keyctl list %:.system_keyring -- To check secure boot is enabled or not. 3 keys for unsecure boot, 6 keys for secure boot.
+
+# Configuration file for key generation.
+cat << EOF > configuration_file.config
+[ req ]
+default_bits = 4096
+distinguished_name = req_distinguished_name
+prompt = no
+string_mask = utf8only
+x509_extensions = myexts
+[ req_distinguished_name ]
+O = Organization
+CN = Organization signing key
+emailAddress = E-mail address
+[ myexts ]
+basicConstraints=critical,CA:FALSE
+keyUsage=digitalSignature
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid
+EOF
+
+# Key generation.
+openssl req -x509 -new -nodes -utf8 -sha256 -days 36500 \
+-batch -config configuration_file.config -outform DER \
+-out my_signing_key_pub.der \
+-keyout my_signing_key.priv
+
+# Request public key for MOK list.
+mokutil --import my_signing_key_pub.der
+
+# Sign kernel module with private key.
+perl /usr/src/kernels/$(uname -r)/scripts/sign-file \
+sha256 \
+my_signing_key.priv\
+my_signing_key_pub.der\
+my_module.ko
+
+# verify kernel keys.
+keyctl list %:.system_keyring
+
+# To copy module to extras.
+cp my_module.ko /lib/modules/$(uname -r)/extra/
+
+# update modular dependency list.
+depmod -a
+
+# verify module.
+lsmod | grep my_module
+
+# Mke module persistant.
+echo "my_module" > /etc/modules-load.d/my_module.conf

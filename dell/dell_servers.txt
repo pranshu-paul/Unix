@@ -1,0 +1,5 @@
+SEVER DELL POWEREDGE R540 INTEL XEON SILVER 4208 2.1G 8C/16T (Application Server)
+PowerEdge 540 MLK Motherboard, V2, 9.6GT/s, 11M Cache, Turbo, HT (85W), 2 CPU, DDR4-2400, 32GBX4 RAM, HDD 960GBX4 SSD, RAID 5, 3 Years Pro-Support & 4 Hrs Mission Critical, RHEL 3 Yrs Premium Subscription
+
+SEVER DELL POWEREDGE R540 INTEL XEON GOLD 5222 3.8G 4C/8T (Database Server)
+PowerEdge 540 MLK Motherboard, V2, 4x32GB (16 Slots), 6x960GB SATA SSD with 3.5" 8xLFF ,2x1Gbe LOM, RAID 0,1,5 (H730+2GB), 2xRPS Standard Inbuilt 750W,iDRAC9 Enterprise + 4 Port addon Lan card / 3 Years Pro-Support & 4 Hrs Mission Critical, RHEL 3 Yrs Premium Subscription

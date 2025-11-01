@@ -1,0 +1,30 @@
+Dec  Hex  Char                        Dec  Hex  Char                        Dec  Hex  Char
+---  ---  ----                       ---  ---  ----                       ---  ---  ----
+  0  00   NUL (null character)        32  20   SPACE                       64  40   @
+  1  01   SOH (start of heading)      33  21   !                           65  41   A
+  2  02   STX (start of text)         34  22   "                           66  42   B
+  3  03   ETX (end of text)           35  23   #                           67  43   C
+  4  04   EOT (end of transmission)   36  24   $                           68  44   D
+  5  05   ENQ (enquiry)               37  25   %                           69  45   E
+  6  06   ACK (acknowledge)           38  26   &                           70  46   F
+  7  07   BEL (bell)                  39  27   '                           71  47   G
+  8  08   BS  (backspace)             40  28   (                           72  48   H
+  9  09   TAB (horizontal tab)        41  29   )                           73  49   I
+ 10  0A   LF  (line feed)             42  2A   *                           74  4A   J
+ 11  0B   VT  (vertical tab)          43  2B   +                           75  4B   K
+ 12  0C   FF  (form feed)             44  2C   ,                           76  4C   L
+ 13  0D   CR  (carriage return)       45  2D   -                           77  4D   M
+ 14  0E   SO  (shift out)             46  2E   .                           78  4E   N
+ 15  0F   SI  (shift in)              47  2F   /                           79  4F   O
+ 16  10   DLE (data link escape)      48  30   0                           80  50   P
+ 17  11   DC1 (device control 1)      49  31   1                           81  51   Q
+ 18  12   DC2 (device control 2)      50  32   2                           82  52   R
+ 19  13   DC3 (device control 3)      51  33   3                           83  53   S
+ 20  14   DC4 (device control 4)      52  34   4                           84  54   T
+ 21  15   NAK (negative acknowledge)  53  35   5                           85  55   U
+ 22  16   SYN (synchronous idle)      54  36   6                           86  56   V
+ 23  17   ETB (end of transmission blk 55  37   7                           87  57   W
+ 24  18   CAN (cancel)                56  38   8                           88  58   X
+ 25  19   EM  (end of medium)         57  39   9                           89  59   Y
+ 26  1A   SUB (substitute)            58  3A   :                           90  5A   Z
+ 27  1B   ESC (

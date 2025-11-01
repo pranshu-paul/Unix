@@ -1,0 +1,23 @@
+To access a Dell Optiplex with Intel vPro Remotely
+
+Press F2
+Set BIOS Admin password
+Reboot the system
+Enter the Admin password: Target13
+Press Ctrl-P to enter the Intel Management Engine BIOS Extension
+Enter in the General Settings enter the default password which admin
+Set a new password which should be eight characters long with a numeric and special character: Mysql#459
+Ensure the Serial Over LAN is enabled
+Set Unconfigure Network access: Full Unprovision
+Activate Network Acess
+Set a host name: Network Setup; Network Name Settings; HostName: MyOptiplex
+User Consent: User Opt in: ALL
+User Consent: Opt in Configuraable from Remote IT: Enabled
+
+Log in to the Intel Standard Manageability. Default Port: 16992 for http
+http://192.168.1.13:16992
+https://192.168.1.13:16993
+This link can be used to send wake on LAN signals
+Enter the default user: admin, password: Mysql#459
+
+systemctl enable getty@ttyS0 

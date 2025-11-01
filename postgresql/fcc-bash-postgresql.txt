@@ -1,0 +1,268 @@
+FREECODECAMP BASH SCRIPTING AND SQL COURSE WITH POTGRESQL PART 1
+
+echo hello SQL
+
+psql --username=freecodecamp --dbname=postgres
+\l -- To list databases.
+
+\q -- To quit.
+
+CREATE DATABASE students; -- This will creates a new database.
+
+\l -- To check whether the database is created or not.
+
+\c students -- To connect to students database.
+
+CREATE TABLE students(); -- To create a new table.
+
+CREATE TABLE majors();
+
+CREATE TABLE courses();
+
+CREATE TABLE majors_courses();
+
+\d -- Shortcut to display tables.
+
+
+ALTER TABLE <table> ADD COLUMN <col_name> <type> <constraint>;
+
+
+ALTER TABLE students ADD COLUMN student_id SERIAL PRIMARY KEY;
+
+ALTER TABLE students ADD COLUMN first_name VARCHAR(50) NOT NULL;
+
+ALTER TABLE students ADD COLUMN last_name VARCHAR(50) NOT NULL;
+
+ALTER TABLE students ADD COLUMN major_id INT;
+
+ALTER TABLE students ADD COLUMN gpa NUMERIC(2,1);
+
+\d <table_name>
+\d students
+
+
+
+ALTER TABLE majors ADD COLUMN major_id SERIAL PRIMARY KEY;
+
+ALTER TABLE majors ADD COLUMN major VARCHAR(50) NOT NULL;
+
+
+ALTER TABLE students ADD FOREIGN KEY(major_id) REFERENCES majors(major_id); -- This adds foreign key to table students from table majors.
+
+
+ALTER TABLE courses ADD COLUMN course_id SERIAL PRIMARY KEY;
+
+ALTER TABLE courses ADD COLUMN course VARCHAR(100) NOT NULL;
+
+
+ALTER TABLE majors_courses ADD COLUMN major_id INT;
+
+ALTER TABLE majors_courses ADD FOREIGN KEY(major_id) REFERENCES majors(major_id);
+
+ALTER TABLE majors_courses ADD COLUMN course_id INT;
+
+ALTER TABLE majors_courses ADD FOREIGN KEY(course_id) REFERENCES courses(course_id);
+
+ALTER TABLE majors_courses ADD CONSTRAINT majors_courses_pkey PRIMARY KEY (major_id, course_id); -- Adding composite primary to two columns to avoid duplicate values;
+
+
+INSERT INTO <table>(<column>) VALUES ('<values>');
+INSERT INTO majors(major) VALUES ('Database Administration');
+
+
+SELECT * FROM majors;
+
+INSERT INTO courses(course) VALUES('Data Structures and Algorithms');
+
+SELECT * FROM courses;
+
+
+INSERT INTO majors_courses(major_id, course_id) VALUES(1, 1);
+
+INSERT INTO <table_name>(<column_1_name>, <column_N_name>) VALUES(<value_1>, <value_N>);
+
+INSERT INTO students(first_name, last_name, major_id, gpa) VALUES('Rhea', 'Kellems', 1, 2.5);
+
+
+touch insert_data.sh
+
+#!/bin/bash
+
+# Script to insert data from courses.csv and students.csv into students database
+
+PSQL="psql -X --username=freecodecamp --dbname=students --no-align --tuples-only -c"
+echo $($PSQL "TRUNCATE students, majors, courses, majors_courses")
+
+cat courses.csv | while IFS="," read MAJOR COURSE
+do
+  if [[ $MAJOR != "major" ]]
+  then
+    # get major_id
+    MAJOR_ID=$($PSQL "SELECT major_id FROM majors WHERE major='$MAJOR'")
+
+    # if not found
+    if [[ -z $MAJOR_ID ]]
+    then
+      # insert major
+      INSERT_MAJOR_RESULT=$($PSQL "INSERT INTO majors(major) VALUES('$MAJOR')")
+      if [[ $INSERT_MAJOR_RESULT == "INSERT 0 1" ]]
+      then
+        echo Inserted into majors, $MAJOR
+      fi
+
+      # get new major_id
+      MAJOR_ID=$($PSQL "SELECT major_id FROM majors WHERE major='$MAJOR'")
+    fi
+
+    # get course_id
+    COURSE_ID=$($PSQL "SELECT course_id FROM courses WHERE course='$COURSE'")
+
+    # if not found
+    if [[ -z $COURSE_ID ]]
+    then
+      # insert course
+      INSERT_COURSE_RESULT=$($PSQL "INSERT INTO courses(course) VALUES('$COURSE')")
+      if [[ $INSERT_COURSE_RESULT == "INSERT 0 1" ]]
+      then
+        echo Inserted into courses, $COURSE
+      fi
+
+      # get new course_id
+      COURSE_ID=$($PSQL "SELECT course_id FROM courses WHERE course='$COURSE'")
+    fi
+
+    # insert into majors_courses
+    INSERT_MAJORS_COURSES_RESULT=$($PSQL "INSERT INTO majors_courses(major_id, course_id) VALUES($MAJOR_ID, $COURSE_ID)")
+    if [[ $INSERT_MAJORS_COURSES_RESULT == "INSERT 0 1" ]]
+    then
+      echo Inserted into majors_courses, $MAJOR : $COURSE
+    fi
+  fi
+done
+
+cat students.csv | while IFS="," read FIRST LAST MAJOR GPA
+do
+  if [[ $FIRST != "first_name" ]]
+  then
+    # get major_id
+    MAJOR_ID=$($PSQL "SELECT major_id FROM majors WHERE major='$MAJOR'") 
+
+    # if not found
+    if [[ -z $MAJOR_ID ]]
+    then
+      # set to null
+      MAJOR_ID=null
+    fi   
+
+
+    # insert student
+    INSERT_STUDENT_RESULT=$($PSQL "INSERT INTO students(first_name, last_name, major_id, gpa) VALUES('$FIRST', '$LAST', $MAJOR_ID, $GPA)")
+    if [[ $INSERT_STUDENT_RESULT == "INSERT 0 1" ]]
+    then
+            echo "Inserted into students, $FIRST $LAST"
+    fi
+  fi
+done
+
+declare -p IFS
+
+cp courses.csv courses_test.csv
+
+TRUNCATE majors;
+
+ERROR:  cannot truncate a table referenced in a foreign key constraint
+
+TRUNCATE majors, students, majors_courses;
+
+SELECT * FROM majors;
+
+TRUNCATE courses, majors_courses;
+
+TRUNCATE majors, students, majors_courses;
+
+
+Backingup the database:
+pg_dump -- Creates a dump of the database.
+
+--clean                  clean (drop) database objects before recreating
+--create                 include commands to create database in dump
+--inserts                dump data as INSERT commands, rather than COPY
+
+pg_dump --clean --create --inserts --username=<username> <database> > <database>.sql
+
+pg_dump --clean --create --inserts --username=freecodecamp students > students.sql
+pg_dump --clean --create --inserts --username=freecodecamp mario_database > mario_database.sql
+
+
+FREECODECAMP BASH SCRIPTING AND SQL COURSE WITH POTGRESQL PART 2
+
+Restoring the database created earlier
+psql -U postgres < students.sql
+
+vim student_info.sh
+
+Where clause examples:
+WHERE gpa < 2.5;
+WHERE gpa < 2.5;
+WHERE gpa != 4.0;
+WHERE major > 'Game Design';
+WHERE major < 'G';
+WHERE last_name < 'M' OR gpa =3.9;
+WHERE last_name < 'M' AND (gpa =3.9 OR gpa < 2.3);
+WHERE course LIKE '_lgorithms';
+WHERE course LIKE '_lgorithms';
+WHERE course LIKE '_e%';
+WHERE course LIKE '% %';
+WHERE course NOT LIKE '% %';
+WHERE course ILIKE '%A%'; -- ignores case
+WHERE course NOT ILIKE '%A%';
+WHERE course NOT ILIKE '%A%' AND course LIKE '% %';
+WHERE gpa IS NULL;
+WHERE major_id IS NULL AND gpa IS NOT NULL;
+
+Order By clause:
+ORDER BY gpa DESC;
+ORDER BY gpa DESC, first_name LIMIT 10;
+
+SELECT course FROM courses WHERE course LIKE '_e%' OR course LIKE '%s' ORDER BY course DESC LIMIT 5;
+
+Functions:
+SELECT MIN(gpa) FROM students;
+SELECT MAX(gpa) FROM students;
+SELECT SUM(major_id) FROM students;
+SELECT AVG(major_id) FROM students;
+
+SELECT CEIL(AVG(major_id)) FROM students;
+SELECT ROUND(AVG(major_id)) FROM students;
+SELECT ROUND(AVG(major_id), 5) FROM students;
+SELECT COUNT(*) FROM majors;
+
+SELECT major_id FROM students GROUP BY major_id;
+SELECT major_id, COUNT(*) FROM students GROUP BY major_id;
+SELECT major_id, MIN(gpa), MAX(gpa) FROM students GROUP BY major_id;
+SELECT major_id, MIN(gpa), MAX(gpa) FROM students GROUP BY major_id HAVING MAX(gpa) = 4.0;
+SELECT major_id, MIN(gpa), MAX(gpa) FROM students GROUP BY major_id HAVING MAX(gpa) = 4.0;
+
+SELECT major_id, COUNT(*) AS number_of_students FROM students GROUP BY major_id HAVING COUNT(*) < 8;
+
+
+Joins:
+Full Join:
+SELECT * FROM <table_1> FULL JOIN <table_2> ON <table_1>.<foreign_key_column> = <table_2>.<foreign_key_column>;
+SELECT * FROM students FULL JOIN majors ON students.major_id = majors.major_id;
+select s.major_id from students as s full join majors as m on s.major_id = m.major_id;
+select * from students full join majors using (major_id);
+select * from students full join majors using(major_id) full join majors_courses using(major_id);
+select * from students full join majors using(major_id) full join majors_courses using(major_id) full join courses using(course_id);
+
+Left Join:
+SELECT * FROM students LEFT JOIN majors ON students.major_id = majors.major_id;
+select * from students right join majors on students.major_id = majors.major_id where student_id is null;
+
+
+Right Join:
+select * from students right join majors on students.major_id = majors.major_id where student_id is null;
+
+Inner Join:
+SELECT * FROM majors INNER JOIN students ON majors.major_id = students.major_id;
+select course from students inner join majors_courses using(major_id) inner join courses using(course_id) group by course having count(*) = 1 order by course;

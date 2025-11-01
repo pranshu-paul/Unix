@@ -1,0 +1,72 @@
+# Creating a backup of a table.
+create table test_tb as select host, user, account_locked from user;
+
+mysqldump -u root -p --information_schema > information_schema.sql
+
+# Backs-up the database.
+mysqldump -u root -p testrst > test.sql
+
+# Restores the database.
+mysql -u root –p testrst < test.sql
+
+# Switches the database.
+use <database_name>;
+
+# To check which constraints are applied on a table's columns
+show create table <table_name>;
+
+# Lists tables.
+show tables;
+
+# Performing mathmatical operations on MySQL.
+select 9/2, now();
+
+# Granting basic grants to a user.
+grant create, alter, drop, insert, update, delete, select, references, reload on *.* to 'pranshu'@'localhost' with grant option;
+grant connect on *.* to 'paul'@'localhost' with grant option;
+
+
+# To list the granted grants of a user.
+show grants for 'pranshu'@'144.24.110.48';
+
+# To grant privilege of specific table of a specific database.
+grant all on database_name.* to 'pranshu'@'144.24.110.48';
+
+create user 'pranshu'@'%' identified by 'Mysql@3456';
+grant all privileges on *.* to 'pranshu'@'%' with grant option;
+flush privileges;
+
+
+# download MySQL
+wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.33-1.el8.x86_64.rpm-bundle.tar
+
+mkdir mysql
+
+tar -xvf <MySQL>.tar -C mysql
+
+rpm -ivh *.rpm --nodeps --force (In case errors occur during the installation)
+
+systemctl enable --now mysqld
+
+grep password /var/log/mysqld.log
+
+mysql -u root -p
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mysql@123'; # This will be the root user's password.
+FLUSH PRIVILEGES;
+
+
+
+# Mysql general commands.
+show databases;
+
+use <database_name>;
+
+show tables;
+
+
+
+# To restore the hr.sql
+# When restoring from actual backup
+create database hr;
+mysql -u root –p hr < hr.sql

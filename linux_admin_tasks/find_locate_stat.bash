@@ -118,3 +118,6 @@ rm start_date end_date
 find <path> -name reports.log -size +1610612736c -type f -ls
 
 find <path> -name reports.log -size +1610612736c -type f -ls -exec sh -c 'echo -n "" > "{}"' \;
+
+# To send the output of the find command to the du command as standard input.
+find . -type f -newermt 2023-01-01 ! -newermt 2024-01-01 -print0 | du --files0-from=- -ch | tail -1

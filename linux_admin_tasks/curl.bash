@@ -64,3 +64,6 @@ curl -L -G \
 --data-urlencode "user=794c66651ad3cfa1ea8521b0fe4e86cc" \
 --data-urlencode "_auth_=1720297465_56ff033d26e52376fea259daffd24d87" \
 https://access.cdn.redhat.com/content/origin/files/sha256/39/398561d7b66f1a4bf23664f4aa8f2cfbb3641aa2f01a320068e86bd1fc0e9076/rhel-9.4-x86_64-dvd.iso
+
+# To download a website completely.
+wget --mirror --convert-links --adjust-extension --page-requisites --no-parent https://unijokes.com/

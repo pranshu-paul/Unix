@@ -23,6 +23,20 @@ spec:
       storage: 2Gi
 EOF
 
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-replica-pvc
+  namespace: mysql-lab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+EOF
+
 kubectl get pvc -n mysql-lab
 
 kubectl apply -f - <<EOF

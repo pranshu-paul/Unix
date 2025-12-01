@@ -120,4 +120,10 @@ find <path> -name reports.log -size +1610612736c -type f -ls
 find <path> -name reports.log -size +1610612736c -type f -ls -exec sh -c 'echo -n "" > "{}"' \;
 
 # To send the output of the find command to the du command as standard input.
-find . -type f -newermt 2023-01-01 ! -newermt 2024-01-01 -print0 | du --files0-from=- -ch | tail -1
+find . -type f -newermt 2025-11-16 ! -newermt 2025-11-23 -print0 | du --files0-from=- -ch | tail -1
+
+# To copy files of a certain date range to another server using rsync.
+find . -type f -newermt 2025-11-16 ! -newermt 2025-11-26 -print0 | rsync -acv --files-from=- --from0 . pranshu@172.19.8.192:/data01/npksmpp02
+
+# To perform checksum on each file within a certain date range.
+find . -type f -newermt 2025-11-16 ! -newermt 2025-11-26 -print0 | xargs -0 md5sum

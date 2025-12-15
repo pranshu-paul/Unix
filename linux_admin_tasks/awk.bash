@@ -107,3 +107,6 @@ free -b | awk '/Mem:|cache:/ {print $2,$3}' | sed 'N;s/\n/ /' | awk '{if($4!="")
 vmstat 1 3 | awk '{for (i=0;i<=NF;i++) if ($i == "id") cmd=i;} {print 100-$cmd}' | tail -1
 
 awk -F 'ansible_host=' '{gsub(/ /,"",$1); print $1 ".example.com", $2}' nexghosts | column -t
+
+# To swap two columns
+awk '{print $2, $1}' nexghosts | column -t

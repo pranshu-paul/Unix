@@ -110,12 +110,21 @@ cp -v tux.svg  /usr/share/grafana/public/img/grafana_icon.svg
 
 # Adding TLS to grafana.
 cd /etc/grafana
-openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout grafana.key -out grafana.crt -subj "/CN=*.example.local"
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout grafana.key -out grafana.crt -subj "/CN=*.nexgplatforms.com"
 
 # Under the server section in grafana.ini, add the following or uncomment.
 protocol = https
+http_port = 443
 cert_file = /etc/grafana/grafana.crt
 cert_key = /etc/grafana/grafana.key
+
+# For systemd based grafana unit, add capabilities to use the port below <1024
+systemctl edit grafana-server
+[Service]
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+PrivateUsers=false
+
 
 # Change the welcome message.
 # Change welcome to grafana to your company.
@@ -271,7 +280,7 @@ probe_http_duration_seconds
 # For CPU
 # For file system
 # Job is from /etc/prometheus/prometheus.yml
-(((sum by (instance) (node_memory_total_bytes{jobs="linux servers"})) - (sum by (instance) (node_memory_free_bytes{jobs="linux servers"})))) / (sum by (instance) (node_memory_total_bytes{jobs="linux servers"})) * 100
+(((sum by (instance) (node_memory_total_bytes{jobs="nexG servers"})) - (sum by (instance) (node_memory_free_bytes{jobs="linux servers"})))) / (sum by (instance) (node_memory_total_bytes{jobs="linux servers"})) * 100
 
 # For CPU usage use mode != idle
 ((sum by (instance) (node_cpu_seconds_total{jobs="Prod Servers", mode != "idle"})) / (sum by (instance) (node_cpu_total_seconds{jobs="Prod Servers"})) * 100
@@ -425,9 +434,41 @@ ps aux | awk '{if (NR>1) print "cpu_usage{command=\""$11"\", pid=\""$2"\"}"}'
 
 # Configura prometheus YAML file to pull the metric from the pushgateway
 
+# Stressing VM components. Use stress-ng
+# To sustain  a memroy test
+echo -1000 > /proc/$$/oom_score_adj
 
+# Increase swapiness to test the swap usage.
+sysctl vm.swappiness=100
 
+# Stress the memory and swap. Clear the swap after testing swapoff -a && swapon -a
+stress-ng --vm 1 --vm-bytes 150% --vm-keep --timeout 300s
 
+# Stress CPU
+stress --cpu $(nproc) --timeout 3600
+
+# Stress the root file system
+stress --hdd 1 --hdd-bytes 20G --timeout 300
+
+stress-ng --fork 50 --timeout 300s
+
+# Also iperf can be used.
+stress-ng --sock 4 --sock-domain ipv4 --timeout 300s
+
+# File descriptor testing.
+stress-ng --open 4 --open-max 50000 --timeout 300s
+
+stress-ng --epoll 4 --epoll-domain ipv4 --epoll-sockets 20000 --timeout 300s
+
+# Directory entry and inode testing
+stress-ng --dirdeep 1 --dirdeep-dirs 200 --dirdeep 15 --dirdeep-inodes 500000 --timeout 300s
+
+# Syscalls testing
+stress-ng --syscall 4 --timeout 300s
+
+# Combined testing.
+stress-ng --dirdeep 1 --dirdeep-dirs 36 --dirdeep 12 --hdd 1 --hdd-bytes 5G --timeout 300s
+stress-ng --cpu 2 --sock 4 --syscall 2 --timeout 300s
 # Monitoring Cloud #
 
 # Create a user for Grafana (entity)

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OCI Health Report</title>
+<style>
+  body { font-family: monospace; background: #ffffff; color: #24292f; padding: 20px; }
+  h1 { color: #0969da; }
+  h2 { color: #0550ae; border-bottom: 1px solid #d0d7de; padding-bottom: 5px; margin-top: 30px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+  th { background: #f6f8fa; color: #0969da; padding: 8px; text-align: left; }
+  td { padding: 8px; border-bottom: 1px solid #d0d7de; vertical-align: top; }
+  tr:hover { background: #f6f8fa; }
+  code { color: #953800; }
+  .ts { color: #57606a; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<h1>OCI Health Report</h1>
+<p class="ts">Generated: 2026-04-18 13:48:11 IST</p>
+
+<h2>Compute Nodes</h2>
+<table><tr><th>Compartment</th><th>Name</th><th>Running</th></tr><tr><td>root</td><td>node01</td><td style='color:green'>True</td></tr><tr><td>root</td><td>node02</td><td style='color:green'>True</td></tr><tr><td>COMP-DEV-OKE</td><td>oke-chzpxqd6seq-nwnmhhfl64q-s6uvmifpcva-0</td><td style='color:red'>False</td></tr></table>
+
+<h2>SSH Commands</h2>
+<table><tr><th>IP</th><th>Command</th><th>Output</th></tr><tr><td>80.225.216.222</td><td><code>uptime -p</code></td><td><pre style='margin:0;font-family:monospace;font-size:0.85em'>up 1 hour, 43 minutes</pre></td></tr><tr><td>80.225.216.222</td><td><code>df -hT | grep -v tmpfs</code></td><td><pre style="margin:0;white-space:pre;font-family:monospace;font-size:0.85em">Filesystem                 Type      Size  Used Avail Use% Mounted on
+efivarfs                   efivarfs  256K   17K  235K   7% /sys/firmware/efi/efivars
+/dev/mapper/ocivolume-root xfs        30G   11G   20G  35% /
+/dev/mapper/ocivolume-oled xfs        15G  195M   15G   2% /var/oled
+/dev/sda2                  xfs       2.0G  445M  1.6G  23% /boot
+/dev/sda1                  vfat      100M  7.5M   93M   8% /boot/efi
+</pre></td></tr><tr><td>80.225.216.222</td><td><code>free -hw</code></td><td><pre style="margin:0;white-space:pre;font-family:monospace;font-size:0.85em">total        used        free      shared     buffers       cache   available
+Mem:            11Gi       850Mi       7.8Gi       8.0Mi       4.0Mi       2.9Gi        10Gi
+Swap:          4.0Gi          0B       4.0Gi
+</pre></td></tr><tr><td colspan='3' style='border-top:2px solid #0969da;padding:0;height:2px'></td></tr><tr><td>161.118.178.41</td><td><code>uptime -p</code></td><td><pre style='margin:0;font-family:monospace;font-size:0.85em'>up 1 hour, 41 minutes</pre></td></tr><tr><td>161.118.178.41</td><td><code>df -hT | grep -v tmpfs</code></td><td><pre style="margin:0;white-space:pre;font-family:monospace;font-size:0.85em">Filesystem                 Type      Size  Used Avail Use% Mounted on
+efivarfs                   efivarfs  256K   17K  235K   7% /sys/firmware/efi/efivars
+/dev/mapper/ocivolume-root xfs        30G   11G   20G  35% /
+/dev/sda2                  xfs       2.0G  445M  1.6G  23% /boot
+/dev/mapper/ocivolume-oled xfs        15G  184M   15G   2% /var/oled
+/dev/sda1                  vfat      100M  7.5M   93M   8% /boot/efi
+</pre></td></tr><tr><td>161.118.178.41</td><td><code>free -hw</code></td><td><pre style="margin:0;white-space:pre;font-family:monospace;font-size:0.85em">total        used        free      shared     buffers       cache   available
+Mem:            11Gi       836Mi       7.8Gi       8.0Mi       4.0Mi       2.9Gi        10Gi
+Swap:          4.0Gi          0B       4.0Gi
+</pre></td></tr></table>
+
+<h2>Load Balancer Backends</h2>
+<table><tr><th>Compartment</th><th>LB</th><th>Backend Set</th><th>Backend</th><th>OK</th></tr><tr><td>root</td><td>web</td><td>web_bs</td><td>10.0.0.184:80</td><td style='color:green'>True</td></tr><tr><td>root</td><td>web</td><td>web_bs</td><td>10.0.0.4:80</td><td style='color:green'>True</td></tr></table>
+
+<h2>Announcements</h2>
+<table><tr><th>Region</th><th>Type</th><th>Summary</th><th>Period</th></tr><tr><td>ap-mumbai-1</td><td colspan='3'>None</td></tr><tr><td>us-phoenix-1</td><td colspan='3'>None</td></tr><tr><td>ap-singapore-1</td><td colspan='3'>None</td></tr></table>
+
+<h2>Cloud Guard Problems</h2>
+<table><tr><th>Risk</th><th>Resource</th><th>Detector</th><th>State</th></tr><tr><td colspan='4'>None</td></tr></table>
+
+</body>
+</html>

@@ -110,3 +110,15 @@ awk -F 'ansible_host=' '{gsub(/ /,"",$1); print $1 ".example.com", $2}' nexghost
 
 # To swap two columns
 awk '{print $2, $1}' nexghosts | column -t
+
+
+
+ip -o route get 1.1.1.1 | awk '{for (i=1;i<=NF;i++) if ($i=="src") print $(i+1)}'
+
+ip -o route get 1.1.1.1 | sed -n 's/.* src \([^ ]*\).*/\1/p'
+
+ip -j route get 1.1.1.1 | jq -r '.[0].prefsrc'
+
+ip -o route get 1.1.1.1 | awk '/src/ {print $7}'
+
+ip -j route get 1.1.1.1 | python3 -c 'import sys, json; print(json.load(sys.stdin)[0]["prefsrc"])'

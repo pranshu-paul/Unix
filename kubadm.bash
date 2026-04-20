@@ -1,14 +1,21 @@
+
+# Update the cache of the apt repo.
 apt update
 
+# Enable Linux cgroups memory support.
 vi /boot/firmware/cmdline.txt
 group_memory=1 cgroup_enable=memory
 
+# Install k3s
 curl -sfL https://get.k3s.io | sh -
 
+# Confirm Kubernetes node is ready.
 kubectl get nodes
 
+# Create a namespace to separate all the mysql objects from the default namespace
 kubectl create namespace mysql-lab
 
+# Create a persistent volume of size 2GiB for mysql master pod
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,6 +30,7 @@ spec:
       storage: 2Gi
 EOF
 
+# Create a persistent volume of size 2GiB for mysql slave pod
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -37,8 +45,11 @@ spec:
       storage: 2Gi
 EOF
 
+# List all the PVCs in in the namespace mysql-lab
 kubectl get pvc -n mysql-lab
 
+# Deploy the pods with the persistent volumes created in the namespace and expose the port 3306.
+# Replicas should be 1 because two mysqls can't share a persistent volume.
 kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
@@ -72,7 +83,8 @@ spec:
           claimName: mysql-pvc
 EOF
 
-
+# Deploy the pods with the persistent volumes created in the namespace and expose the port 3306.
+# Replicas should be 1 because two mysqls can't share a persistent volume.
 kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
